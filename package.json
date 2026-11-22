@@ -1,0 +1,12 @@
+{
+  "name": "langkatalk",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Portal berita Langkatalk: HTML statis + Supabase + Vercel",
+  "scripts": {
+    "dev": "npx --yes serve . -l 3000",
+    "start": "npx --yes serve . -l 3000"
+  },
+  "engines": { "node": ">=18" },
+  "license": "UNLICENSED"
+}

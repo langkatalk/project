@@ -16,8 +16,12 @@ Tidak ada proses build. Cukup unggah folder ini.
 3. Buka **Authentication > Providers > Email**. Selama uji coba, matikan **Confirm email** supaya pendaftar bisa langsung masuk. Nyalakan lagi saat situs sudah live.
 4. Buka **Project Settings > API**. Salin **Project URL** dan **anon public key**.
 
-## 2. Isi config.js
-Ganti dua nilai di `config.js` dengan URL dan anon key tadi. Jangan pernah memakai `service_role` key.
+## 2. Isi config.js dan vercel.json
+- `config.js`: ganti `SUPABASE_URL` (contoh `https://abcdxyz.supabase.co`) dan `SUPABASE_ANON_KEY`. Pakai kunci dari tab **Legacy anon, service_role API keys** (diawali `eyJ...`). Jangan pernah memakai `service_role`.
+- `vercel.json`: ganti `GANTI_PROJECT_REF` dengan bagian depan URL Supabase-mu (untuk contoh di atas: `abcdxyz`).
+
+### Kenapa ada "jembatan"?
+Sebagian provider internet di Indonesia memblokir `supabase.co`. Karena itu `USE_PROXY: true` membuat situs memanggil `domain-kamu.vercel.app/supabase/...`, lalu Vercel yang meneruskannya ke Supabase. Peramban pengunjung tidak pernah menyentuh supabase.co. Hasilnya aman untuk login karena tetap satu domain.
 
 ## 3. Coba di komputer (opsional, perlu Node.js 18+)
 ```
@@ -49,6 +53,12 @@ Peran lain (redaktur, editor, reporter) diatur direktur lewat menu **Pengguna da
 2. Di https://vercel.com: **Add New > Project**, pilih repositori itu. Framework: **Other**. Biarkan build command kosong. Klik **Deploy**.
 3. Setelah live, buka Supabase **Authentication > URL Configuration**, isi **Site URL** dengan alamat Vercel-mu (misalnya https://langkatalk.vercel.app).
 4. Domain sendiri: Vercel **Settings > Domains**.
+
+## Jika situs menampilkan "Supabase belum disambungkan"
+1. Di GitHub, pastikan `index.html`, `config.js`, `vercel.json`, dan folder `assets` ada di **akar** repositori (bukan di dalam folder lain). Jika semuanya di dalam folder, atur **Settings > General > Root Directory** di Vercel ke folder itu.
+2. Buka `https://domain-kamu.vercel.app/config.js` di peramban. Jika masih tertulis `GANTI_...`, berarti file yang diisi bukan file yang dipakai Vercel, atau belum deploy ulang.
+3. Setiap kali file di GitHub berubah, Vercel otomatis deploy ulang. Cek di tab **Deployments**.
+4. Logo tidak tampil biasanya karena folder `assets` belum terunggah. Unggah lewat GitHub: **Add file > Upload files**, lalu seret folder `assets` (atau unggah `logo.png` dan `favicon.png` dengan awalan `assets/` pada nama folder).
 
 ## Catatan keamanan
 - Keamanan ada di database (RLS dan fungsi `advance_article`), bukan di tampilan. Status naskah tidak bisa diubah di luar alur redaksi walaupun orang membuka konsol peramban.

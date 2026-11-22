@@ -96,7 +96,8 @@ var esc=function(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){r
 var fmt=function(d){return d?new Date(d).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'}):''};
 var fmtT=function(d){return new Date(d).toLocaleString('id-ID',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})};
 var CFG=window.LANGKATALK_CONFIG||{},ready=!!(CFG.SUPABASE_URL&&CFG.SUPABASE_ANON_KEY&&CFG.SUPABASE_URL.indexOf('GANTI')<0&&window.supabase);
-var sb=ready?supabase.createClient(CFG.SUPABASE_URL,CFG.SUPABASE_ANON_KEY):null;
+var API=CFG.USE_PROXY?location.origin+'/supabase':CFG.SUPABASE_URL;
+var sb=ready?supabase.createClient(API,CFG.SUPABASE_ANON_KEY):null;
 var root=$('root'),me=null,view='direktur',page='home',pre=null,cat='',D={arts:[],ideas:[],profs:[]};
 var CATS=['Investigasi','Ruang Gelap','Politik','Panggung','Ekonomi Gelap','Opini'];
 var ROLES={direktur:'Direktur',pemred:'Pemimpin Redaksi',redaktur:'Redaktur',editor:'Editor',reporter:'Reporter',kontributor:'Kontributor'};
@@ -112,7 +113,8 @@ var TR={draf:[{to:'diajukan',l:'Ajukan ke editor',w:['author']}],revisi:[{to:'di
 function toast(t){var e=$('ts');e.textContent=t;e.classList.add('on');clearTimeout(toast.k);toast.k=setTimeout(function(){e.classList.remove('on')},3200)}
 var eff=function(){return me.r==='direktur'?view:me.r};
 var pn=function(id){var p=D.profs.filter(function(x){return x.id===id})[0];return p?p.full_name:'-'};
-function setup(){return'<div class="wrap"><div class="notice"><b>Supabase belum disambungkan.</b><br>Isi <code>SUPABASE_URL</code> dan <code>SUPABASE_ANON_KEY</code> di file <code>config.js</code>, lalu muat ulang halaman. Langkahnya ada di README.md.</div></div>'}
+function setup(){var why=!window.supabase?'Pustaka Supabase gagal dimuat dari CDN (jaringan atau pemblokiran). Coba muat ulang atau ganti jaringan.':(!CFG.SUPABASE_URL||CFG.SUPABASE_URL.indexOf('GANTI')>-1||!CFG.SUPABASE_ANON_KEY||CFG.SUPABASE_ANON_KEY.indexOf('GANTI')>-1)?'File <code>config.js</code> yang tampil di situs ini masih berisi nilai contoh. Pastikan <code>config.js</code> di <b>akar</b> repositori GitHub sudah diisi, lalu deploy ulang di Vercel.':'Konfigurasi tidak terbaca.';
+ return'<div class="wrap"><div class="notice"><b>Supabase belum disambungkan.</b><br>'+why+' Langkahnya ada di README.md.</div></div>'}
 /* ---------- router ---------- */
 function route(){var p=location.hash.replace(/^#\/?/,'').split('/');$('dlg').classList.remove('on');
  if(p[0]==='baca')return showArticle(decodeURIComponent(p[1]||''));if(p[0]==='masuk')return showLogin();if(p[0]==='redaksi')return showNewsroom();showHome()}

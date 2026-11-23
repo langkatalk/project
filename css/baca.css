@@ -1,0 +1,107 @@
+/* css/baca.css
+   Halaman detail berita. Memakai variabel dari base.css
+   dan kelas header, ikon, dan panel dari feed.css. */
+
+.lk-kembali {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--lk-teks);
+}
+
+.lk-baca {
+  display: grid;
+  gap: 14px;
+  max-width: 720px;
+  margin: 14px auto 0;
+  padding: 0 12px 8px;
+}
+
+.bc-kartu {
+  background: #fff;
+  border: 1px solid var(--lk-garis);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(95, 63, 200, 0.07);
+}
+
+.bc-isi { padding: 12px 16px 0; }
+.bc-lencana { display: flex; gap: 6px; margin-bottom: 6px; }
+.bc-judul {
+  font-family: 'Sora', 'Plus Jakarta Sans', sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--lk-teks);
+  margin: 4px 0 8px;
+}
+.bc-meta { margin: 0 0 4px; font-size: 13px; color: var(--lk-muted); }
+.bc-meta b { color: var(--lk-teks); }
+
+.bc-aksi { padding: 4px 8px 0; }
+.bc-jumlah { padding: 0 16px; margin: 4px 0 0; }
+
+.bc-tubuh {
+  padding: 14px 16px 22px;
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--lk-teks);
+}
+.bc-tubuh p { margin: 0 0 16px; }
+.bc-tubuh h1,
+.bc-tubuh h2,
+.bc-tubuh h3 { margin: 22px 0 10px; }
+.bc-tubuh img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: 14px;
+  margin: 14px auto;
+}
+.bc-tubuh figure { margin: 14px 0; }
+.bc-tubuh figcaption {
+  font-size: 13px;
+  color: var(--lk-muted);
+  text-align: center;
+}
+.bc-tubuh blockquote {
+  margin: 16px 0;
+  padding: 10px 14px;
+  border-left: 3px solid var(--lk-ungu);
+  background: var(--lk-lavender);
+  border-radius: 0 12px 12px 0;
+  color: var(--lk-body);
+  font-style: italic;
+}
+.bc-tubuh ul,
+.bc-tubuh ol { padding-left: 22px; margin: 0 0 16px; }
+.bc-tubuh table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  margin: 14px 0;
+  font-size: 14px;
+}
+.bc-tubuh th,
+.bc-tubuh td {
+  border: 1px solid var(--lk-garis);
+  padding: 8px 10px;
+  text-align: left;
+}
+.bc-tubuh iframe {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 0;
+  border-radius: 14px;
+  margin: 14px 0;
+}
+.bc-tubuh a { color: var(--lk-ungu); text-decoration: underline; }
+
+.bc-bagian { padding: 16px; }
+
+@media (min-width: 1024px) {
+  .lk-baca { max-width: 760px; }
+}

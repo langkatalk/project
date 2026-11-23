@@ -155,7 +155,7 @@
       try {
         var sesi = await sb.auth.getSession();
         var user = sesi && sesi.data && sesi.data.session && sesi.data.session.user;
-        if (!user) return;
+                if (!user) { box.innerHTML = '<a class="btn btn-utama btn-kecil" href="redaksi.html">Masuk</a>'; return; }
         var p = await sb.from('profiles').select('username,full_name,avatar_url').eq('id', user.id).maybeSingle();
         var profil = (p && p.data) || {};
         var inisial = ((profil.full_name || profil.username || '?').trim().charAt(0) || '?').toUpperCase();
@@ -166,7 +166,7 @@
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', function(){ setTimeout(gantiHeaderAkun, 300); });
     } else {
-      setTimeout(gantiHeaderAkun, 300);
+            setTimeout(gantiHeaderAkun, 0);
     }
   })();
   </script>

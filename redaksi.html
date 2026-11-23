@@ -19,6 +19,15 @@
     .r-brand h1{font-family:'Sora',sans-serif;font-size:20px;font-weight:800;margin:0}
     .r-brand .sub{font-size:12px;color:var(--mute)}
     .r-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+    .btn-grad-dark{
+      display:inline-flex;align-items:center;justify-content:center;gap:6px;
+      padding:9px 16px;border-radius:999px;border:0;
+      background:linear-gradient(135deg,#1E293B 0%,#0F172A 100%);
+      color:#fff !important;text-decoration:none;
+      font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;
+      cursor:pointer;box-shadow:0 8px 20px rgba(15,23,42,.26);transition:.15s
+    }
+    .btn-grad-dark:hover{transform:translateY(-1px);filter:brightness(1.08)}
     .r-tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
     .r-tab{border:1px solid rgba(255,255,255,.75);background:rgba(255,255,255,.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:var(--ink);padding:8px 14px;border-radius:999px;font-size:13px;font-weight:700;cursor:pointer;transition:.15s}
     .r-tab.on{background:var(--grad);color:#fff;border-color:transparent;box-shadow:0 8px 22px rgba(95,111,238,.28)}
@@ -96,7 +105,7 @@
     const redaksiState = {
       user: null,
       profile: null,
-      authMode: 'login', // 'login' | 'forgot' | 'recovery'
+      authMode: 'login',
       tab: 'artikel',
       articles: [],
       comments: [],
@@ -679,7 +688,7 @@
             <div class="r-actions">
               <a class="pill" href="index.html">Beranda</a>
               <a class="go sm" href="tulis.html">+ Tulis Berita</a>
-              <button type="button" class="pill" onclick="handleRedaksiLogout()">Keluar</button>
+              <button type="button" class="btn-grad-dark" onclick="handleRedaksiLogout()">Keluar</button>
             </div>
           </div>
 

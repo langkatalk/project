@@ -55,7 +55,7 @@
   "rewrites": [
     {
       "source": "/supabase/:path*",
-      "destination": "https://GANTI_PROJECT_REF.supabase.co/:path*"
+      "destination": "https://wzobvwdsnhnuvcbtalpa.supabase.co/:path*"
     }
   ]
 }

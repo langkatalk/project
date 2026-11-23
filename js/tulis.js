@@ -1,24 +1,8 @@
-// Penangkap error: tampilkan pesan kesalahan di layar supaya terlihat
-window.addEventListener('error', function (e) {
-  tampilkanError(e.message || String(e.error));
-});
-window.addEventListener('unhandledrejection', function (e) {
-  var r = e.reason;
-  tampilkanError((r && (r.message || String(r))) || 'Gagal (tidak diketahui)');
-});
-function tampilkanError(teks) {
-  var box = document.getElementById('tErr');
-  if (box) {
-    box.textContent = 'Error: ' + teks;
-    box.hidden = false;
-    box.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
-  var bawah = document.getElementById('tAutosave');
-  if (bawah) bawah.textContent = 'Error: ' + teks;
-}
 // js/tulis.js
-// Halaman Tulis Berita: editor, cover 2:1, simpan draf, ajukan lewat advance_article,
-// simpan lokal tiap 30 detik, dan peringatan jika tab ditutup sebelum tersimpan.
+// Halaman Tulis Berita (versi lengkap).
+// Editor, keterangan gambar wajib, Baca juga, cover 2:1 dengan keterangan,
+// simpan draf, ajukan lewat advance_article, simpan lokal tiap 30 detik,
+// dan notifikasi kaca di bawah layar.
 (function () {
   'use strict';
 
@@ -45,7 +29,8 @@ function tampilkanError(teks) {
     coverUrl: '',
     kotor: false,
     sedang: false,
-    terkunci: false
+    terkunci: false,
+    terbit: []
   };
 
   var simpanRange = null;
@@ -83,21 +68,23 @@ function tampilkanError(teks) {
     return dasar + '-' + Date.now().toString(36);
   }
 
-  function pesanErr(teks) {
-    $('tOk').hidden = true;
-    $('tErr').textContent = teks;
-    $('tErr').hidden = false;
+  /* ---------- Notifikasi kaca (pop-up di bawah layar) ---------- */
+
+  function toast(teks, jenis, lama) {
+    var box = $('tlToast');
+    if (!box) return;
+    box.textContent = teks;
+    box.className = 'tl-toast on ' + (jenis || '');
+    clearTimeout(toast.t);
+    toast.t = setTimeout(function () { box.classList.remove('on'); }, lama || 4500);
   }
 
-  function pesanOk(teks) {
-    $('tErr').hidden = true;
-    $('tOk').textContent = teks;
-    $('tOk').hidden = false;
-  }
+  function pesanErr(teks) { toast(teks, 'err', 6000); }
+  function pesanOk(teks) { toast(teks, 'ok'); }
 
   function bersihkanPesan() {
-    $('tErr').hidden = true;
-    $('tOk').hidden = true;
+    var box = $('tlToast');
+    if (box) box.classList.remove('on');
   }
 
   function setSibuk(on) {
@@ -113,7 +100,7 @@ function tampilkanError(teks) {
     $('tlBawah').hidden = true;
   }
 
-  /* ---------- Sanitasi HTML (dipakai sebelum simpan, preview, dan saat dipulihkan) ---------- */
+  /* ---------- Sanitasi HTML (dipakai sebelum simpan, pratinjau, dan saat dipulihkan) ---------- */
 
   function bersihkan(html) {
     var doc = new DOMParser().parseFromString('<div>' + (html || '') + '</div>', 'text/html');
@@ -233,12 +220,14 @@ function tampilkanError(teks) {
     perintah('createLink', u);
   }
 
+  // Gambar di isi berita wajib punya keterangan
   function aksiGambar() {
     var u = (prompt('Alamat gambar (mulai dengan https://)', 'https://') || '').trim();
     if (!u) return;
     if (!/^https:\/\//i.test(u)) return pesanErr('Alamat gambar harus mulai dengan https://');
-    var keterangan = (prompt('Keterangan gambar (boleh dikosongkan)', '') || '').trim();
-    sisipkan('<figure><img src="' + esc(u) + '" alt="' + esc(keterangan || 'Ilustrasi berita') +
+    var keterangan = (prompt('Keterangan gambar (wajib diisi)', '') || '').trim();
+    if (!keterangan) return pesanErr('Gambar tidak disisipkan: keterangan wajib diisi.');
+    sisipkan('<figure><img src="' + esc(u) + '" alt="' + esc(keterangan) +
       '" loading="lazy" decoding="async"><figcaption>' + esc(keterangan) + '</figcaption></figure><p><br></p>');
   }
 
@@ -274,6 +263,36 @@ function tampilkanError(teks) {
     pembaruan();
   }
 
+  /* ---------- Baca juga ---------- */
+
+  function bukaBacaJuga() {
+    var daftar = $('daftarBacaJuga');
+    if (!st.terbit.length) {
+      daftar.innerHTML = '<p class="tl-info">Belum ada berita terbit untuk ditautkan.</p>';
+    } else {
+      daftar.innerHTML = st.terbit.map(function (a) {
+        return '<button type="button" class="tl-bj-item" data-id="' + esc(a.id) + '">' +
+          (a.cover_url
+            ? '<img src="' + esc(a.cover_url) + '" alt="" loading="lazy">'
+            : '<span class="tl-bj-kosong"></span>') +
+          '<span>' + esc(a.title) + '</span></button>';
+      }).join('');
+    }
+    $('modalBacaJuga').hidden = false;
+  }
+
+  function pilihBacaJuga(id) {
+    var a = st.terbit.find(function (x) { return String(x.id) === String(id); });
+    if (!a) return pesanErr('Berita tidak ditemukan.');
+    $('modalBacaJuga').hidden = true;
+    sisipkan(
+      '<div class="lk-baca-juga"><a href="baca.html?s=' + encodeURIComponent(a.slug || a.id) + '">' +
+        (a.cover_url ? '<img src="' + esc(a.cover_url) + '" alt="" loading="lazy">' : '') +
+        '<div><span class="lk-bj-label">Baca juga</span><span class="lk-bj-judul">' + esc(a.title) + '</span></div>' +
+      '</a></div><p><br></p>'
+    );
+  }
+
   function klikToolbar(e) {
     var b = e.target.closest('button');
     if (!b || b.disabled) return;
@@ -284,6 +303,7 @@ function tampilkanError(teks) {
     switch (b.dataset.aksi) {
       case 'link': return aksiLink();
       case 'gambar': return aksiGambar();
+      case 'bacajuga': return bukaBacaJuga();
       case 'tabel': return sisipkan(TABEL_HTML);
       case 'video': return aksiVideo();
       case 'sumber': return togglSumber();
@@ -336,14 +356,16 @@ function tampilkanError(teks) {
     }).join('');
   }
 
-  async function muatTerkait() {
+  // Daftar berita terbit: dipakai untuk pilihan "Baca juga" dan "Berita terkait"
+  async function muatArtikelTerbit() {
     var r = await sb.from('articles')
-      .select('id,title')
+      .select('id,title,slug,cover_url')
       .eq('status', 'terbit')
       .is('deleted_at', null)
       .order('published_at', { ascending: false })
       .limit(50);
     if (r.error || !r.data) return;
+    st.terbit = r.data;
     $('tRelatedSelect').innerHTML = '<option value="">Pilih berita…</option>' + r.data.map(function (a) {
       return '<option value="' + a.id + '">' + esc(a.title) + '</option>';
     }).join('');
@@ -449,6 +471,7 @@ function tampilkanError(teks) {
       description: val('tDesc') || null,
       body: isiEditor(),
       cover_url: st.coverUrl || null,
+      cover_caption: val('tCoverCaption') || null,
       tags: st.tags.slice(),
       source: val('tSource') || null,
       author_name: val('tAuthor') || (st.profil && (st.profil.full_name || st.profil.username)) || null,
@@ -520,6 +543,18 @@ function tampilkanError(teks) {
     }
   }
 
+  // Keterangan gambar wajib diisi sebelum diajukan (draf boleh belum lengkap)
+  function cekKeteranganGambar(d) {
+    if (d.cover_url && !d.cover_caption) return 'Isi keterangan gambar sampul dulu.';
+    var adaTanpaKet = Array.from($('cmsEditorArea').querySelectorAll('img')).some(function (im) {
+      var f = im.closest('figure');
+      var cap = f && f.querySelector('figcaption');
+      return !cap || !cap.textContent.trim();
+    });
+    if (adaTanpaKet) return 'Ada gambar di isi berita tanpa keterangan. Tambahkan keterangan, lalu ajukan lagi.';
+    return '';
+  }
+
   async function aksiAjukan() {
     if (st.terkunci || st.sedang) return;
     bersihkanPesan();
@@ -532,6 +567,8 @@ function tampilkanError(teks) {
     if (kata < MIN_KATA_AJUKAN) {
       return pesanErr('Isi berita minimal ' + MIN_KATA_AJUKAN + ' kata sebelum diajukan. Sekarang ' + kata + ' kata.');
     }
+    var salahKet = cekKeteranganGambar(d);
+    if (salahKet) return pesanErr(salahKet);
     if (!confirm('Ajukan naskah ini ke redaksi? Setelah diajukan, naskah tidak bisa diubah sampai redaksi meminta revisi.')) return;
 
     setSibuk(true);
@@ -570,6 +607,7 @@ function tampilkanError(teks) {
     $('tTopic').value = d.topic || '';
     $('tMetaTitle').value = d.meta_title || '';
     $('tMetaDesc').value = d.meta_description || '';
+    $('tCoverCaption').value = d.cover_caption || '';
     $('tAllowComment').checked = d.allow_comment !== false;
     $('tShowHome').checked = d.show_on_home !== false;
 
@@ -627,7 +665,11 @@ function tampilkanError(teks) {
 
   function bukaPratinjau() {
     var judul = val('tTitle') || '(Tanpa judul)';
-    var gambar = st.coverUrl ? '<img class="tl-pratinjau-gambar" src="' + esc(st.coverUrl) + '" alt="' + esc(judul) + '">' : '';
+    var gambar = st.coverUrl
+      ? '<figure style="margin:0"><img class="tl-pratinjau-gambar" src="' + esc(st.coverUrl) + '" alt="' + esc(judul) + '">' +
+        (val('tCoverCaption') ? '<figcaption style="font-style:italic;font-size:13px;color:#6B6890;text-align:center">' + esc(val('tCoverCaption')) + '</figcaption>' : '') +
+        '</figure>'
+      : '';
     $('pratinjauIsi').innerHTML =
       '<div class="tl-info">' + esc($('tCategory').value || 'Umum') + ' • Oleh ' + esc(val('tAuthor')) + '</div>' +
       '<h2 style="font-family:Sora,sans-serif;font-size:24px;line-height:1.2;margin:8px 0">' + esc(judul) + '</h2>' +
@@ -653,7 +695,7 @@ function tampilkanError(teks) {
   function pasangKejadian() {
     $('tTitle').addEventListener('input', pembaruan);
     $('tDesc').addEventListener('input', pembaruan);
-    ['tSource', 'tAuthor', 'tTopic', 'tMetaTitle', 'tMetaDesc'].forEach(function (id) {
+    ['tSource', 'tAuthor', 'tTopic', 'tMetaTitle', 'tMetaDesc', 'tCoverCaption'].forEach(function (id) {
       $(id).addEventListener('input', pembaruan);
     });
     ['tAllowComment', 'tShowHome'].forEach(function (id) {
@@ -714,9 +756,19 @@ function tampilkanError(teks) {
     $('modalPratinjau').addEventListener('click', function (e) {
       if (e.target === this) tutupPratinjau();
     });
+
+    $('btnTutupBacaJuga').addEventListener('click', function () { $('modalBacaJuga').hidden = true; });
+    $('modalBacaJuga').addEventListener('click', function (e) {
+      if (e.target === this) this.hidden = true;
+    });
+    $('daftarBacaJuga').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-id]');
+      if (b) pilihBacaJuga(b.dataset.id);
+    });
+
     $('btnKeluar').addEventListener('click', keluar);
 
-    // Peringatan jika tab ditutup atau pindah saat ada perubahan yang belum tersimpan lokal
+    // Peringatan jika tab ditutup saat ada perubahan yang belum tersimpan lokal
     window.addEventListener('beforeunload', function (e) {
       if (st.kotor && !st.terkunci) {
         e.preventDefault();
@@ -758,7 +810,7 @@ function tampilkanError(teks) {
       $('tAuthor').value = p.data.full_name || p.data.username || '';
 
       pasangKejadian();
-      await Promise.all([muatRubrik(), muatTerkait()]);
+      await Promise.all([muatRubrik(), muatArtikelTerbit()]);
 
       var id = new URLSearchParams(location.search).get('id');
       if (id) await muatNaskah(id);

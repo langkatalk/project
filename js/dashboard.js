@@ -406,13 +406,13 @@
   }
 
   async function jalankanKomentar(act, id, tombol) {
-    var status = act === 'setuju' ? 'disetujui' : 'ditolak';
     tombol.disabled = true;
-    var r = await sb.from('comments').update({ status: status }).eq('id', id);
+    var fungsi = act === 'setuju' ? 'approve_comment' : 'reject_comment';
+    var r = await sb.rpc(fungsi, { p_id: Number(id) });
     tombol.disabled = false;
 
     if (r.error) return kabarkan('Gagal: ' + r.error.message);
-    kabarkan(status === 'disetujui' ? 'Komentar disetujui' : 'Komentar ditolak');
+    kabarkan(act === 'setuju' ? 'Komentar disetujui' : 'Komentar ditolak');
     muatKomentar();
   }
 

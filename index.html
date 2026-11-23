@@ -344,8 +344,132 @@ async function loadPublicFeedFromSupabase() {
   window.addEventListener('hashchange', () => {
     setTimeout(loadPublicFeedFromSupabase, 60);
   });
+    let activeHomeCategory = 'Semua';
+
+  function homeEsc(v) {
+    return String(v ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function homePlainText(html) {
+    const d = document.createElement('div');
+    d.innerHTML = html || '';
+    return (d.textContent || d.innerText || '').trim();
+  }
+
+  function homeFmtDate(d) {
+    if (!d) return 'Baru saja';
+    const dt = new Date(d);
+    if (Number.isNaN(dt.getTime())) return String(d);
+    return dt.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+  }
+
+  function bindHomeCategories(allArticles) {
+    const cats = ['Semua', 'Investigasi', 'Ruang Gelap', 'Politik', 'Panggung', 'Ekonomi Gelap', 'Opini'];
+    const bar = document.querySelector('.cat-bar') || document.querySelector('[class*="cat"]');
+    if (bar) {
+      bar.querySelectorAll('button, a').forEach(el => {
+        const txt = (el.textContent || '').trim();
+        const matched = cats.find(c => txt.toLowerCase().startsWith(c.toLowerCase()));
+        if (matched) {
+          el.classList.toggle('active', activeHomeCategory.toLowerCase() === matched.toLowerCase());
+          el.onclick = (e) => {
+            e.preventDefault();
+            activeHomeCategory = matched;
+            renderHomeArticlesList(allArticles);
+          };
+        }
+      });
+    }
+  }
+
+  function renderHomeArticlesList(allArticles) {
+    bindHomeCategories(allArticles);
+    const filtered = activeHomeCategory === 'Semua'
+      ? allArticles
+      : allArticles.filter(a => (a.category || '').toLowerCase() === activeHomeCategory.toLowerCase());
+
+    const cardsHtml = filtered.map(a => {
+      const title = homeEsc(a.title || '(Tanpa Judul)');
+      const cat = homeEsc(a.category || 'Umum');
+      const author = homeEsc(a.author_name || 'Redaksi');
+      const excerpt = homeEsc((a.description || homePlainText(a.body) || '').slice(0, 150));
+      const thumb = a.cover_url
+        ? `<img class="card-thumb" src="${homeEsc(a.cover_url)}" alt="${title}" loading="lazy" style="width:120px;height:86px;object-fit:cover;border-radius:12px;flex-shrink:0">`
+        : '';
+      const words = homePlainText(a.body).split(/\s+/).filter(Boolean).length;
+      const mins = Math.max(1, Math.ceil(words / 200));
+
+      return `
+        <article class="lt-card glass-box" style="margin-bottom:14px;cursor:pointer" onclick="location.hash='#/berita/${encodeURIComponent(a.slug || a.id)}'">
+          <div class="card-top" style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="avatar-sm" style="width:32px;height:32px;border-radius:999px;background:var(--grad);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px">${homeEsc(author.charAt(0).toUpperCase())}</div>
+              <div>
+                <div style="font-weight:700;font-size:13px">${author}</div>
+                <div style="font-size:11px;color:var(--mute)">${cat} • ${homeFmtDate(a.published_at || a.created_at)}</div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px">
+            <div style="min-width:0;flex:1">
+              <h3 style="font-family:'Sora',sans-serif;font-size:17px;margin:0 0 6px">${title}</h3>
+              <p style="font-size:13px;color:var(--mute);margin:0 0 8px;line-height:1.5">${excerpt}</p>
+              <div style="font-size:11px;color:var(--mute);font-weight:600">${mins} mnt baca • ${Number(a.views || 0)} dibaca</div>
+            </div>
+            ${thumb}
+          </div>
+        </article>
+      `;
+    }).join('');
+
+    const emptyHtml = `
+      <div class="glass-box" style="margin-top:12px">
+        <p style="margin:0">Belum ada berita terbit di kategori <b>${homeEsc(activeHomeCategory)}</b>.</p>
+      </div>
+    `;
+
+    const target = document.querySelector('.feed-list') || document.querySelector('main.wrap') || document.getElementById('root');
+    if (!target) return;
+
+    if (target.id === 'root') {
+      target.innerHTML = `<main class="wrap" style="margin-top:16px">${cardsHtml || emptyHtml}</main>`;
+    } else if (target.tagName === 'MAIN') {
+      const existingFeed = target.querySelector('.feed-list');
+      if (existingFeed) {
+        existingFeed.innerHTML = cardsHtml || emptyHtml;
+      } else {
+        target.innerHTML = `<div class="feed-list">${cardsHtml || emptyHtml}</div>`;
+      }
+    } else {
+      target.innerHTML = cardsHtml || emptyHtml;
+    }
+  }
+
+  async function loadPublicFeedFromSupabase() {
+    const cfg = window.APP_CONFIG || {};
+    if (!window.supabase || !cfg.SUPABASE_URL || !cfg.SUPABASE_PUBLISHABLE_KEY) return;
+    try {
+      const sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_PUBLISHABLE_KEY);
+      const { data, error } = await sb
+        .from('articles')
+        .select('*')
+        .eq('status', 'terbit')
+        .order('published_at', { ascending: false, nullsFirst: false })
+        .order('created_at', { ascending: false });
+
+      if (!error && Array.isArray(data)) {
+        renderHomeArticlesList(data);
+      }
+    } catch (_) {}
+  }
   renderIndexRoute();
     setTimeout(loadPublicFeedFromSupabase, 80);
+    renderIndexRoute();
+  setTimeout(loadPublicFeedFromSupabase, 100);
 </script>
 </body>
 </html>

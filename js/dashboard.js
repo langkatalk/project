@@ -31,7 +31,7 @@
     { id: 'ditolak', nama: 'Ditolak' }
   ];
 
-  var state = { profil: null, tab: 'naskah', fNaskah: 'semua', fKomen: 'menunggu', naskah: [], komen: [] };
+  var state = { profil: null, tab: sessionStorage.getItem('lk_tab') || 'naskah', fNaskah: 'semua', fKomen: 'menunggu', naskah: [], komen: [] };
 
   var el = {
     masuk: document.getElementById('layarMasuk'),

@@ -395,3 +395,29 @@
   margin: 6px 0 0;
   white-space: pre-wrap;
 }
+
+/* Foto profil (header redaksi dan daftar Pengguna & Jabatan) */
+.rd-av,
+.rd-av-foto {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+}
+.rd-av {
+  background: var(--lk-grad-tombol);
+  color: #fff;
+  font-weight: 800;
+  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.rd-av-foto { object-fit: cover; background: var(--lk-lavender); }
+.rd-av-sedang { width: 36px; height: 36px; font-size: 13px; }
+
+.rd-pengguna-atas { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.rd-pengguna-form { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+.rd-pengguna-form .rd-label { margin: 0; min-width: 150px; flex: 1 1 150px; }
+.rd-pengguna-form .rd-cek { min-height: auto; }
+.pg-label-foto { white-space: nowrap; }

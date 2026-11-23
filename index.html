@@ -161,4 +161,120 @@
         const isLiked = ltState.likedIds.has(a.id);
         const isSaved = ltState.savedIds.has(a.id);
         const initial = (a.author_name || 'L').trim().charAt(0).toUpperCase();
-        const excerpt = esc(a.description || stripHtmlText(a.
+        const excerpt = esc(a.description || stripHtmlText(a.body || '')).slice(0, 145);
+      const thumbHtml = a.cover_url
+        ? `<img class="card-thumb" src="${esc(a.cover_url)}" alt="${esc(a.title)}" loading="lazy">`
+        : `<div class="card-thumb-empty">Langkatalk</div>`;
+      const adBetween = (idx === 1 && ads.length)
+        ? renderInlineAd(ads[0])
+        : (idx === 4 && ads.length > 1 ? renderInlineAd(ads[1]) : '');
+
+      return `
+        <article class="lt-card" onclick="location.hash='#/berita/${encodeURIComponent(slugOrId)}'">
+          <div class="card-top">
+            <div class="card-author">
+              <div class="avatar-sm">${esc(initial)}</div>
+              <div>
+                <div class="author-name">${esc(a.author_name || 'Redaksi')}</div>
+                <div class="author-sub">${esc(a.category || 'Umum')} • ${fmtDate(a.published_at)}</div>
+              </div>
+            </div>
+            <div class="card-actions-top" onclick="event.stopPropagation()">
+              <button type="button" class="icon-btn ${isLiked ? 'active' : ''}" onclick="toggleLike('${esc(a.id)}', this)" title="Suka">♥</button>
+              <button type="button" class="icon-btn ${isSaved ? 'active' : ''}" onclick="toggleSave('${esc(a.id)}', this)" title="Simpan">🔖</button>
+            </div>
+          </div>
+          <div class="card-body-row">
+            <div class="card-text">
+              <h3 class="card-title">${esc(a.title)}</h3>
+              <p class="card-excerpt">${excerpt}</p>
+              <div class="card-meta">
+                <span>${readMinutes(a.body)} mnt baca</span>
+                <span>•</span>
+                <span>${Number(a.views || 0)} dibaca</span>
+              </div>
+            </div>
+            ${thumbHtml}
+          </div>
+        </article>
+        ${adBetween}
+      `;
+    }).join('');
+
+    const feedBody = items.length
+      ? `<div class="feed-list">${cardsHtml}</div>`
+      : `<div class="glass-box mt"><p>Belum ada cerita di kategori ini.</p></div>`;
+
+    const innerHtml = `
+      ${renderTopHeader()}
+      ${renderCategoryBar()}
+      <main class="wrap page-main">
+        ${heroHtml}
+        ${feedBody}
+      </main>
+    `;
+
+    root.innerHTML = renderPublicShell(innerHtml);
+  }
+
+  async function renderDetailPage(slugOrId) {
+    const root = $('root');
+    if (!root) return;
+    root.innerHTML = `
+      ${renderTopHeader()}
+      <main class="wrap page-main">
+        <div class="glass-box"><p>Memuat cerita...</p></div>
+      </main>
+    `;
+
+    let art = null;
+    if (typeof fetchArticleDetail === 'function') {
+      art = await fetchArticleDetail(slugOrId);
+    }
+
+    if (!art) {
+      root.innerHTML = renderPublicShell(`
+        ${renderTopHeader()}
+        <main class="wrap page-main">
+          <div class="glass-box">
+            <h2>Cerita tidak ditemukan</h2>
+            <p class="mt">Artikel mungkin sudah dipindahkan atau belum terbit.</p>
+            <a class="go sm mt" href="index.html">Kembali ke Beranda</a>
+          </div>
+        </main>
+      `);
+      return;
+    }
+
+    const isLiked = ltState.likedIds.has(art.id);
+    const isSaved = ltState.savedIds.has(art.id);
+    const detailHtml = `
+      ${renderTopHeader()}
+      <main class="wrap page-main">
+        <article class="glass-box detail-article">
+          <div class="detail-meta-top">
+            <span class="chip">${esc(art.category || 'Umum')}</span>
+            <span>${fmtDate(art.published_at)}</span>
+            <span>•</span>
+            <span>${readMinutes(art.body)} mnt baca</span>
+          </div>
+          <h1 class="detail-title">${esc(art.title)}</h1>
+          <div class="detail-author">Oleh <b>${esc(art.author_name || 'Redaksi')}</b></div>
+          ${art.cover_url ? `<img class="detail-cover" src="${esc(art.cover_url)}" alt="${esc(art.title)}">` : ''}
+          <div class="detail-body">${art.body || ''}</div>
+          <div class="detail-bar">
+            <button type="button" class="pill ${isLiked ? 'active' : ''}" onclick="toggleLike('${esc(art.id)}', this)">♥ Suka</button>
+            <button type="button" class="pill ${isSaved ? 'active' : ''}" onclick="toggleSave('${esc(art.id)}', this)">🔖 Simpan</button>
+            <button type="button" class="pill" onclick="shareCurrentArticle()">↗ Bagikan</button>
+          </div>
+        </article>
+      </main>
+    `;
+
+    root.innerHTML = renderPublicShell(detailHtml);
+  }
+
+  renderIndexRoute();
+</script>
+</body>
+</html>

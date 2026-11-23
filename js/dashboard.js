@@ -111,6 +111,7 @@
   function bukaTab(id) {
     var ada = menuUntuk(state.profil.role).some(function (m) { return m.id === id; });
     state.tab = ada ? id : 'naskah';
+        sessionStorage.setItem('lk_tab', state.tab);
     gambarTab();
 
     if (state.tab === 'naskah') return muatNaskah();
@@ -122,6 +123,7 @@
   /* ---------- Layar masuk dan sesi ---------- */
 
   function tampilMasuk() {
+        sessionStorage.removeItem('lk_tab');
     el.masuk.hidden = false;
     el.app.hidden = true;
     el.aksi.hidden = true;
@@ -259,7 +261,7 @@
       }
       return b.join('');
     }
-
+    b.push('<a class="btn-xs" href="baca.html?pratinjau=' + a.id + '" target="_blank" rel="noopener">Pratinjau</a>');
     if ((st === 'draf' || st === 'draft' || st === 'revisi') && (saya || r === 'direktur')) {
       b.push(t('ajukan', 'Ajukan', 'utama'));
     }

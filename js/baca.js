@@ -1,13 +1,16 @@
 // js/baca.js
 // Halaman detail berita. Membaca ?s=slug (atau id), membersihkan isi, lalu menampilkan
-// suka, komentar, simpan, dan bagikan. Form suka dan komentar ada di halaman ini.
+// suka, komentar, simpan, bagikan, dan berita terkait.
+// Mode pratinjau: ?pratinjau=ID (hanya untuk redaksi yang sudah masuk).
 (function () {
   'use strict';
 
   var sb = window.LK && window.LK.sb;
   var REGEX_EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
   var JEDA_KOMENTAR_MS = 30000;
-  var KOLOM = 'id,title,slug,category,body,description,source,author_name,published_at,cover_url,is_exclusive,is_breaking,allow_comment,like_count,comment_count';
+  var KOLOM = 'id,title,slug,category,body,description,source,author_name,published_at,cover_url,cover_caption,meta_title,meta_description,related_ids,status,is_exclusive,is_breaking,allow_comment,like_count,comment_count';
+  var PRATINJAU = new URLSearchParams(location.search).get('pratinjau') || '';
+  var modePratinjau = /^\d+$/.test(PRATINJAU);
 
   var TAG_BOLEH = {
     B: 1, I: 1, U: 1, S: 1, SUB: 1, SUP: 1, H1: 1, H2: 1, H3: 1, H4: 1,
@@ -134,13 +137,13 @@
   // Hanya tag yang diizinkan yang dibiarkan.
   function bersihkanNode(node) {
     Array.from(node.childNodes).forEach(function (n) {
-      if (n.nodeType === 3) return;            // teks biasa aman
-      if (n.nodeType !== 1) { n.remove(); return; } // komentar HTML dll
+      if (n.nodeType === 3) return;                  // teks biasa aman
+      if (n.nodeType !== 1) { n.remove(); return; }  // komentar HTML dll
 
       if (TAG_BUANG[n.tagName]) { n.remove(); return; }
 
       if (!TAG_BOLEH[n.tagName]) {
-        bersihkanNode(n);                      // bersihkan isinya dulu
+        bersihkanNode(n);                            // bersihkan isinya dulu
         n.replaceWith.apply(n, Array.from(n.childNodes)); // lalu buang pembungkusnya
         return;
       }
@@ -280,6 +283,7 @@
   function tampil(a) {
     artikel = a;
     pasangSeo(a);
+    if (modePratinjau) aturMeta('name', 'robots', 'noindex,nofollow');
 
     var html = bersihkanHtml(a.body);
     var menit = hitungMenit(html);
@@ -287,11 +291,30 @@
     var disimpanSekarang = disimpan.has(a.id);
 
     var gambar = a.cover_url
-      ? '<div class="ig-media"><img class="ig-gambar" src="' + esc(a.cover_url) +
-        '" alt="' + esc(a.title) + '" width="1200" height="600" fetchpriority="high"></div>'
+      ? '<figure class="bc-cover"><div class="ig-media"><img class="ig-gambar" src="' + esc(a.cover_url) +
+        '" alt="' + esc(a.title) + '" width="1200" height="600" fetchpriority="high"></div>' +
+        '<figcaption class="bc-keterangan">' + esc(a.cover_caption || '') + '</figcaption></figure>'
       : '';
 
+    var banner = modePratinjau
+      ? '<div class="bc-pratinjau">PRATINJAU • status: ' + esc(a.status) + '<br>' +
+        'Judul SEO: ' + esc(a.meta_title || a.title) + '<br>' +
+        'Deskripsi SEO: ' + esc(a.meta_description || a.description || '-') + '</div>'
+      : '';
+
+    var aksi = modePratinjau ? '' :
+      '<div class="ig-aksi bc-aksi">' +
+        '<button type="button" class="ig-ikon suka' + (disukaiSekarang ? ' aktif' : '') + '" data-aksi="suka"' +
+          ' aria-label="Suka" aria-pressed="' + disukaiSekarang + '">' + IKON.hati + '</button>' +
+        '<button type="button" class="ig-ikon" data-aksi="komen" aria-label="Komentar">' + IKON.komen + '</button>' +
+        '<button type="button" class="ig-ikon" data-aksi="bagi" aria-label="Bagikan">' + IKON.kirim + '</button>' +
+        '<button type="button" class="ig-ikon ig-simpan' + (disimpanSekarang ? ' aktif' : '') + '" data-aksi="simpan"' +
+          ' aria-label="Simpan">' + IKON.simpan + '</button>' +
+      '</div>' +
+      '<p class="ig-jumlah bc-jumlah"><span data-jumlah-suka>' + (a.like_count || 0) + '</span> suka</p>';
+
     el.baca.innerHTML =
+      banner +
       '<article class="bc-kartu">' +
         gambar +
         '<div class="bc-isi">' +
@@ -304,25 +327,28 @@
             esc(a.category || 'Umum') + ' • ' + tgl(a.published_at) + ' • ' + menit + ' mnt baca</p>' +
           (a.source ? '<p class="bc-meta">Sumber: ' + esc(a.source) + '</p>' : '') +
         '</div>' +
-        '<div class="ig-aksi bc-aksi">' +
-          '<button type="button" class="ig-ikon suka' + (disukaiSekarang ? ' aktif' : '') + '" data-aksi="suka"' +
-            ' aria-label="Suka" aria-pressed="' + disukaiSekarang + '">' + IKON.hati + '</button>' +
-          '<button type="button" class="ig-ikon" data-aksi="komen" aria-label="Komentar">' + IKON.komen + '</button>' +
-          '<button type="button" class="ig-ikon" data-aksi="bagi" aria-label="Bagikan">' + IKON.kirim + '</button>' +
-          '<button type="button" class="ig-ikon ig-simpan' + (disimpanSekarang ? ' aktif' : '') + '" data-aksi="simpan"' +
-            ' aria-label="Simpan">' + IKON.simpan + '</button>' +
-        '</div>' +
-        '<p class="ig-jumlah bc-jumlah"><span data-jumlah-suka>' + (a.like_count || 0) + '</span> suka</p>' +
+        aksi +
         '<div class="bc-tubuh">' + html + '</div>' +
+        '<div id="bcTerkait"></div>' +
       '</article>' +
-      '<section class="bc-kartu bc-bagian" id="bagianSuka" hidden>' + formSuka() + '</section>' +
-      '<section class="bc-kartu bc-bagian" id="bagianKomentar">' + bagianKomentar() + '</section>';
+      (modePratinjau ? '' :
+        '<section class="bc-kartu bc-bagian" id="bagianSuka" hidden>' + formSuka() + '</section>' +
+        '<section class="bc-kartu bc-bagian" id="bagianKomentar">' + bagianKomentar() + '</section>');
+
+    if (a.related_ids && a.related_ids.length) muatTerkait(a.related_ids);
   }
 
   /* ---------- Muat artikel ---------- */
 
   async function muatArtikel() {
     if (!sb) return gagal('Koneksi ke database belum siap. Periksa config.js.');
+
+    if (modePratinjau) {
+      var p = await sb.from('articles').select(KOLOM).eq('id', Number(PRATINJAU)).maybeSingle();
+      if (p.error || !p.data) return gagal('Pratinjau hanya bisa dibuka oleh redaksi yang sudah masuk.');
+      return tampil(p.data);
+    }
+
     if (!kunci) return gagal('Berita tidak ditemukan.');
 
     var dasar = sb.from('articles')
@@ -339,6 +365,25 @@
     if (!r.data) return gagal('Berita tidak ditemukan atau belum terbit.');
 
     tampil(r.data);
+  }
+
+  async function muatTerkait(ids) {
+    var r = await sb.from('articles')
+      .select('id,title,slug,cover_url')
+      .in('id', ids.map(Number))
+      .eq('status', 'terbit')
+      .is('deleted_at', null);
+    if (r.error || !r.data || !r.data.length) return;
+
+    var box = document.getElementById('bcTerkait');
+    if (!box) return;
+    box.innerHTML = '<div class="bc-terkait"><h2 class="sh-judul">Berita terkait</h2>' +
+      r.data.map(function (x) {
+        var href = 'baca.html?s=' + encodeURIComponent(x.slug || x.id);
+        return '<a class="bc-terkait-item" href="' + href + '">' +
+          (x.cover_url ? '<img src="' + esc(x.cover_url) + '" alt="" loading="lazy">' : '') +
+          '<span>' + esc(x.title) + '</span></a>';
+      }).join('') + '</div>';
   }
 
   async function muatKomentar() {
@@ -528,7 +573,7 @@
 
   async function mulai() {
     await muatArtikel();
-    if (artikel) {
+    if (artikel && !modePratinjau) {
       muatKomentar();
       catatDilihat(artikel.id);
     }

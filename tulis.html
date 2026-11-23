@@ -42,8 +42,6 @@
   <main class="tl-wrap" id="layarTulis" hidden>
 
     <div class="tl-kolom">
-      <p id="tErr" class="tl-err" hidden></p>
-      <p id="tOk" class="tl-ok" hidden></p>
       <p id="tCatatanRevisi" class="tl-catatan" hidden></p>
 
       <section class="tl-kartu">
@@ -66,6 +64,9 @@
         <div id="tImgPreview" hidden>
           <img id="tImgEl" alt="Pratinjau sampul" width="1200" height="600">
         </div>
+        <label class="tl-label" style="margin-top:12px">Keterangan gambar sampul (wajib jika ada sampul)
+          <input id="tCoverCaption" type="text" maxlength="160" placeholder="Contoh: Massa aksi di depan gedung DPRD Langkat">
+        </label>
       </section>
 
       <section class="tl-kartu">
@@ -128,7 +129,8 @@
 
             <div class="tl-baris">
               <button type="button" class="tl-btn" data-aksi="link" title="Sisipkan tautan">🔗</button>
-              <button type="button" class="tl-btn" data-aksi="gambar" title="Gambar dari alamat">🖼</button>
+              <button type="button" class="tl-btn" data-aksi="gambar" title="Gambar dari alamat (wajib ada keterangan)">🖼</button>
+              <button type="button" class="tl-btn" data-aksi="bacajuga" title="Sisipkan Baca juga">📰</button>
               <button type="button" class="tl-btn" data-aksi="tabel" title="Tabel">⊞</button>
               <button type="button" class="tl-btn" data-aksi="video" title="Video (YouTube, TikTok, Instagram, Facebook)">🎞</button>
               <span class="tl-sep"></span>
@@ -236,6 +238,20 @@
       <div id="pratinjauIsi"></div>
     </div>
   </div>
+
+  <!-- Pilih berita untuk Baca juga -->
+  <div class="tl-modal" id="modalBacaJuga" hidden>
+    <div class="tl-modal-kartu">
+      <div class="tl-modal-atas">
+        <b>Pilih berita untuk "Baca juga"</b>
+        <button type="button" class="btn btn-tutup btn-kecil" id="btnTutupBacaJuga">Tutup</button>
+      </div>
+      <div id="daftarBacaJuga" class="tl-bj-daftar"></div>
+    </div>
+  </div>
+
+  <!-- Notifikasi kaca di bawah layar -->
+  <div id="tlToast" class="tl-toast" role="status" aria-live="polite"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="config.js"></script>

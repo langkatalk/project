@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Berita – Langkatalk</title>
+  <meta name="description" content="Baca berita Langkatalk.">
+  <meta property="og:site_name" content="Langkatalk">
+  <link rel="icon" href="favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/feed.css">
+  <link rel="stylesheet" href="css/baca.css">
+</head>
+<body>
+
+  <header class="lk-header">
+    <a class="lk-kembali" href="index.html">← Beranda</a>
+    <a class="lk-logo" href="index.html">
+      <img src="favicon.png" alt="" width="28" height="28">
+      <span>
+        <b>Langkatalk</b>
+        <small>Menghubungkan Cerita Langkat</small>
+      </span>
+    </a>
+    <a class="btn btn-utama btn-kecil" href="redaksi.html">Masuk</a>
+  </header>
+
+  <main class="lk-baca" id="baca">
+    <p class="lk-status">Memuat berita…</p>
+  </main>
+
+  <footer class="lk-footer">
+    <div><b>Langkatalk</b> • Dari hulu ke hilir, dari bukit ke layar.</div>
+    <div class="lk-footer-link">
+      <a href="index.html">Beranda</a>
+      <a href="tulis.html">Tulis</a>
+      <a href="redaksi.html">Redaksi</a>
+    </div>
+  </footer>
+
+  <div id="toast" class="lk-toast" role="status"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="config.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/baca.js"></script>
+</body>
+</html>

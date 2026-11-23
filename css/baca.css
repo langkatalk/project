@@ -105,3 +105,99 @@
 @media (min-width: 1024px) {
   .lk-baca { max-width: 760px; }
 }
+/* Keterangan gambar: italic, lebih kecil dari isi berita */
+.bc-tubuh figcaption {
+  font-style: italic;
+  font-size: 13px;
+  color: var(--lk-muted);
+  text-align: center;
+  margin-top: 6px;
+}
+.bc-cover { margin: 0; }
+.bc-keterangan {
+  padding: 8px 16px 0;
+  margin: 0;
+  font-size: 13px;
+  font-style: italic;
+  color: var(--lk-muted);
+  text-align: left;
+}
+
+/* Banner pratinjau (hanya untuk redaksi) */
+.bc-pratinjau {
+  max-width: 720px;
+  margin: 14px auto 0;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: #FFF7ED;
+  border: 1px solid #FED7AA;
+  color: #9A3412;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+/* Berita terkait */
+.bc-terkait { padding: 16px; border-top: 1px solid var(--lk-garis); }
+.bc-terkait-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--lk-garis);
+}
+.bc-terkait-item img {
+  width: 96px;
+  aspect-ratio: 2 / 1;
+  object-fit: cover;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+.bc-terkait-item span {
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--lk-teks);
+}
+
+/* Kotak "Baca juga" di dalam isi berita */
+.bc-tubuh .lk-baca-juga {
+  display: flex;
+  align-items: center;
+  margin: 16px 0;
+  padding: 12px;
+  border: 1px solid var(--lk-garis);
+  border-radius: 16px;
+  background: var(--lk-lavender);
+}
+.bc-tubuh .lk-baca-juga a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--lk-teks);
+  text-decoration: none;
+  width: 100%;
+}
+.bc-tubuh .lk-baca-juga img {
+  width: 96px;
+  aspect-ratio: 2 / 1;
+  object-fit: cover;
+  border-radius: 10px;
+  margin: 0;
+  flex-shrink: 0;
+}
+.bc-tubuh .lk-bj-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--lk-ungu);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+}
+.bc-tubuh .lk-bj-judul {
+  display: block;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.4;
+}

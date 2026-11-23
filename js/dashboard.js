@@ -698,6 +698,71 @@
   });
 
   el.isi.addEventListener('click', function (ev) {
+     // FIX GANTI FOTO: langsung upload begitu pilih foto, jangan nunggu Simpan.
+  // Ini yang bikin tadi gak ada notif & gak ada yang berubah.
+  el.isi.addEventListener('change', async function (ev) {
+    if (!ev.target.classList.contains('pg-foto')) return;
+    var input = ev.target;
+    var file = input.files && input.files[0];
+    if (!file) return;
+
+    var baris = input.closest('.rd-pengguna');
+    if (!baris) return;
+    var uid = baris.dataset.uid;
+    var u = state.pengguna.find(function (x) { return x.id === uid; });
+    if (!u) return;
+
+    var sayaSendiri = uid === state.profil.id;
+    var label = baris.querySelector('.pg-label-foto');
+    var teksAwal = label ? label.childNodes[0].textContent : 'Ganti foto';
+
+    // 1. Langsung tampilkan preview biar keliatan berubah, jangan nunggu upload kelar
+    var imgLama = baris.querySelector('.rd-av-foto, .rd-av');
+    var previewUrl = URL.createObjectURL(file);
+    if (imgLama) {
+      var imgBaru = document.createElement('img');
+      imgBaru.className = 'rd-av-foto';
+      imgBaru.src = previewUrl;
+      imgBaru.alt = '';
+      imgLama.replaceWith(imgBaru);
+    }
+
+    // 2. Kasih notif langsung, biar gak dikira gak ada apa-apa
+    kabarkan('Mengunggah foto…');
+    if (label) label.childNodes[0].textContent = 'Mengunggah…';
+
+    try {
+      var url = await unggahFoto(file, state.profil.id);
+
+      if (sayaSendiri) {
+        // Akun sendiri: pakai fungsi sendiri, jangan pakai atur_pengguna (itu ditolak kalau direktur ubah diri sendiri)
+        var r1 = await sb.rpc('perbarui_profil_sendiri', { p_full_name: null, p_username: null, p_avatar_url: url });
+        if (r1.error) throw new Error(r1.error.message);
+        state.profil.avatar_url = url;
+      } else {
+        // Akun orang lain: pakai fungsi direktur
+        var r2 = await sb.rpc('atur_pengguna', {
+          p_id: uid, p_role: u.role, p_is_active: u.is_active !== false,
+          p_username: u.username, p_full_name: u.full_name, p_desk: u.desk || null,
+          p_avatar_url: url
+        });
+        if (r2.error) throw new Error(r2.error.message);
+      }
+
+      kabarkan('Foto profil diperbarui');
+      // Refresh list + header biar foto baru muncul di semua tempat
+      muatPengguna();
+      if (sayaSendiri) tampilRedaksi(state.profil);
+    } catch (e) {
+      kabarkan('Gagal: ' + (e.message || e));
+      // Kalau gagal, balikin preview ke foto lama
+      muatPengguna();
+    } finally {
+      if (label) label.childNodes[0].textContent = teksAwal;
+      input.value = ''; // Biar bisa pilih foto yang sama lagi kalau mau coba ulang
+      URL.revokeObjectURL(previewUrl);
+    }
+  });
     var t;
     if ((t = ev.target.closest('[data-fn]'))) { state.fNaskah = t.dataset.fn; return tampilNaskah(); }
     if ((t = ev.target.closest('[data-fk]'))) { state.fKomen = t.dataset.fk; return muatKomentar(); }

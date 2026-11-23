@@ -1,12 +1,13 @@
 // js/feed.js
 // Beranda: kartu gaya Instagram, suka (dengan nama dan email), komentar (dengan nama, email, isi), simpan, bagikan.
+// Keterangan foto sampul tampil di pojok gambar. Foto penulis diambil dari view public_penulis.
 (function () {
   'use strict';
 
   var UKURAN = 10;
   var JEDA_KOMENTAR_MS = 30000;
   var KATEGORI_CADANGAN = ['Investigasi', 'Ruang Gelap', 'Politik', 'Panggung', 'Ekonomi Gelap', 'Opini', 'Kilas Info'];
-     var KOLOM = 'id,title,slug,category,description,cover_url,cover_caption,author_id,author_name,published_at,like_count,comment_count,is_exclusive,is_breaking';
+  var KOLOM = 'id,title,slug,category,description,cover_url,cover_caption,author_id,author_name,published_at,like_count,comment_count,is_exclusive,is_breaking';
   var REGEX_EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
   var IKON = {
@@ -35,6 +36,9 @@
     disimpan: new Set(ambilLokal('lk_saved_ids')),
     disukai: new Set(ambilLokal('lk_liked_ids'))
   };
+
+  // Cache foto penulis: id penulis -> url foto ('' kalau tidak punya foto)
+  var cachePenulis = {};
 
   /* ---------- Utilitas ---------- */
 
@@ -170,6 +174,29 @@
     }).join('');
   }
 
+  /* ---------- Foto penulis ---------- */
+
+  // Mengambil foto penulis untuk daftar berita. Hanya id dan foto yang dibaca (lewat view public_penulis).
+  async function ambilPenulis(data) {
+    try {
+      var ids = Array.from(new Set(data.map(function (a) { return a.author_id; }).filter(Boolean)))
+        .filter(function (id) { return !(id in cachePenulis); });
+
+      if (ids.length) {
+        var r = await sb.from('public_penulis').select('id,avatar_url').in('id', ids);
+        if (!r.error && r.data) {
+          r.data.forEach(function (p) { cachePenulis[p.id] = p.avatar_url || ''; });
+        }
+        ids.forEach(function (id) {
+          if (!(id in cachePenulis)) cachePenulis[id] = '';
+        });
+      }
+    } catch (e) {
+      console.error('[feed] foto penulis', e);
+    }
+    return cachePenulis;
+  }
+
   /* ---------- Muat berita ---------- */
 
   function dasarQuery() {
@@ -226,8 +253,10 @@
         return;
       }
 
-         var peta = await ambilPenulis(data || []);
-      el.feed.insertAdjacentHTML('beforeend', (data || []).map(function (a) { return kartu(a, peta); }).join(''));
+      var peta = await ambilPenulis(data);
+      if (gen !== st.gen) return;
+
+      el.feed.insertAdjacentHTML('beforeend', data.map(function (a) { return kartu(a, peta); }).join(''));
       tulisStatus(st.selesai ? 'Sudah semua berita ditampilkan.' : '');
     } catch (e) {
       if (gen === st.gen) tulisStatus('Gagal memuat berita. Coba lagi sebentar lagi.');
@@ -235,24 +264,6 @@
     } finally {
       if (gen === st.gen) st.sedangMuat = false;
     }
-  }
-
-    var cachePenulis = {};
-
-  // Mengambil foto penulis dari view public_penulis (hanya id dan foto)
-  async function ambilPenulis(data) {
-    try {
-      var ids = Array.from(new Set(data.map(function (a) { return a.author_id; }).filter(Boolean)))
-        .filter(function (id) { return !(id in cachePenulis); });
-      if (ids.length) {
-        var r = await sb.from('public_penulis').select('id,avatar_url').in('id', ids);
-        if (!r.error && r.data) r.data.forEach(function (p) { cachePenulis[p.id] = p.avatar_url || ''; });
-        ids.forEach(function (id) { if (!(id in cachePenulis)) cachePenulis[id] = ''; });
-      }
-    } catch (e) {
-      console.error('[feed] foto penulis', e);
-    }
-    return cachePenulis;
   }
 
   function kartu(a, peta) {
@@ -307,7 +318,9 @@
           '<button type="button" class="ig-lihat" data-aksi="komen">Lihat ' + (a.comment_count || 0) + ' komentar</button>' +
         '</div>' +
       '</article>';
-  }  /* ---------- Suka ---------- */
+  }
+
+  /* ---------- Suka ---------- */
 
   function panggilSuka(id, nama, email) {
     return sb.rpc('suka_berita', {

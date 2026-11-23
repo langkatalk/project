@@ -2,452 +2,50 @@
 <html lang="id">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Langkatalk – Menghubungkan Cerita Langkat</title>
-  <meta name="description" content="Langkatalk – Menghubungkan Cerita Langkat. Portal berita investigasi, cerita lokal, dan jurnalisme sosial.">
-  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Langkatalk">
-  <meta property="og:title" content="Langkatalk – Menghubungkan Cerita Langkat">
-  <meta property="og:description" content="Portal berita investigasi, cerita lokal, dan jurnalisme sosial.">
-  <link rel="canonical" href="https://langkatalk.vercel.app/">
-  <link rel="icon" type="image/png" href="favicon.png">
-  <link rel="apple-touch-icon" href="favicon.png">
+  <meta name="description" content="Portal berita investigasi, cerita lokal, dan jurnalisme sosial dari Langkat, Sumatera Utara.">
+  <link rel="icon" href="favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-  <style>
-    .lt-top-bar{position:sticky;top:0;z-index:40;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);background:rgba(255,255,255,.78);border-bottom:1px solid rgba(22,17,51,.08)}
-    .lt-top-inner{max-width:960px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-    .lt-logo-link{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
-    .lt-logo-link img{width:36px;height:36px;border-radius:11px;object-fit:cover}
-    .lt-logo-name{font-family:'Sora',sans-serif;font-weight:800;font-size:17px;line-height:1.1}
-    .lt-logo-sub{font-size:11px;color:var(--mute)}
-    .lt-btn-masuk{display:inline-flex;align-items:center;justify-content:center;padding:8px 18px;border-radius:999px;background:var(--grad);color:#fff !important;text-decoration:none;font-weight:700;font-size:13px;box-shadow:0 6px 18px rgba(124,63,224,.24)}
-
-    .lt-cat-wrap{max-width:960px;margin:14px auto 0;padding:0 16px;display:flex;flex-wrap:wrap;gap:8px}
-    .lt-cat-pill{border:1px solid rgba(255,255,255,.85);background:rgba(255,255,255,.74);backdrop-filter:blur(14px);color:var(--ink);padding:7px 14px;border-radius:999px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;transition:.15s}
-    .lt-cat-pill.active{background:var(--grad);color:#fff;border-color:transparent;box-shadow:0 6px 18px rgba(95,111,238,.25)}
-
-    .lt-main{max-width:960px;margin:16px auto 56px;padding:0 16px}
-    .lt-hero-card{background:rgba(255,255,255,.8);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.92);border-radius:24px;overflow:hidden;box-shadow:0 14px 36px rgba(22,17,51,.07);margin-bottom:18px;cursor:pointer}
-    .lt-hero-cover{width:100%;max-height:360px;object-fit:cover;display:block}
-    .lt-hero-body{padding:20px}
-    .lt-hero-title{font-family:'Sora',sans-serif;font-size:22px;font-weight:800;margin:8px 0;color:var(--ink)}
-    .lt-hero-desc{font-size:14px;color:var(--mute);margin:0 0 12px;line-height:1.6}
-
-    .lt-feed-card{background:rgba(255,255,255,.8);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.92);border-radius:22px;padding:18px;box-shadow:0 12px 32px rgba(22,17,51,.06);margin-bottom:14px}
-    .lt-feed-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
-    .lt-author-row{display:flex;align-items:center;gap:10px}
-    .lt-avatar{width:34px;height:34px;border-radius:999px;background:var(--grad);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0}
-    .lt-author-name{font-size:13px;font-weight:700;color:var(--ink)}
-    .lt-author-meta{font-size:11px;color:var(--mute)}
-    .lt-feed-body{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;cursor:pointer}
-    .lt-feed-title{font-family:'Sora',sans-serif;font-size:17px;font-weight:800;margin:0 0 6px;color:var(--ink)}
-    .lt-feed-excerpt{font-size:13px;color:var(--mute);margin:0 0 8px;line-height:1.55}
-    .lt-feed-thumb{width:124px;height:88px;object-fit:cover;border-radius:12px;flex-shrink:0}
-
-    .lt-social-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid rgba(22,17,51,.08)}
-    .lt-social-left{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-    .lt-act-btn{display:inline-flex;align-items:center;gap:5px;border:1px solid rgba(22,17,51,.1);background:rgba(255,255,255,.85);color:var(--ink);padding:6px 12px;border-radius:999px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;transition:.15s}
-    .lt-act-btn:hover{border-color:#7C3FE0}
-    .lt-act-btn.liked{background:rgba(239,68,68,.12);border-color:#EF4444;color:#B91C1C}
-    .lt-act-btn.saved{background:rgba(124,63,224,.12);border-color:#7C3FE0;color:#5B21B6}
-
-    .lt-detail-card{background:rgba(255,255,255,.84);backdrop-filter:blur(22px);border:1px solid rgba(255,255,255,.94);border-radius:24px;padding:24px;box-shadow:0 16px 40px rgba(22,17,51,.08)}
-    .lt-detail-title{font-family:'Sora',sans-serif;font-size:26px;font-weight:800;margin:10px 0;line-height:1.25}
-    .lt-detail-cover{width:100%;max-height:420px;object-fit:cover;border-radius:16px;margin:14px 0}
-    .lt-detail-content{font-size:15px;line-height:1.8;color:var(--ink);margin-top:12px}
-    .lt-detail-content img{max-width:100%;height:auto;border-radius:12px}
-
-    .lt-comment-box{margin-top:20px;background:rgba(255,255,255,.8);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.92);border-radius:20px;padding:18px}
-    .lt-comment-item{padding:10px 0;border-bottom:1px solid rgba(22,17,51,.08)}
-    .lt-comment-item:last-child{border-bottom:0}
-
-    .lt-footer{max-width:960px;margin:32px auto 28px;padding:14px 16px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;font-size:12px;color:var(--mute)}
-    .lt-footer-links{display:flex;gap:14px}
-    .lt-footer-links a{color:var(--ink);text-decoration:none;font-weight:700}
-    .lt-footer-links a:hover{color:#7C3FE0}
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/feed.css">
 </head>
 <body>
-  <div id="root"></div>
+
+  <header class="lk-header">
+    <a class="lk-logo" href="index.html">
+      <img src="favicon.png" alt="" width="28" height="28">
+      <span>
+        <b>Langkatalk</b>
+        <small>Menghubungkan Cerita Langkat</small>
+      </span>
+    </a>
+    <a class="btn btn-utama btn-kecil" href="redaksi.html">Masuk</a>
+  </header>
+
+  <nav class="lk-chips" id="chips" aria-label="Kategori berita"></nav>
+
+  <main class="lk-feed" id="feed"></main>
+
+  <div id="sentinel" class="lk-sentinel" aria-hidden="true"></div>
+  <p id="status" class="lk-status" role="status"></p>
+
+  <footer class="lk-footer">
+    <div><b>Langkatalk</b> • Dari hulu ke hilir, dari bukit ke layar.</div>
+    <div class="lk-footer-link">
+      <a href="index.html">Beranda</a>
+      <a href="tulis.html">Tulis</a>
+      <a href="redaksi.html">Redaksi</a>
+    </div>
+  </footer>
+
+  <div id="toast" class="lk-toast" role="status"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="config.js"></script>
-  <script src="app.js"></script>
-  <script>
-    const homeState = {
-      articles: [],
-      category: 'Semua',
-      likedIds: new Set(JSON.parse(localStorage.getItem('lt_liked_ids') || '[]')),
-      savedIds: new Set(JSON.parse(localStorage.getItem('lt_saved_ids') || '[]')),
-      commentCounts: {}
-    };
-
-    function hEsc(v) {
-      return String(v ?? '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-    }
-
-    function hPlain(html) {
-      const div = document.createElement('div');
-      div.innerHTML = html || '';
-      return (div.textContent || div.innerText || '').trim();
-    }
-
-    function hDate(d) {
-      if (!d) return 'Baru saja';
-      const dt = new Date(d);
-      if (Number.isNaN(dt.getTime())) return String(d);
-      return dt.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
-    }
-
-    function hReadMin(html) {
-      const words = hPlain(html).split(/\s+/).filter(Boolean).length;
-      return Math.max(1, Math.ceil(words / 200));
-    }
-
-    function getPublicClient() {
-      try {
-        if (typeof getSupabase === 'function') {
-          const c = getSupabase();
-          if (c) return c;
-        }
-      } catch (_) {}
-      const cfg = window.APP_CONFIG || {};
-      if (window.supabase && cfg.SUPABASE_URL && cfg.SUPABASE_PUBLISHABLE_KEY) {
-        return window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_PUBLISHABLE_KEY);
-      }
-      return null;
-    }
-
-    function persistLocalSets() {
-      localStorage.setItem('lt_liked_ids', JSON.stringify(Array.from(homeState.likedIds)));
-      localStorage.setItem('lt_saved_ids', JSON.stringify(Array.from(homeState.savedIds)));
-    }
-
-    function toggleHomeLike(id, ev) {
-      if (ev) ev.stopPropagation();
-      if (homeState.likedIds.has(id)) homeState.likedIds.delete(id);
-      else homeState.likedIds.add(id);
-      persistLocalSets();
-      renderHomeShell();
-    }
-
-    function toggleHomeSave(id, ev) {
-      if (ev) ev.stopPropagation();
-      if (homeState.savedIds.has(id)) homeState.savedIds.delete(id);
-      else homeState.savedIds.add(id);
-      persistLocalSets();
-      renderHomeShell();
-    }
-
-    function shareArticleLink(slugOrId, ev) {
-      if (ev) ev.stopPropagation();
-      const url = `${window.location.origin}/index.html#/berita/${encodeURIComponent(slugOrId)}`;
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(url).then(() => alert('Tautan artikel disalin!'));
-      } else {
-        prompt('Salin tautan artikel:', url);
-      }
-    }
-
-    async function loadHomeArticles() {
-      const sb = getPublicClient();
-      if (!sb) return;
-      try {
-        const { data, error } = await sb
-          .from('articles')
-          .select('*')
-          .eq('status', 'terbit')
-          .order('published_at', { ascending: false, nullsFirst: false })
-          .order('created_at', { ascending: false });
-
-        if (!error && Array.isArray(data)) {
-          homeState.articles = data;
-        }
-
-        const { data: comRows } = await sb
-          .from('comments')
-          .select('article_id')
-          .eq('status', 'approved');
-
-        const counts = {};
-        (comRows || []).forEach(r => {
-          if (r.article_id) counts[r.article_id] = (counts[r.article_id] || 0) + 1;
-        });
-        homeState.commentCounts = counts;
-      } catch (_) {}
-    }
-
-    function renderTopHeaderHtml() {
-      return `
-        <header class="lt-top-bar">
-          <div class="lt-top-inner">
-            <a class="lt-logo-link" href="index.html" onclick="homeState.category='Semua';location.hash=''">
-              <img src="favicon.png" alt="Langkatalk">
-              <div>
-                <div class="lt-logo-name">Langkatalk</div>
-                <div class="lt-logo-sub">Menghubungkan Cerita Langkat</div>
-              </div>
-            </a>
-            <a class="lt-btn-masuk" href="redaksi.html">Masuk</a>
-          </div>
-        </header>
-      `;
-    }
-
-    function renderFooterHtml() {
-      return `
-        <footer class="lt-footer">
-          <div><b>Langkatalk</b> • Menghubungkan Cerita Langkat</div>
-          <div class="lt-footer-links">
-            <a href="index.html">Beranda</a>
-            <a href="tulis.html">Tulis</a>
-            <a href="redaksi.html">Redaksi</a>
-          </div>
-        </footer>
-      `;
-    }
-
-    async function renderDetailView(slugOrId) {
-      const root = document.getElementById('root');
-      if (!root) return;
-
-      let art = homeState.articles.find(a => String(a.slug) === String(slugOrId) || String(a.id) === String(slugOrId));
-      const sb = getPublicClient();
-
-      if (!art && sb) {
-        const bySlug = await sb.from('articles').select('*').eq('slug', slugOrId).maybeSingle();
-        if (bySlug.data) art = bySlug.data;
-        else {
-          const byId = await sb.from('articles').select('*').eq('id', slugOrId).maybeSingle();
-          if (byId.data) art = byId.data;
-        }
-      }
-
-      if (!art) {
-        root.innerHTML = `
-          ${renderTopHeaderHtml()}
-          <main class="lt-main">
-            <div class="lt-detail-card">
-              <h2>Berita tidak ditemukan</h2>
-              <p style="color:var(--mute)">Artikel mungkin belum terbit atau sudah dipindahkan.</p>
-              <a class="lt-btn-masuk" href="index.html" style="margin-top:10px">← Kembali ke Beranda</a>
-            </div>
-          </main>
-          ${renderFooterHtml()}
-        `;
-        return;
-      }
-
-      let approvedComments = [];
-      if (sb && art.allow_comment !== false) {
-        const { data: cData } = await sb
-          .from('comments')
-          .select('*')
-          .eq('article_id', art.id)
-          .eq('status', 'approved')
-          .order('created_at', { ascending: false });
-        approvedComments = cData || [];
-      }
-
-      const isLiked = homeState.likedIds.has(art.id);
-      const isSaved = homeState.savedIds.has(art.id);
-
-      const commentsSectionHtml = art.allow_comment === false
-        ? `<div class="lt-comment-box"><p style="margin:0;color:var(--mute);font-size:13px">Komentar dinonaktifkan untuk artikel ini.</p></div>`
-        : `
-          <div class="lt-comment-box">
-            <h3 style="font-family:'Sora',sans-serif;font-size:16px;margin:0 0 12px">Komentar (${approvedComments.length})</h3>
-            <form id="commentForm" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
-              <input id="cName" type="text" required placeholder="Nama kamu" style="padding:10px 12px;border-radius:10px;border:1px solid rgba(22,17,51,.14);background:#fff">
-              <input id="cPhone" type="tel" placeholder="No. HP / WhatsApp (opsional, privat untuk Pemred/Direktur)" style="padding:10px 12px;border-radius:10px;border:1px solid rgba(22,17,51,.14);background:#fff">
-              <textarea id="cBody" required rows="3" placeholder="Tulis tanggapan atau komentar..." style="padding:10px 12px;border-radius:10px;border:1px solid rgba(22,17,51,.14);background:#fff"></textarea>
-              <button type="submit" class="lt-btn-masuk" style="border:0;width:fit-content;cursor:pointer">Kirim Komentar</button>
-            </form>
-            <div id="cMsg" style="font-size:12px;font-weight:700;margin-bottom:10px"></div>
-            <div>
-              ${approvedComments.length
-                ? approvedComments.map(c => `
-                    <div class="lt-comment-item">
-                      <div style="font-weight:700;font-size:13px">${hEsc(c.author_name || 'Pembaca')} • <span style="font-weight:400;color:var(--mute);font-size:11px">${hDate(c.created_at)}</span></div>
-                      <div style="font-size:13px;margin-top:4px">${hEsc(c.body || c.content || '')}</div>
-                    </div>
-                  `).join('')
-                : '<p style="margin:0;color:var(--mute);font-size:13px">Belum ada komentar yang disetujui.</p>'
-              }
-            </div>
-          </div>
-        `;
-
-      root.innerHTML = `
-        ${renderTopHeaderHtml()}
-        <main class="lt-main">
-          <div style="margin-bottom:12px">
-            <a href="index.html" style="font-size:13px;font-weight:700;color:var(--ink);text-decoration:none">← Kembali ke Beranda</a>
-          </div>
-          <article class="lt-detail-card">
-            <div style="font-size:12px;color:var(--mute);font-weight:700">
-              ${hEsc(art.category || 'Umum')} • ${hDate(art.published_at || art.created_at)} • ${hReadMin(art.body)} mnt baca
-            </div>
-            <h1 class="lt-detail-title">${hEsc(art.title)}</h1>
-            <div style="font-size:13px;color:var(--mute)">
-              Oleh <b>${hEsc(art.author_name || 'Redaksi')}</b>${art.source ? ' • Sumber: <b>' + hEsc(art.source) + '</b>' : ''}
-            </div>
-            ${art.cover_url ? `<img class="lt-detail-cover" src="${hEsc(art.cover_url)}" alt="${hEsc(art.title)}">` : ''}
-            <div class="lt-detail-content">${art.body || ''}</div>
-            <div class="lt-social-bar">
-              <div class="lt-social-left">
-                <button type="button" class="lt-act-btn ${isLiked ? 'liked' : ''}" onclick="toggleHomeLike('${hEsc(art.id)}')">♥ Suka</button>
-                <button type="button" class="lt-act-btn ${isSaved ? 'saved' : ''}" onclick="toggleHomeSave('${hEsc(art.id)}')">🔖 Simpan</button>
-                <button type="button" class="lt-act-btn" onclick="shareArticleLink('${hEsc(art.slug || art.id)}')">↗ Bagikan</button>
-              </div>
-            </div>
-          </article>
-          ${commentsSectionHtml}
-        </main>
-        ${renderFooterHtml()}
-      `;
-
-      const cForm = document.getElementById('commentForm');
-      if (cForm && sb) {
-        cForm.addEventListener('submit', async (ev) => {
-          ev.preventDefault();
-          const cMsg = document.getElementById('cMsg');
-          const { error } = await sb.from('comments').insert({
-            article_id: art.id,
-            author_name: document.getElementById('cName').value.trim(),
-            phone: document.getElementById('cPhone').value.trim() || null,
-            body: document.getElementById('cBody').value.trim(),
-            status: 'pending'
-          });
-          if (cMsg) {
-            cMsg.style.color = error ? '#B91C1C' : '#166534';
-            cMsg.textContent = error
-              ? 'Gagal mengirim komentar: ' + error.message
-              : 'Komentar terkirim dan menunggu persetujuan redaksi.';
-          }
-          if (!error) cForm.reset();
-        });
-      }
-    }
-
-    function renderHomeShell() {
-      const hash = window.location.hash || '';
-      const detailMatch = hash.match(/^#\/berita\/(.+)$/);
-      if (detailMatch) {
-        renderDetailView(decodeURIComponent(detailMatch[1]));
-        return;
-      }
-
-      const root = document.getElementById('root');
-      if (!root) return;
-
-      const categories = ['Semua', 'Investigasi', 'Ruang Gelap', 'Politik', 'Panggung', 'Ekonomi Gelap', 'Opini', 'Kilas Info'];
-      const catBarHtml = `
-        <div class="lt-cat-wrap">
-          ${categories.map(cat => `
-            <button type="button" class="lt-cat-pill ${homeState.category.toLowerCase() === cat.toLowerCase() ? 'active' : ''}" onclick="homeState.category='${hEsc(cat)}';renderHomeShell()">${hEsc(cat)}</button>
-          `).join('')}
-          <button type="button" class="lt-cat-pill ${homeState.category === '__saved__' ? 'active' : ''}" onclick="homeState.category='__saved__';renderHomeShell()">Disimpan (${homeState.savedIds.size})</button>
-        </div>
-      `;
-
-      let items = homeState.articles.slice();
-      if (homeState.category === '__saved__') {
-        items = items.filter(a => homeState.savedIds.has(a.id));
-      } else if (homeState.category !== 'Semua') {
-        items = items.filter(a => (a.category || '').toLowerCase() === homeState.category.toLowerCase());
-      }
-
-      const heroArt = homeState.category === 'Semua' && items.length ? items[0] : null;
-      const feedItems = heroArt ? items.slice(1) : items;
-
-      const heroHtml = heroArt ? `
-        <article class="lt-hero-card" onclick="location.hash='#/berita/${encodeURIComponent(heroArt.slug || heroArt.id)}'">
-          ${heroArt.cover_url ? `<img class="lt-hero-cover" src="${hEsc(heroArt.cover_url)}" alt="${hEsc(heroArt.title)}">` : ''}
-          <div class="lt-hero-body">
-            <div style="font-size:11px;font-weight:800;color:#7C3FE0;text-transform:uppercase">${hEsc(heroArt.category || 'Berita Utama')}</div>
-            <h1 class="lt-hero-title">${hEsc(heroArt.title)}</h1>
-            <p class="lt-hero-desc">${hEsc((heroArt.description || hPlain(heroArt.body) || '').slice(0, 160))}</p>
-            <div style="font-size:12px;color:var(--mute)">
-              <b>${hEsc(heroArt.author_name || 'Redaksi')}</b> • ${hDate(heroArt.published_at || heroArt.created_at)} • ${hReadMin(heroArt.body)} mnt baca
-            </div>
-          </div>
-        </article>
-      ` : '';
-
-      const feedHtml = feedItems.map(a => {
-        const slugOrId = hEsc(a.slug || a.id);
-        const title = hEsc(a.title || '(Tanpa Judul)');
-        const cat = hEsc(a.category || 'Umum');
-        const author = hEsc(a.author_name || 'Redaksi');
-        const excerpt = hEsc((a.description || hPlain(a.body) || '').slice(0, 150));
-        const isLiked = homeState.likedIds.has(a.id);
-        const isSaved = homeState.savedIds.has(a.id);
-        const cCount = Number(homeState.commentCounts[a.id] || 0);
-
-        return `
-          <article class="lt-feed-card">
-            <div class="lt-feed-head">
-              <div class="lt-author-row">
-                <div class="lt-avatar">${hEsc(author.charAt(0).toUpperCase())}</div>
-                <div>
-                  <div class="lt-author-name">${author}</div>
-                  <div class="lt-author-meta">${cat} • ${hDate(a.published_at || a.created_at)}</div>
-                </div>
-              </div>
-              <button type="button" class="lt-act-btn ${isSaved ? 'saved' : ''}" onclick="toggleHomeSave('${hEsc(a.id)}', event)">🔖 ${isSaved ? 'Tersimpan' : 'Simpan'}</button>
-            </div>
-            <div class="lt-feed-body" onclick="location.hash='#/berita/${encodeURIComponent(a.slug || a.id)}'">
-              <div style="min-width:0;flex:1">
-                <h2 class="lt-feed-title">${title}</h2>
-                <p class="lt-feed-excerpt">${excerpt}</p>
-                <div style="font-size:11px;color:var(--mute);font-weight:600">${hReadMin(a.body)} mnt baca • ${Number(a.views || 0)} dibaca</div>
-              </div>
-              ${a.cover_url ? `<img class="lt-feed-thumb" src="${hEsc(a.cover_url)}" alt="${title}" loading="lazy">` : ''}
-            </div>
-            <div class="lt-social-bar">
-              <div class="lt-social-left">
-                <button type="button" class="lt-act-btn ${isLiked ? 'liked' : ''}" onclick="toggleHomeLike('${hEsc(a.id)}', event)">♥ Suka</button>
-                <button type="button" class="lt-act-btn" onclick="location.hash='#/berita/${encodeURIComponent(a.slug || a.id)}'">💬 Komentar (${cCount})</button>
-                <button type="button" class="lt-act-btn" onclick="shareArticleLink('${slugOrId}', event)">↗ Bagikan</button>
-              </div>
-            </div>
-          </article>
-        `;
-      }).join('');
-
-      const emptyBox = !heroArt && !feedItems.length
-        ? `<div class="lt-feed-card"><p style="margin:0;color:var(--mute)">Belum ada berita terbit di kategori ini.</p></div>`
-        : '';
-
-      root.innerHTML = `
-        ${renderTopHeaderHtml()}
-        ${catBarHtml}
-        <main class="lt-main">
-          ${heroHtml}
-          ${feedHtml}
-          ${emptyBox}
-        </main>
-        ${renderFooterHtml()}
-      `;
-    }
-
-    window.addEventListener('hashchange', renderHomeShell);
-
-    (async function bootHome() {
-      renderHomeShell();
-      await loadHomeArticles();
-      renderHomeShell();
-    })();
-  </script>
+  <script src="js/supabase.js"></script>
+  <script src="js/feed.js"></script>
 </body>
 </html>

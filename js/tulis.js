@@ -1,3 +1,21 @@
+// Penangkap error: tampilkan pesan kesalahan di layar supaya terlihat
+window.addEventListener('error', function (e) {
+  tampilkanError(e.message || String(e.error));
+});
+window.addEventListener('unhandledrejection', function (e) {
+  var r = e.reason;
+  tampilkanError((r && (r.message || String(r))) || 'Gagal (tidak diketahui)');
+});
+function tampilkanError(teks) {
+  var box = document.getElementById('tErr');
+  if (box) {
+    box.textContent = 'Error: ' + teks;
+    box.hidden = false;
+    box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+  var bawah = document.getElementById('tAutosave');
+  if (bawah) bawah.textContent = 'Error: ' + teks;
+}
 // js/tulis.js
 // Halaman Tulis Berita: editor, cover 2:1, simpan draf, ajukan lewat advance_article,
 // simpan lokal tiap 30 detik, dan peringatan jika tab ditutup sebelum tersimpan.

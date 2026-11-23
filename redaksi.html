@@ -320,4 +320,479 @@
       if (!confirm('Hapus komentar ini?')) return;
       const sb = getClient();
       if (!sb) return;
-      const { error } = await sb.from('comments
+      const { error } = await sb.from('comments').delete().eq('id', id);
+      if (error) return setNotice('err', 'Gagal menghapus komentar: ' + error.message);
+      await loadRedaksiData();
+      setNotice('ok', 'Komentar dihapus.');
+    }
+
+    async function saveAdRow(ev) {
+      ev.preventDefault();
+      const sb = getClient();
+      if (!sb) return;
+      const { error } = await sb.from('ads').insert({
+        title: document.getElementById('adTitle').value.trim(),
+        placement: document.getElementById('adPlacement').value,
+        image_url: document.getElementById('adImageUrl').value.trim() || null,
+        target_url: document.getElementById('adTargetUrl').value.trim() || null,
+        ad_code: document.getElementById('adCode').value.trim() || null,
+        is_active: document.getElementById('adActive').checked
+      });
+      if (error) return setNotice('err', 'Gagal menyimpan iklan: ' + error.message);
+      ev.target.reset();
+      await loadRedaksiData();
+      setNotice('ok', 'Iklan tersimpan.');
+    }
+
+    async function toggleAdActive(id, currentActive) {
+      const sb = getClient();
+      if (!sb) return;
+      const { error } = await sb.from('ads').update({ is_active: !currentActive }).eq('id', id);
+      if (error) return setNotice('err', 'Gagal mengubah status iklan: ' + error.message);
+      await loadRedaksiData();
+      setNotice('ok', 'Status iklan diperbarui.');
+    }
+
+    async function deleteAdRow(id) {
+      if (!confirm('Hapus slot iklan ini?')) return;
+      const sb = getClient();
+      if (!sb) return;
+      const { error } = await sb.from('ads').delete().eq('id', id);
+      if (error) return setNotice('err', 'Gagal menghapus iklan: ' + error.message);
+      await loadRedaksiData();
+      setNotice('ok', 'Iklan dihapus.');
+    }
+
+    async function saveSiteSettings(ev) {
+      ev.preventDefault();
+      const sb = getClient();
+      if (!sb) return;
+      const pairs = [
+        { key: 'site_title', value: document.getElementById('setTitle').value.trim() },
+        { key: 'tagline', value: document.getElementById('setTagline').value.trim() },
+        { key: 'subtag', value: document.getElementById('setSubtag').value.trim() }
+      ];
+      for (const item of pairs) {
+        const { error } = await sb.from('site_settings').upsert({ key: item.key, value: item.value }, { onConflict: 'key' });
+        if (error) return setNotice('err', 'Gagal menyimpan pengaturan: ' + error.message);
+      }
+      await loadRedaksiData();
+      setNotice('ok', 'Pengaturan situs tersimpan.');
+    }
+
+    function renderLoginView() {
+      const isForgot = redaksiState.authMode === 'forgot';
+      const isRecovery = redaksiState.authMode === 'recovery';
+
+      let formHtml = '';
+      if (isRecovery) {
+        formHtml = `
+          <h1>Atur Kata Sandi Baru</h1>
+          <p class="lead">Masukkan kata sandi baru untuk akun redaksi kamu.</p>
+          <form onsubmit="handleUpdateRecoveredPassword(event)">
+            <div class="r-field" style="margin-bottom:12px">
+              <label for="rNewPassword">Kata Sandi Baru</label>
+              <input id="rNewPassword" type="password" required minlength="6" placeholder="Minimal 6 karakter">
+            </div>
+            <div class="r-field" style="margin-bottom:14px">
+              <label for="rConfirmPassword">Konfirmasi Kata Sandi Baru</label>
+              <input id="rConfirmPassword" type="password" required minlength="6" placeholder="Ulangi kata sandi baru">
+            </div>
+            <div id="rAuthErr" class="auth-msg-err"></div>
+            <button type="submit" class="go" style="width:100%;justify-content:center">Simpan Kata Sandi</button>
+          </form>
+        `;
+      } else if (isForgot) {
+        formHtml = `
+          <h1>Lupa Kata Sandi</h1>
+          <p class="lead">Masukkan email akun redaksi yang terdaftar di Supabase.</p>
+          <form onsubmit="handleForgotPassword(event)">
+            <div class="r-field" style="margin-bottom:14px">
+              <label for="rResetEmail">Email Redaksi</label>
+              <input id="rResetEmail" type="email" required placeholder="nama@email.com">
+            </div>
+            <div id="rAuthErr" class="auth-msg-err"></div>
+            <div id="rAuthOk" class="auth-msg-ok" style="display:none"></div>
+            <button type="submit" class="go" style="width:100%;justify-content:center">Kirim Link Reset ke Email</button>
+          </form>
+          <div style="margin-top:14px;text-align:center">
+            <button type="button" class="link-btn" onclick="redaksiState.authMode='login';renderRedaksiPage()">← Kembali ke Halaman Masuk</button>
+          </div>
+        `;
+      } else {
+        formHtml = `
+          <h1>Masuk Redaksi</h1>
+          <p class="lead">Masuk menggunakan akun tim redaksi yang terhubung dengan Supabase.</p>
+          <form onsubmit="handleRedaksiLogin(event)">
+            <div class="r-field" style="margin-bottom:12px">
+              <label for="rEmail">Email</label>
+              <input id="rEmail" type="email" required placeholder="redaksi@langkatalk.id">
+            </div>
+            <div class="r-field" style="margin-bottom:6px">
+              <label for="rPassword">Kata Sandi</label>
+              <input id="rPassword" type="password" required placeholder="••••••••">
+            </div>
+            <div class="auth-row-meta">
+              <span style="font-size:11px;color:var(--mute)">Supabase Auth</span>
+              <button type="button" class="link-btn" onclick="redaksiState.authMode='forgot';renderRedaksiPage()">Lupa kata sandi?</button>
+            </div>
+            <div id="rAuthErr" class="auth-msg-err"></div>
+            <button type="submit" class="go" style="width:100%;justify-content:center">Masuk ke Ruang Redaksi</button>
+          </form>
+        `;
+      }
+
+      document.getElementById('root').innerHTML = `
+        <div class="glass-auth-wrap">
+          <div class="glass-auth-card">
+            <div class="glass-auth-head">
+              <div class="glass-brand">
+                <img src="favicon.png" alt="Langkatalk">
+                <div>
+                  <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:15px">Langkatalk</div>
+                  <div style="font-size:12px;color:var(--mute)">Ruang Redaksi</div>
+                </div>
+              </div>
+              <a href="index.html" style="font-size:12px;font-weight:700;color:var(--mute)">← Beranda</a>
+            </div>
+            ${formHtml}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderArticlesTab() {
+      const rows = redaksiState.articles.map(a => {
+        const st = (a.status || 'draft').toLowerCase();
+        const badgeCls = st === 'terbit' ? 'b-terbit' : (st === 'arsip' ? 'b-arsip' : 'b-draft');
+        const idAttr = rEsc(a.id);
+        return `
+          <tr>
+            <td>
+              <div style="font-weight:700">${rEsc(a.title || '(Tanpa judul)')}</div>
+              <div style="font-size:11px;color:var(--mute)">${rEsc(a.category || 'Umum')} • ${rEsc(a.author_name || 'Redaksi')}</div>
+            </td>
+            <td><span class="badge ${badgeCls}">${rEsc(st)}</span></td>
+            <td>${Number(a.views || 0)}</td>
+            <td style="font-size:12px;color:var(--mute)">${rFmtDate(a.created_at)}</td>
+            <td>
+              <div class="r-row-act">
+                <button type="button" class="btn-xs pri" data-art-act="status" data-art-id="${idAttr}" data-art-status="terbit">Terbitkan</button>
+                <button type="button" class="btn-xs" data-art-act="status" data-art-id="${idAttr}" data-art-status="draft">Draft</button>
+                <button type="button" class="btn-xs" data-art-act="status" data-art-id="${idAttr}" data-art-status="arsip">Arsip</button>
+                <button type="button" class="btn-xs del" data-art-act="delete" data-art-id="${idAttr}">Hapus</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      return `
+        <div class="r-card">
+          <h2>Daftar Artikel &amp; Status</h2>
+          <div class="r-table-wrap">
+            <table class="r-tbl">
+              <thead>
+                <tr>
+                  <th>Judul</th>
+                  <th>Status</th>
+                  <th>Dibaca</th>
+                  <th>Tanggal</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rows || '<tr><td colspan="5">Belum ada artikel.</td></tr>'}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderCommentsTab() {
+      const canSeePhone = isDirectorOrEditor();
+      const rows = redaksiState.comments.map(c => {
+        const st = (c.status || 'pending').toLowerCase();
+        const badgeCls = st === 'approved' || st === 'terbit' ? 'b-terbit' : 'b-pending';
+        const phoneDisplay = canSeePhone
+          ? (c.phone || c.no_hp || '-')
+          : 'Terkunci (Direktur/Pemred)';
+        const cid = rEsc(c.id);
+        return `
+          <tr>
+            <td>
+              <div style="font-weight:700">${rEsc(c.author_name || 'Pembaca')}</div>
+              <div style="font-size:12px;margin-top:3px">${rEsc(c.body || c.content || '')}</div>
+            </td>
+            <td style="font-size:12px">${rEsc(phoneDisplay)}</td>
+            <td><span class="badge ${badgeCls}">${rEsc(st)}</span></td>
+            <td style="font-size:12px;color:var(--mute)">${rFmtDate(c.created_at)}</td>
+            <td>
+              <div class="r-row-act">
+                <button type="button" class="btn-xs pri" data-com-act="approve" data-com-id="${cid}">Setujui</button>
+                <button type="button" class="btn-xs del" data-com-act="delete" data-com-id="${cid}">Hapus</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      return `
+        <div class="r-card">
+          <h2>Moderasi Komentar</h2>
+          <div class="r-table-wrap">
+            <table class="r-tbl">
+              <thead>
+                <tr>
+                  <th>Komentar</th>
+                  <th>No. HP</th>
+                  <th>Status</th>
+                  <th>Tanggal</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rows || '<tr><td colspan="5">Belum ada komentar.</td></tr>'}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderAdsTab() {
+      const rows = redaksiState.ads.map(ad => {
+        const aid = rEsc(ad.id);
+        return `
+          <tr>
+            <td>
+              <div style="font-weight:700">${rEsc(ad.title || 'Slot Iklan')}</div>
+              <div style="font-size:11px;color:var(--mute)">${rEsc(ad.target_url || (ad.ad_code ? 'Kode AdSense/Script' : '-'))}</div>
+            </td>
+            <td>${rEsc(ad.placement || 'feed')}</td>
+            <td><span class="badge ${ad.is_active ? 'b-terbit' : 'b-arsip'}">${ad.is_active ? 'Aktif' : 'Nonaktif'}</span></td>
+            <td>
+              <div class="r-row-act">
+                <button type="button" class="btn-xs" data-ad-act="toggle" data-ad-id="${aid}" data-ad-active="${Boolean(ad.is_active)}">${ad.is_active ? 'Nonaktifkan' : 'Aktifkan'}</button>
+                <button type="button" class="btn-xs del" data-ad-act="delete" data-ad-id="${aid}">Hapus</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      return `
+        <div class="r-card">
+          <h2>Tambah Iklan / AdSense</h2>
+          <form onsubmit="saveAdRow(event)" class="r-form-grid">
+            <div class="r-field">
+              <label for="adTitle">Judul / Label Iklan</label>
+              <input id="adTitle" type="text" required placeholder="Promo Partner Lokal">
+            </div>
+            <div class="r-field">
+              <label for="adPlacement">Posisi Penempatan</label>
+              <select id="adPlacement">
+                <option value="feed">Di Sela Feed</option>
+                <option value="header">Banner Atas</option>
+                <option value="detail">Halaman Baca</option>
+              </select>
+            </div>
+            <div class="r-field">
+              <label for="adImageUrl">URL Gambar Banner (Opsional)</label>
+              <input id="adImageUrl" type="url" placeholder="https://...">
+            </div>
+            <div class="r-field">
+              <label for="adTargetUrl">URL Tujuan Klik (Opsional)</label>
+              <input id="adTargetUrl" type="url" placeholder="https://...">
+            </div>
+            <div class="r-field full">
+              <label for="adCode">Kode HTML / AdSense (Opsional)</label>
+              <textarea id="adCode" placeholder="Tempel potongan kode iklan jika memakai AdSense atau script banner"></textarea>
+            </div>
+            <div class="r-field full" style="flex-direction:row;align-items:center;justify-content:space-between">
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+                <input id="adActive" type="checkbox" checked style="width:auto">
+                <span>Aktifkan langsung</span>
+              </label>
+              <button type="submit" class="go sm">Simpan Iklan</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="r-card">
+          <h2>Daftar Iklan Terpasang</h2>
+          <div class="r-table-wrap">
+            <table class="r-tbl">
+              <thead>
+                <tr>
+                  <th>Judul</th>
+                  <th>Posisi</th>
+                  <th>Status</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rows || '<tr><td colspan="4">Belum ada data iklan.</td></tr>'}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderSettingsTab() {
+      const s = redaksiState.settings || {};
+      return `
+        <div class="r-card">
+          <h2>Pengaturan Situs</h2>
+          <form onsubmit="saveSiteSettings(event)" class="r-form-grid">
+            <div class="r-field">
+              <label for="setTitle">Nama Situs</label>
+              <input id="setTitle" type="text" value="${rEsc(s.site_title || 'Langkatalk')}">
+            </div>
+            <div class="r-field">
+              <label for="setTagline">Tagline Utama</label>
+              <input id="setTagline" type="text" value="${rEsc(s.tagline || 'Menghubungkan Cerita Langkat')}">
+            </div>
+            <div class="r-field full">
+              <label for="setSubtag">Sub-tagline / Deskripsi Singkat</label>
+              <input id="setSubtag" type="text" value="${rEsc(s.subtag || 'Bongkar Atraksi Ruang Gelap')}">
+            </div>
+            <div class="r-field full" style="align-items:flex-end">
+              <button type="submit" class="go sm">Simpan Pengaturan</button>
+            </div>
+          </form>
+        </div>
+      `;
+    }
+
+    function bindRedaksiActions() {
+      const root = document.getElementById('root');
+      if (!root) return;
+
+      root.querySelectorAll('[data-art-act]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const act = btn.getAttribute('data-art-act');
+          const id = btn.getAttribute('data-art-id');
+          if (!id) return;
+          if (act === 'status') {
+            await setArticleStatus(id, btn.getAttribute('data-art-status'));
+          } else if (act === 'delete') {
+            await deleteArticleRow(id);
+          }
+        });
+      });
+
+      root.querySelectorAll('[data-com-act]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const act = btn.getAttribute('data-com-act');
+          const id = btn.getAttribute('data-com-id');
+          if (!id) return;
+          if (act === 'approve') {
+            await setCommentStatus(id, 'approved');
+          } else if (act === 'delete') {
+            await deleteCommentRow(id);
+          }
+        });
+      });
+
+      root.querySelectorAll('[data-ad-act]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const act = btn.getAttribute('data-ad-act');
+          const id = btn.getAttribute('data-ad-id');
+          if (!id) return;
+          if (act === 'toggle') {
+            await toggleAdActive(id, btn.getAttribute('data-ad-active') === 'true');
+          } else if (act === 'delete') {
+            await deleteAdRow(id);
+          }
+        });
+      });
+    }
+
+    function renderRedaksiPage() {
+      if (!redaksiState.user || redaksiState.authMode === 'recovery') {
+        renderLoginView();
+        return;
+      }
+
+      const totalArt = redaksiState.articles.length;
+      const terbitArt = redaksiState.articles.filter(a => (a.status || '').toLowerCase() === 'terbit').length;
+      const draftArt = redaksiState.articles.filter(a => (a.status || '').toLowerCase() !== 'terbit').length;
+      const pendingCom = redaksiState.comments.filter(c => !['approved', 'terbit'].includes((c.status || '').toLowerCase())).length;
+
+      const noticeHtml = redaksiState.notice
+        ? `<div class="r-notice ${redaksiState.notice.type === 'err' ? 'err' : 'ok'}">${rEsc(redaksiState.notice.text)}</div>`
+        : '';
+
+      let tabContent = '';
+      if (redaksiState.tab === 'artikel') tabContent = renderArticlesTab();
+      else if (redaksiState.tab === 'komentar') tabContent = renderCommentsTab();
+      else if (redaksiState.tab === 'iklan') tabContent = renderAdsTab();
+      else if (redaksiState.tab === 'pengaturan') tabContent = renderSettingsTab();
+
+      document.getElementById('root').innerHTML = `
+        <div class="r-wrap">
+          <div class="r-top">
+            <div class="r-brand">
+              <img src="favicon.png" alt="Langkatalk">
+              <div>
+                <h1>Ruang Redaksi</h1>
+                <div class="sub">${rEsc(redaksiState.profile?.full_name || redaksiState.user.email)} • Peran: <b>${rEsc(redaksiState.profile?.role || 'penulis')}</b></div>
+              </div>
+            </div>
+            <div class="r-actions">
+              <a class="pill" href="index.html">Beranda</a>
+              <a class="go sm" href="tulis.html">+ Tulis Berita</a>
+              <button type="button" class="btn-grad-dark" onclick="handleRedaksiLogout()">Keluar</button>
+            </div>
+          </div>
+
+          <div class="r-grid4">
+            <div class="r-stat"><div class="k">Total Artikel</div><div class="v">${totalArt}</div></div>
+            <div class="r-stat"><div class="k">Terbit</div><div class="v">${terbitArt}</div></div>
+            <div class="r-stat"><div class="k">Draft / Arsip</div><div class="v">${draftArt}</div></div>
+            <div class="r-stat"><div class="k">Komentar Menunggu</div><div class="v">${pendingCom}</div></div>
+          </div>
+
+          <div class="r-tabs">
+            <button type="button" class="r-tab ${redaksiState.tab === 'artikel' ? 'on' : ''}" onclick="redaksiState.notice=null;redaksiState.tab='artikel';renderRedaksiPage()">Artikel &amp; Status</button>
+            <button type="button" class="r-tab ${redaksiState.tab === 'komentar' ? 'on' : ''}" onclick="redaksiState.notice=null;redaksiState.tab='komentar';renderRedaksiPage()">Moderasi Komentar</button>
+            <button type="button" class="r-tab ${redaksiState.tab === 'iklan' ? 'on' : ''}" onclick="redaksiState.notice=null;redaksiState.tab='iklan';renderRedaksiPage()">Iklan &amp; AdSense</button>
+            <button type="button" class="r-tab ${redaksiState.tab === 'pengaturan' ? 'on' : ''}" onclick="redaksiState.notice=null;redaksiState.tab='pengaturan';renderRedaksiPage()">Pengaturan Situs</button>
+          </div>
+
+          ${noticeHtml}
+          ${tabContent}
+        </div>
+      `;
+
+      bindRedaksiActions();
+    }
+
+    (async function initRedaksi() {
+      const sb = getClient();
+      if (sb && sb.auth && sb.auth.onAuthStateChange) {
+        sb.auth.onAuthStateChange(async (event) => {
+          if (event === 'PASSWORD_RECOVERY') {
+            redaksiState.authMode = 'recovery';
+            renderRedaksiPage();
+          }
+        });
+      }
+
+      if (window.location.hash && window.location.hash.includes('type=recovery')) {
+        redaksiState.authMode = 'recovery';
+      }
+
+      renderRedaksiPage();
+      await loadRedaksiSession();
+      if (redaksiState.user && redaksiState.authMode !== 'recovery') {
+        await loadRedaksiData();
+      }
+      renderRedaksiPage();
+    })();
+  </script>
+</body>
+</html>

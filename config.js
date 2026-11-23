@@ -7,4 +7,5 @@ window.LANGKATALK_CONFIG = {
   // true = semua permintaan ke Supabase lewat jembatan di domain Vercel-mu (/supabase).
   // Wajib true jika provider internet memblokir supabase.co. Alamat tujuan jembatan diatur di vercel.json.
   USE_PROXY: true
+  // trigger deploy
 };

@@ -7,7 +7,7 @@
   'use strict';
 
   var sb = window.LK && window.LK.sb;
-  var ROLE_BOLEH = ['direktur', 'pemred', 'redaktur', 'reporter', 'kontributor'];
+  var ROLE_BOLEH = ['direktur', 'pemred', 'redaktur', 'editor', 'reporter', 'kontributor'];
   var RUBRIK_CADANGAN = ['Investigasi', 'Ruang Gelap', 'Politik', 'Panggung', 'Ekonomi Gelap', 'Opini', 'Kilas Info'];
   var KUNCI_LOKAL = 'lk_tulis_draf_v2';
   var BATAS_MENTAH = 1024 * 1024; // 1 MB, sesuai anchor

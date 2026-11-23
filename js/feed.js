@@ -6,7 +6,7 @@
   var UKURAN = 10;
   var JEDA_KOMENTAR_MS = 30000;
   var KATEGORI_CADANGAN = ['Investigasi', 'Ruang Gelap', 'Politik', 'Panggung', 'Ekonomi Gelap', 'Opini', 'Kilas Info'];
-    var KOLOM = 'id,title,slug,category,description,cover_url,cover_caption,author_id,author_name,published_at,like_count,comment_count,is_exclusive,is_breaking';
+     var KOLOM = 'id,title,slug,category,description,cover_url,cover_caption,author_id,author_name,published_at,like_count,comment_count,is_exclusive,is_breaking';
   var REGEX_EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
   var IKON = {

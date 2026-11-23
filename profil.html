@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Profil Saya – Langkatalk</title>
+  <link rel="icon" href="favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/feed.css">
+  <style>
+    .lk-profil{max-width:720px;margin:18px auto;padding:0 14px}
+    .lk-kartu{background:rgba(255,255,255,.82);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.9);border-radius:20px;padding:18px;box-shadow:0 10px 30px rgba(95,63,200,.10);margin-bottom:14px}
+    .lk-profil-atas{display:flex;gap:16px;align-items:center}
+    .lk-foto-besar{width:84px;height:84px;border-radius:999px;overflow:hidden;flex-shrink:0;border:3px solid #fff;box-shadow:0 6px 18px rgba(124,58,237,.25);background:linear-gradient(135deg,#7c3aed,#2563eb,#06b6d4,#f59e0b);color:#fff;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800}
+    .lk-foto-besar img{width:100%;height:100%;object-fit:cover;display:block}
+    .lk-nama{font-family:Sora,sans-serif;font-size:22px;font-weight:800;margin:0}
+    .lk-username{color:#6b7280;margin:2px 0 6px}
+    .lk-chip{display:inline-block;background:#E9E4FF;color:#5b21b6;font-weight:700;font-size:12.5px;padding:4px 10px;border-radius:999px}
+    .lk-stat{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:14px}
+    .lk-stat div{background:#F3F0FF;border-radius:14px;padding:12px;text-align:center}
+    .lk-stat b{display:block;font-size:22px;line-height:1}
+    .lk-stat span{font-size:12.5px;color:#6b7280}
+    .lk-label{display:block;font-size:13px;font-weight:700;margin:12px 0 4px}
+    .lk-label small{font-weight:400;color:#6b7280}
+    .lk-input{width:100%;height:44px;border:1.5px solid #e5e7eb;border-radius:12px;padding:0 12px;font:inherit;background:#fff;box-sizing:border-box}
+    .lk-bar{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .lk-note{font-size:13px;color:#6b7280}
+    .lk-berkas{border:1.5px dashed #c7d2fe;border-radius:12px;padding:12px;margin-top:8px}
+    .lk-berkas a{font-weight:700}
+  </style>
+</head>
+<body>
+  <header class="lk-header">
+    <a class="lk-logo" href="index.html">
+      <img src="favicon.png" alt="" width="28" height="28">
+      <span><b>Langkatalk</b><small>Menghubungkan Cerita Langkat</small></span>
+    </a>
+    <span id="headerAkun"><span class="lk-avatar lk-avatar-kosong" aria-hidden="true"></span></span>
+  </header>
+
+  <main class="lk-profil">
+    <div id="isiProfil"><p class="lk-note" style="text-align:center;padding:30px">Memuat profil…</p></div>
+    <div style="text-align:center"><a href="index.html">← Kembali ke Beranda</a> &nbsp;•&nbsp; <a href="redaksi.html">Ruang Redaksi</a></div>
+  </main>
+
+  <div id="toast" class="lk-toast" role="status"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="config.js"></script>
+  <script src="js/supabase.js"></script>
+  <script>
+  (function(){
+    function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+    function kabar(t){var e=document.getElementById('toast');if(!e)return;e.textContent=t;e.classList.add('show');setTimeout(function(){e.classList.remove('show')},2500)}
+    function tglIndo(t){if(!t)return '-';try{return new Date(t).toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}catch(e){return t}}
+
+    async function muat(){
+      var sb=window.LK&&window.LK.sb; if(!sb)return;
+      var sesi=await sb.auth.getSession();
+      var user=sesi&&sesi.data&&sesi.data.session&&sesi.data.session.user;
+      if(!user){location.href='redaksi.html';return;}
+
+      // Header avatar kecil
+      try{
+        var ph=await sb.from('profiles').select('*').eq('id',user.id).maybeSingle();
+        var pr=ph.data||{};
+        var box=document.getElementById('headerAkun');
+        if(box){ box.innerHTML='<a class="lk-avatar" href="profil.html" title="Akun saya">'+(pr.avatar_url?'<img src="'+esc(pr.avatar_url)+'" alt="">':esc(((pr.full_name||pr.username||'?').trim().charAt(0)||'?').toUpperCase()))+'</a>'; }
+      }catch(e){}
+
+      // Hitung berita
+      var terbit=0, draf=0, total=0;
+      try{
+        var a=await sb.from('articles').select('id,status').eq('author_id',user.id).limit(1000);
+        var list=(a.data||[]); total=list.length;
+        list.forEach(function(x){ if(x.status==='terbit'||x.status==='published') terbit++; else draf++; });
+      }catch(e){}
+
+      var gabung = pr.created_at || pr.join_date || user.created_at;
+      var hariAktif = gabung ? Math.max(1, Math.floor((Date.now()-new Date(gabung).getTime())/86400000)+1) : 1;
+
+      var inisial=((pr.full_name||pr.username||'?').trim().charAt(0)||'?').toUpperCase();
+      var foto=pr.avatar_url?'<img src="'+esc(pr.avatar_url)+'" alt="">':inisial;
+      var roleMap={direktur:'Direktur',pemred:'Pemimpin Redaksi',redaktur:'Redaktur',editor:'Editor',reporter:'Reporter',kontributor:'Kontributor'};
+      var jabatan=roleMap[pr.role]||pr.role||'Kontributor';
+
+      document.getElementById('isiProfil').innerHTML=
+      '<section class="lk-kartu"><div class="lk-profil-atas"><div class="lk-foto-besar">'+foto+'</div><div><p class="lk-nama">'+esc(pr.full_name||pr.username||'Tanpa Nama')+'</p><p class="lk-username">@'+esc(pr.username||'-')+'</p><span class="lk-chip">'+esc(jabatan)+'</span></div></div>'+
+      '<div class="lk-stat"><div><b>'+terbit+'</b><span>Berita Terbit</span></div><div><b>'+draf+'</b><span>Draf / Proses</span></div><div><b>'+hariAktif+' hari</b><span>Aktif Sejak '+tglIndo(gabung)+'</span></div></div>'+
+      '<div class="lk-bar"><a class="btn btn-utama btn-kecil" href="tulis.html">+ Tulis Berita</a><a class="btn btn-kecil" style="background:#fff;border:1.5px solid #e5e7eb" href="redaksi.html">Ubah Foto di Redaksi</a></div></section>'+
+      '<section class="lk-kartu"><h2 style="font-size:17px">Data Pribadi</h2><p class="lk-note">No HP & tanggal lahir hanya dilihat kamu sendiri, tidak tampil di publik.</p>'+
+      '<form id="formProfil"><label class="lk-label">Nama Lengkap</label><input class="lk-input" id="fNama" value="'+esc(pr.full_name||'')+'">'+
+      '<label class="lk-label">No HP / WhatsApp</label><input class="lk-input" id="fPhone" placeholder="08xxxxxxxxxx" value="'+esc(pr.phone||'')+'">'+
+      '<label class="lk-label">Tanggal Lahir</label><input class="lk-input" id="fBirth" type="date" value="'+esc(pr.birth_date||'')+'">'+
+      '<label class="lk-label">Alamat</label><input class="lk-input" id="fAddr" placeholder="Kecamatan, Kabupaten" value="'+esc(pr.address||'')+'">'+
+      '<label class="lk-label">Email <small>(tidak bisa diubah di sini)</small></label><input class="lk-input" value="'+esc(user.email||'')+'" disabled>'+
+      '<div class="lk-bar"><button type="submit" class="btn btn-utama btn-kecil">Simpan Perubahan</button></div></form></section>'+
+      '<section class="lk-kartu"><h2 style="font-size:17px">Berkas Karyawan</h2><p class="lk-note">Untuk KTP / SK / kontrak, kirim ke Direktur lewat WhatsApp redaksi dulu. Nanti link berkasnya ditampilkan di sini.</p><div class="lk-berkas">Belum ada berkas yang diunggah.</div></section>';
+
+      document.getElementById('formProfil').addEventListener('submit', async function(ev){
+        ev.preventDefault();
+        var upd={full_name:document.getElementById('fNama').value.trim(), phone:document.getElementById('fPhone').value.trim()||null, birth_date:document.getElementById('fBirth').value||null, address:document.getElementById('fAddr').value.trim()||null};
+        var r=await sb.from('profiles').update(upd).eq('id',user.id);
+        if(r.error){ kabar('Gagal simpan: '+r.error.message); } else { kabar('Profil tersimpan!'); }
+      });
+    }
+    if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',muat)}else{muat()}
+  })();
+  </script>
+</body>
+</html>

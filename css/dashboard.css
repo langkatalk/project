@@ -354,3 +354,44 @@
   .rd-form-grid { grid-template-columns: 1fr 1fr; }
   .rd-app { padding: 22px 24px 60px; }
 }
+/* Submenu status dan komentar */
+.rd-chips {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  margin-bottom: 12px;
+  scrollbar-width: none;
+}
+.rd-chips::-webkit-scrollbar { display: none; }
+.rd-chip {
+  flex: 0 0 auto;
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid var(--lk-garis);
+  background: #fff;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--lk-body);
+  cursor: pointer;
+}
+.rd-chip span { margin-left: 4px; color: var(--lk-muted); }
+.rd-chip.on {
+  background: var(--lk-grad-tombol);
+  color: #fff;
+  border-color: transparent;
+}
+.rd-chip.on span { color: #fff; }
+
+/* Menu yang belum dibuat */
+.rd-tab button.segera { opacity: 0.55; }
+.rd-tab button.segera::after { content: ' · segera'; font-size: 11px; }
+
+.rd-baris-isi {
+  font-size: 14px;
+  color: var(--lk-body);
+  margin: 6px 0 0;
+  white-space: pre-wrap;
+}

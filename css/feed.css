@@ -1,5 +1,5 @@
 /* css/feed.css
-   Tampilan beranda: header, kategori, kartu berita, dan footer. */
+   Beranda gaya Instagram: gambar 2:1, ikon minimalis, dan panel komentar/suka. */
 
 /* Header */
 .lk-header {
@@ -12,7 +12,7 @@
   gap: 12px;
   min-height: 56px;
   padding: env(safe-area-inset-top, 0px) 16px 0;
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
   border-bottom: 1px solid var(--lk-kaca-garis);
@@ -32,7 +32,7 @@
 .lk-logo small { display: block; font-size: 10px; color: var(--lk-muted); }
 .btn-kecil { min-height: 40px; padding: 0 14px; font-size: 13px; }
 
-/* Kategori (geser ke samping) */
+/* Kategori */
 .lk-chips {
   position: sticky;
   top: 56px;
@@ -42,7 +42,7 @@
   overflow-x: auto;
   padding: 10px 16px;
   scrollbar-width: none;
-  background: rgba(243, 240, 255, 0.92);
+  background: rgba(243, 240, 255, 0.94);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
 }
@@ -53,7 +53,7 @@
   padding: 6px 14px;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.85);
-  background: rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.8);
   font-family: inherit;
   font-size: 13px;
   font-weight: 600;
@@ -67,22 +67,21 @@
   box-shadow: 0 4px 12px rgba(124, 63, 224, 0.24);
 }
 
-/* Daftar kartu */
+/* Daftar: satu kolom, seperti Instagram */
 .lk-feed {
   display: grid;
-  gap: 16px;
-  max-width: 680px;
-  margin: 16px auto 0;
-  padding: 0 12px;
+  gap: 14px;
+  max-width: 560px;
+  margin: 14px auto 0;
+  padding: 0 0 8px;
 }
-.kartu-berita {
-  background: var(--lk-kaca);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border: 1px solid var(--lk-kaca-garis);
-  border-radius: 22px;
-  box-shadow: var(--lk-bayangan);
+
+.ig-kartu {
+  background: #fff;
+  border: 1px solid var(--lk-garis);
+  border-radius: 20px;
   overflow: hidden;
+  box-shadow: 0 6px 20px rgba(95, 63, 200, 0.07);
   animation: munculNaik 220ms ease both;
 }
 @keyframes munculNaik {
@@ -90,10 +89,11 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-.kb-kepala { display: flex; align-items: center; gap: 10px; padding: 12px 14px; }
-.kb-info { min-width: 0; flex: 1; }
-.kb-info b { display: block; font-size: 13px; color: var(--lk-teks); }
-.kb-info small { font-size: 11px; color: var(--lk-muted); }
+/* Kepala kartu */
+.ig-kepala { display: flex; align-items: center; gap: 10px; padding: 12px 14px; }
+.ig-info { min-width: 0; flex: 1; }
+.ig-info b { display: block; font-size: 13px; color: var(--lk-teks); }
+.ig-info small { font-size: 11px; color: var(--lk-muted); }
 .av {
   flex-shrink: 0;
   width: 34px;
@@ -117,29 +117,71 @@
   font-weight: 800;
 }
 
-.kb-gambar {
+/* Gambar: selalu landscape 2:1 (1200 x 600) */
+.ig-media {
   display: block;
   width: 100%;
-  aspect-ratio: 16 / 9;
-  object-fit: cover;
+  aspect-ratio: 2 / 1;
   background: var(--lk-grad-brand);
-}
-
-.kb-isi { padding: 12px 14px 4px; }
-.kb-judul {
-  font-family: 'Sora', 'Plus Jakarta Sans', sans-serif;
-  font-size: 18px;
-  font-weight: 800;
-  line-height: 1.25;
-  color: var(--lk-teks);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
   overflow: hidden;
 }
-.kb-judul a { color: inherit; }
-.kb-desk {
-  margin: 6px 0 0;
+.ig-gambar {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.ig-media-kosong {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-family: 'Sora', 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800;
+  font-size: 22px;
+}
+
+/* Ikon aksi minimalis */
+.ig-aksi {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 8px 0;
+}
+.ig-ikon {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--lk-teks);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.ig-ikon:active { transform: scale(0.9); }
+.ig-ikon:disabled { opacity: 0.5; }
+.ig-ikon.suka.aktif { color: #E11D48; }
+.ig-ikon.suka.aktif svg { fill: currentColor; }
+.ig-ikon.ig-simpan { margin-left: auto; }
+.ig-ikon.ig-simpan.aktif { color: var(--lk-ungu); }
+.ig-ikon.ig-simpan.aktif svg { fill: currentColor; }
+
+/* Isi di bawah ikon */
+.ig-isi { padding: 6px 14px 14px; }
+.ig-jumlah { margin: 0 0 6px; font-size: 13px; font-weight: 700; color: var(--lk-teks); }
+.ig-judul {
+  font-family: 'Sora', 'Plus Jakarta Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.3;
+  color: var(--lk-teks);
+  margin: 0;
+}
+.ig-judul a { color: inherit; }
+.ig-desk {
+  margin: 4px 0 0;
   font-size: 14px;
   line-height: 1.5;
   color: var(--lk-body);
@@ -148,35 +190,20 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-
-/* Tombol aksi di bawah kartu */
-.kb-aksi {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  padding: 8px 8px 12px;
-}
-.btn-aksi {
-  min-height: 44px;
-  padding: 0 10px;
+.ig-lihat {
+  display: block;
+  margin-top: 6px;
+  padding: 0;
   border: 0;
-  border-radius: 12px;
-  background: transparent;
+  background: none;
   font-family: inherit;
   font-size: 13px;
-  font-weight: 700;
-  color: var(--lk-teks);
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
+  font-weight: 600;
+  color: var(--lk-muted);
   cursor: pointer;
 }
-.btn-aksi:active { transform: scale(0.96); }
-.btn-aksi:disabled { opacity: 0.6; }
-.btn-aksi.suka.aktif { color: #E11D48; }
-.btn-aksi.simpan.aktif { color: var(--lk-ungu); }
 
-/* Status dan penanda */
+/* Status, toast, footer */
 .lk-sentinel { height: 1px; }
 .lk-status {
   text-align: center;
@@ -185,7 +212,6 @@
   padding: 16px;
   min-height: 24px;
 }
-
 .lk-toast {
   position: fixed;
   left: 50%;
@@ -202,13 +228,12 @@
   max-width: 90vw;
   text-align: center;
   transition: 200ms ease;
-  z-index: 50;
+  z-index: 80;
 }
 .lk-toast.on { opacity: 1; transform: translate(-50%, 0); }
-
 .lk-footer {
-  max-width: 680px;
-  margin: 32px auto 24px;
+  max-width: 560px;
+  margin: 28px auto 24px;
   padding: 16px;
   border-top: 1px solid var(--lk-garis);
   font-size: 12px;
@@ -221,12 +246,95 @@
 .lk-footer-link { display: flex; gap: 14px; }
 .lk-footer-link a { color: var(--lk-teks); font-weight: 700; }
 
-/* Tablet dan desktop: dua kolom */
-@media (min-width: 768px) {
-  .lk-feed {
-    grid-template-columns: 1fr 1fr;
-    max-width: 920px;
-    gap: 20px;
-  }
-  .lk-header, .lk-chips { padding-left: 24px; padding-right: 24px; }
+/* Panel bawah (suka dengan data, komentar) */
+.lk-sheet-bg {
+  position: fixed;
+  inset: 0;
+  background: rgba(13, 10, 44, 0.45);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease;
+  z-index: 60;
 }
+.lk-sheet-bg.on { opacity: 1; pointer-events: auto; }
+.lk-sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: 88vh;
+  overflow-y: auto;
+  background: rgba(255, 255, 255, 0.97);
+  border-radius: 24px 24px 0 0;
+  padding: 10px 18px calc(22px + env(safe-area-inset-bottom, 0px));
+  transform: translateY(100%);
+  transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 61;
+}
+.lk-sheet.on { transform: translateY(0); }
+@media (min-width: 768px) {
+  .lk-sheet { max-width: 560px; margin: 0 auto; border-radius: 24px; }
+}
+.lk-grip {
+  width: 42px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--lk-garis);
+  margin: 0 auto 12px;
+}
+.sh-judul {
+  font-family: 'Sora', 'Plus Jakarta Sans', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--lk-teks);
+  margin: 0 0 4px;
+}
+.sh-catatan { font-size: 12.5px; color: var(--lk-muted); margin: 8px 0; line-height: 1.5; }
+.sh-form { margin-top: 8px; }
+.sh-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--lk-teks);
+  margin-bottom: 10px;
+}
+.sh-label input,
+.sh-label textarea {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  min-height: 46px;
+  padding: 10px 14px;
+  border: 1.5px solid var(--lk-garis);
+  border-radius: 14px;
+  font-family: inherit;
+  font-size: 16px; /* mencegah zoom otomatis di iPhone */
+  font-weight: 400;
+  color: var(--lk-teks);
+  background: #fff;
+}
+.sh-label textarea { min-height: 90px; resize: vertical; }
+.sh-label input:focus,
+.sh-label textarea:focus {
+  outline: none;
+  border-color: #5F6FEE;
+  box-shadow: 0 0 0 4px rgba(95, 111, 238, 0.16);
+}
+.sh-err { min-height: 18px; color: #B91C1C; font-size: 13px; font-weight: 600; margin: 6px 0 0; }
+.sh-tombol { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
+.btn-tutup {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1.5px solid var(--lk-garis);
+  background: #fff;
+  border-radius: 14px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--lk-teks);
+  cursor: pointer;
+}
+.k-list { max-height: 220px; overflow-y: auto; margin: 6px 0 4px; }
+.k-item { padding: 9px 0; border-bottom: 1px solid var(--lk-garis); font-size: 14px; }
+.k-item small { color: var(--lk-muted); margin-left: 6px; }
+.k-item p { margin: 4px 0 0; color: var(--lk-body); white-space: pre-wrap; }

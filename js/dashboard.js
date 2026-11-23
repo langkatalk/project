@@ -261,7 +261,7 @@
       }
       return b.join('');
     }
-    b.push('<a class="btn-xs" href="baca.html?pratinjau=' + a.id + '" target="_blank" rel="noopener">Pratinjau</a>');
+        if (st !== 'terbit') b.push('<a class="btn-xs" href="baca.html?pratinjau=' + a.id + '" target="_blank" rel="noopener">Pratinjau</a>');
     if ((st === 'draf' || st === 'draft' || st === 'revisi') && (saya || r === 'direktur')) {
       b.push(t('ajukan', 'Ajukan', 'utama'));
     }

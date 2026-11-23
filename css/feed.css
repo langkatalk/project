@@ -1,0 +1,232 @@
+/* css/feed.css
+   Tampilan beranda: header, kategori, kartu berita, dan footer. */
+
+/* Header */
+.lk-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 56px;
+  padding: env(safe-area-inset-top, 0px) 16px 0;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--lk-kaca-garis);
+}
+.lk-logo { display: flex; align-items: center; gap: 8px; }
+.lk-logo img { width: 28px; height: 28px; border-radius: 6px; }
+.lk-logo b {
+  display: block;
+  font-family: 'Sora', 'Plus Jakarta Sans', sans-serif;
+  font-size: 17px;
+  line-height: 1.05;
+  background: linear-gradient(90deg, #7A3FE0, #5B78F2);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.lk-logo small { display: block; font-size: 10px; color: var(--lk-muted); }
+.btn-kecil { min-height: 40px; padding: 0 14px; font-size: 13px; }
+
+/* Kategori (geser ke samping) */
+.lk-chips {
+  position: sticky;
+  top: 56px;
+  z-index: 15;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 10px 16px;
+  scrollbar-width: none;
+  background: rgba(243, 240, 255, 0.92);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+.lk-chips::-webkit-scrollbar { display: none; }
+.chip-kat {
+  flex: 0 0 auto;
+  min-height: 38px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.75);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--lk-body);
+  cursor: pointer;
+}
+.chip-kat.on {
+  background: var(--lk-grad-tombol);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 4px 12px rgba(124, 63, 224, 0.24);
+}
+
+/* Daftar kartu */
+.lk-feed {
+  display: grid;
+  gap: 16px;
+  max-width: 680px;
+  margin: 16px auto 0;
+  padding: 0 12px;
+}
+.kartu-berita {
+  background: var(--lk-kaca);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--lk-kaca-garis);
+  border-radius: 22px;
+  box-shadow: var(--lk-bayangan);
+  overflow: hidden;
+  animation: munculNaik 220ms ease both;
+}
+@keyframes munculNaik {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.kb-kepala { display: flex; align-items: center; gap: 10px; padding: 12px 14px; }
+.kb-info { min-width: 0; flex: 1; }
+.kb-info b { display: block; font-size: 13px; color: var(--lk-teks); }
+.kb-info small { font-size: 11px; color: var(--lk-muted); }
+.av {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: var(--lk-grad-tombol);
+  color: #fff;
+  font-weight: 800;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.lencana {
+  flex-shrink: 0;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--lk-jingga);
+  color: var(--lk-navy);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.kb-gambar {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: var(--lk-grad-brand);
+}
+
+.kb-isi { padding: 12px 14px 4px; }
+.kb-judul {
+  font-family: 'Sora', 'Plus Jakarta Sans', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.25;
+  color: var(--lk-teks);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.kb-judul a { color: inherit; }
+.kb-desk {
+  margin: 6px 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--lk-body);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Tombol aksi di bawah kartu */
+.kb-aksi {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 8px 8px 12px;
+}
+.btn-aksi {
+  min-height: 44px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--lk-teks);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+.btn-aksi:active { transform: scale(0.96); }
+.btn-aksi:disabled { opacity: 0.6; }
+.btn-aksi.suka.aktif { color: #E11D48; }
+.btn-aksi.simpan.aktif { color: var(--lk-ungu); }
+
+/* Status dan penanda */
+.lk-sentinel { height: 1px; }
+.lk-status {
+  text-align: center;
+  font-size: 13px;
+  color: var(--lk-muted);
+  padding: 16px;
+  min-height: 24px;
+}
+
+.lk-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translate(-50%, 16px);
+  opacity: 0;
+  pointer-events: none;
+  background: var(--lk-malam);
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  max-width: 90vw;
+  text-align: center;
+  transition: 200ms ease;
+  z-index: 50;
+}
+.lk-toast.on { opacity: 1; transform: translate(-50%, 0); }
+
+.lk-footer {
+  max-width: 680px;
+  margin: 32px auto 24px;
+  padding: 16px;
+  border-top: 1px solid var(--lk-garis);
+  font-size: 12px;
+  color: var(--lk-muted);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px;
+}
+.lk-footer-link { display: flex; gap: 14px; }
+.lk-footer-link a { color: var(--lk-teks); font-weight: 700; }
+
+/* Tablet dan desktop: dua kolom */
+@media (min-width: 768px) {
+  .lk-feed {
+    grid-template-columns: 1fr 1fr;
+    max-width: 920px;
+    gap: 20px;
+  }
+  .lk-header, .lk-chips { padding-left: 24px; padding-right: 24px; }
+}

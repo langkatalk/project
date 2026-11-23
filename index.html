@@ -160,7 +160,7 @@
         var profil = (p && p.data) || {};
         var inisial = ((profil.full_name || profil.username || '?').trim().charAt(0) || '?').toUpperCase();
         var foto = profil.avatar_url ? '<img src="' + profil.avatar_url + '" alt="">' : inisial;
-        box.innerHTML = '<a class="lk-avatar" href="redaksi.html" title="Akun saya">' + foto + '</a>';
+              box.innerHTML = '<a class="btn btn-utama btn-kecil" href="redaksi.html">Ruang Redaksi</a><a class="lk-avatar" href="profil.html" title="Akun saya">' + foto + '</a>';
       } catch (e) {}
     }
     if (document.readyState === 'loading') {

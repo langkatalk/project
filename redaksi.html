@@ -25,7 +25,7 @@
     </div>
   </header>
 
-  <!-- Halaman masuk -->
+  <!-- Masuk -->
   <main class="rd-masuk" id="layarMasuk">
     <section class="rd-kartu">
       <h1 class="rd-judul">Masuk Redaksi</h1>
@@ -44,6 +44,25 @@
     </section>
   </main>
 
+  <!-- Atur kata sandi baru (muncul setelah klik tautan dari email) -->
+  <main class="rd-masuk" id="layarSandi" hidden>
+    <section class="rd-kartu">
+      <h1 class="rd-judul">Atur Kata Sandi Baru</h1>
+      <p class="rd-catatan">Buat kata sandi baru untuk akun kamu. Minimal 8 karakter.</p>
+      <form id="formSandi" novalidate>
+        <label class="rd-label">Kata sandi baru
+          <input id="sBaru" type="password" autocomplete="new-password" placeholder="Minimal 8 karakter" required>
+        </label>
+        <label class="rd-label">Ulangi kata sandi baru
+          <input id="sUlang" type="password" autocomplete="new-password" placeholder="Ketik ulang" required>
+        </label>
+        <p class="rd-err" id="sErr"></p>
+        <p class="rd-err" id="sOk"></p>
+        <button type="submit" class="btn btn-utama rd-tombol-lebar" id="sKirim">Simpan kata sandi</button>
+      </form>
+    </section>
+  </main>
+
   <!-- Dashboard (diisi setelah masuk) -->
   <main class="rd-app" id="layarApp" hidden>
     <section class="rd-profil" id="profil"></section>
@@ -57,5 +76,6 @@
   <script src="config.js"></script>
   <script src="js/supabase.js"></script>
   <script src="js/dashboard.js"></script>
+  <script src="js/sandi.js"></script>
 </body>
 </html>

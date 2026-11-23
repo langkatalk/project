@@ -7,8 +7,8 @@
   <meta name="description" content="Langkatalk: portal berita Langkat. Menghubungkan Cerita Langkat.">
   <meta property="og:title" content="Langkatalk">
   <meta property="og:description" content="Menghubungkan Cerita Langkat">
-  <meta property="og:image" content="assets/logo.png">
-  <link rel="icon" href="assets/favicon.png">
+  <meta property="og:image" content="logo.png">
+  <link rel="icon" href="favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -1030,7 +1030,7 @@
       return `
         <header class="ph">
           <div class="wrap">
-            <a href="#/"><img src="assets/logo.png" alt="Langkatalk"></a>
+            <a href="#/"><img src="logo.png" alt="Langkatalk"></a>
             <nav class="cats">
               <button class="${cat ? '' : 'on'}" onclick="setCat('')">Terbaru</button>
               ${CATS.map((c) => `<button class="${cat === c ? 'on' : ''}" onclick="setCat('${c}')">${c}</button>`).join('')}
@@ -1175,7 +1175,7 @@
       $('root').innerHTML = `
         <div class="lg">
           <aside class="brand">
-            <div class="cw"><img src="assets/logo.png" alt="Langkatalk"></div>
+            <div class="cw"><img src="logo.png" alt="Langkatalk"></div>
             <div>
               <h1>Ruang redaksi Langkatalk</h1>
               <p>Setiap tulisan melewati reporter, editor, redaktur, dan pemimpin redaksi sebelum terbit. Masuk menggunakan email terdaftar untuk melihat bagianmu.</p>
@@ -1184,7 +1184,7 @@
           </aside>
           <main class="side">
             <div class="card">
-              <img class="ml" src="assets/logo.png" alt="Langkatalk">
+              <img class="ml" src="logo.png" alt="Langkatalk">
               <div class="tabs">
                 <button id="ti" aria-selected="true" type="button">Masuk</button>
                 <button id="tu" aria-selected="false" type="button">Daftar penulis</button>
@@ -1697,7 +1697,7 @@
         $('root').innerHTML = `
           <div class="shell">
             <aside class="sb">
-              <img src="assets/logo.png" alt="Langkatalk">
+              <img src="logo.png" alt="Langkatalk">
               <nav id="nav">
                 ${MENUS.filter((m) => menuList.includes(m[0])).map((m) => `
                   <button data-p="${m[0]}" class="${m[0] === page ? 'on' : ''}">${m[1]}${m[0] === 'antre' && tCount ? ` <span class="badge">${tCount}</span>` : ''}</button>

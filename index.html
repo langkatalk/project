@@ -1,220 +1,1744 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Langkatalk – Menghubungkan Cerita Langkat</title>
-<meta name="description" content="Langkatalk: portal berita Langkat. Menghubungkan cerita Langkat.">
-<meta property="og:title" content="Langkatalk"><meta property="og:description" content="Menghubungkan Cerita Langkat"><meta property="og:image" content="assets/logo.png">
-<link rel="icon" href="assets/favicon.png">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-:root{--violet:#7C3FE0;--indigo:#5F6FEE;--blue:#2B7BEA;--cyan:#1CC8C8;--orange:#FF9A55;--ink:#1B1640;--mute:#6B6890;--bg:#F6F4FF;--line:#E4E0F5;--err:#D6336C;--ok:#12926E;
-box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
-*,*::before,*::after{box-sizing:border-box}
-body{margin:0;font:15px/1.6 'Plus Jakarta Sans',system-ui,sans-serif;color:var(--ink);background:var(--bg);overflow-x:hidden}
-:focus-visible{outline:3px solid rgba(95,111,238,.55);outline-offset:2px}
-a{color:inherit;text-decoration:none}button{font:inherit;color:inherit;cursor:pointer}
-h1,h2,h3{margin:0;letter-spacing:-.01em}
-.go{height:46px;border:0;border-radius:13px;padding:0 20px;font-weight:700;color:#fff;background:linear-gradient(100deg,var(--violet),var(--blue) 70%,var(--cyan));box-shadow:0 10px 22px rgba(95,63,200,.28);display:inline-flex;align-items:center;justify-content:center}
-.go:disabled{opacity:.6;cursor:wait}.sm{height:36px;padding:0 14px;font-size:13.5px;border-radius:10px;box-shadow:none}
-.gh{height:36px;border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:0 14px;font-weight:600;font-size:13.5px;display:inline-flex;align-items:center}
-.gh:hover{border-color:var(--indigo)}.rd{background:var(--err)!important;color:#fff;box-shadow:none}
-input[type=text],input[type=email],input[type=password],select,textarea{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:0 13px;height:44px;font:inherit;color:var(--ink);background:#fff}
-textarea{height:auto;padding:11px 13px;resize:vertical;min-height:110px}
-input:focus,select:focus,textarea:focus{outline:none;border-color:var(--indigo);box-shadow:0 0 0 4px rgba(95,111,238,.16)}
-label{display:block;font-size:13px;font-weight:600;margin:0 0 6px}.f{margin-bottom:14px}
-.err{color:var(--err);font-size:13px;margin:0 0 12px;min-height:0}.hide{display:none!important}
-.chip{display:inline-block;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:600;background:#EFEBFF;color:var(--violet);white-space:nowrap}
-.chip.ex{background:#FFE4EC;color:var(--err)}.chip.ok{background:#DDF6EE;color:var(--ok)}.chip.wr{background:#FFF0DF;color:#B25E12}.chip.bl{background:#E1EEFF;color:var(--blue)}
-.mt{font-size:12.5px;color:var(--mute)}.empty{padding:22px;text-align:center;color:var(--mute);border:1.5px dashed var(--line);border-radius:14px;background:#fff}
-/* portal */
-.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
-.ph{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.88);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top,0px)}
-.ph .wrap{display:flex;align-items:center;gap:16px;height:68px}.ph img{height:46px}
-.cats{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;margin:0 auto}.cats button{border:0;background:none;padding:6px 12px;border-radius:999px;font-weight:600;font-size:14px;color:var(--mute);white-space:nowrap}
-.cats button:hover{background:#F0EDFB}.cats button.on{background:#EFEBFF;color:var(--violet)}
-.hero{display:block;margin:26px 0;border-radius:24px;padding:36px;min-height:340px;color:#fff;display:flex;flex-direction:column;justify-content:flex-end;gap:12px;background:radial-gradient(circle at 88% 10%,rgba(255,154,85,.55),transparent 28%),linear-gradient(145deg,#2A1470,#5B2FD0 40%,#2B7BEA 80%,#1CC8C8)}
-.hero h1{font-size:clamp(26px,4.4vw,44px);line-height:1.12;font-weight:800;max-width:22ch}.hero p{margin:0;max-width:60ch;color:rgba(255,255,255,.88)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:50px}
-.nc{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;display:flex;flex-direction:column;gap:8px;transition:transform .2s,border-color .2s}
-.nc:hover{transform:translateY(-3px);border-color:var(--indigo)}.nc h3{font-size:18px;font-weight:700;line-height:1.3}.nc p{margin:0;color:var(--mute);font-size:14px}
-.art{max-width:720px;margin:34px auto 60px}.art h1{font-size:clamp(28px,4.5vw,42px);line-height:1.15;font-weight:800;margin:14px 0}
-.art .by{display:flex;gap:6px 16px;flex-wrap:wrap;color:var(--mute);font-size:13px;margin-bottom:24px}
-.art .tx{white-space:pre-wrap;font-size:17px;line-height:1.8;max-width:68ch}
-.pf{border-top:1px solid var(--line);padding:26px 0 40px;color:var(--mute);font-size:13px;margin-top:20px}
-.notice{background:#FFF4EA;border:1px solid #FFD9B8;color:#8A4A12;border-radius:14px;padding:16px;margin:26px 0}
-/* login */
-.lg{min-height:100vh;display:grid;grid-template-columns:1.05fr 1fr}
-.brand{color:#fff;padding:40px 48px;display:flex;flex-direction:column;justify-content:space-between;background:radial-gradient(circle at 85% 12%,rgba(255,154,85,.55),transparent 28%),linear-gradient(145deg,#2A1470,#5B2FD0 38%,#2B7BEA 78%,#1CC8C8)}
-.brand .cw{background:#fff;border-radius:18px;padding:14px 20px;align-self:flex-start;box-shadow:0 18px 40px rgba(20,8,70,.35)}.brand .cw img{display:block;height:92px}
-.brand h1{font-size:clamp(28px,3.4vw,42px);line-height:1.12;font-weight:800;max-width:15ch;margin-bottom:12px}.brand p{margin:0;max-width:42ch;color:rgba(255,255,255,.88)}
-.side{display:flex;align-items:center;justify-content:center;padding:30px 20px}
-.card{width:100%;max-width:420px;background:#fff;border:1px solid var(--line);border-radius:24px;padding:28px;box-shadow:0 24px 60px rgba(95,63,200,.14)}
-.ml{display:none;height:54px;margin:0 auto 16px}.tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:#F0EDFB;border-radius:14px;padding:4px;margin-bottom:20px}
-.tabs button{border:0;background:none;border-radius:11px;padding:9px;font-weight:600;color:var(--mute)}.tabs button[aria-selected=true]{background:#fff;color:var(--violet);box-shadow:0 4px 14px rgba(95,63,200,.16)}
-.card h2{font-size:23px;font-weight:800;margin-bottom:4px}.sub{margin:0 0 18px;color:var(--mute);font-size:14px}
-.in{position:relative}.eye{position:absolute;right:5px;top:5px;height:34px;border:0;background:none;color:var(--violet);font-weight:600;font-size:13px;padding:0 10px}
-/* newsroom */
-.shell{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
-.sb{background:#fff;border-right:1px solid var(--line);padding:18px 14px;position:sticky;top:0;height:100vh;overflow:auto}.sb img{height:64px;display:block;margin:0 auto 14px}
-.sb nav{display:flex;flex-direction:column;gap:3px}.sb nav button{text-align:left;border:0;background:none;border-radius:12px;padding:10px 13px;font-weight:600;color:var(--mute)}
-.sb nav button:hover{background:#F4F1FF}.sb nav button.on{background:linear-gradient(100deg,rgba(124,63,224,.14),rgba(28,200,200,.14));color:var(--violet)}
-.badge{float:right;background:var(--orange);color:#4a2400;border-radius:999px;font-size:11px;padding:0 7px;line-height:19px}
-.tp{display:flex;align-items:center;gap:12px;padding:12px 24px;background:rgba(255,255,255,.88);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5;flex-wrap:wrap}
-.tp .sp{flex:1}.tp select{width:auto;height:36px;font-size:13px}
-.ct{padding:26px 24px 60px;max-width:1000px}.ct h2{font-size:26px;font-weight:800;margin-bottom:4px}.lead{color:var(--mute);margin:0 0 20px}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:24px}
-.st{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 16px}.st b{display:block;font-size:26px;font-weight:800;color:var(--violet)}.st span{font-size:13px;color:var(--mute)}
-.panel{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;margin-bottom:18px}
-.rw{display:flex;gap:10px;align-items:center;flex-wrap:wrap;width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:8px}
-button.rw:hover{border-color:var(--indigo)}.rw b{flex:1 1 260px;font-weight:600}
-table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left}th{font-size:12px;color:var(--mute);font-weight:600}.tw{overflow-x:auto}.c{text-align:center}
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.tog{display:flex;gap:10px;align-items:center;padding:10px 12px;border:1.5px solid var(--line);border-radius:12px;font-weight:500;margin:0}.tog input{width:18px;height:18px;accent-color:var(--violet)}
-.dlg{position:fixed;inset:0;background:rgba(27,22,64,.5);display:none;align-items:flex-start;justify-content:center;padding:40px 16px;overflow:auto;z-index:30}.dlg.on{display:flex}
-.dlg .box{background:#fff;border-radius:22px;max-width:680px;width:100%;padding:24px;box-shadow:0 30px 80px rgba(20,8,70,.4)}
-.body{white-space:pre-wrap;background:#FAF9FF;border:1px solid var(--line);border-radius:12px;padding:14px;margin:12px 0}
-.log{list-style:none;padding:0;margin:8px 0 16px;font-size:13px;color:var(--mute)}.log li{padding:5px 0 5px 14px;border-left:2px solid var(--line)}
-.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-.toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translate(-50%,30px);opacity:0;pointer-events:none;background:var(--ink);color:#fff;padding:11px 20px;border-radius:999px;font-weight:600;transition:.3s;z-index:60;max-width:90vw;text-align:center}.toast.on{transform:translate(-50%,0);opacity:1}
-@media(max-width:860px){.lg{grid-template-columns:1fr}.brand{display:none}.ml{display:block}.side{align-items:flex-start}.cats{display:none}.ph .wrap{justify-content:space-between}
-.shell{grid-template-columns:1fr}.sb{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}.sb img{height:48px}.sb nav{flex-direction:row;overflow-x:auto}.sb nav button{white-space:nowrap}.row2{grid-template-columns:1fr}.tp{padding:10px 16px}.ct{padding:20px 16px 60px}.hero{padding:24px}}
-@media(prefers-reduced-motion:reduce){*{transition:none!important}}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Langkatalk – Menghubungkan Cerita Langkat</title>
+  <meta name="description" content="Langkatalk: portal berita Langkat. Menghubungkan Cerita Langkat.">
+  <meta property="og:title" content="Langkatalk">
+  <meta property="og:description" content="Menghubungkan Cerita Langkat">
+  <meta property="og:image" content="assets/logo.png">
+  <link rel="icon" href="assets/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --violet: #7C3FE0;
+      --indigo: #5F6FEE;
+      --blue: #2B7BEA;
+      --cyan: #1CC8C8;
+      --orange: #FF9A55;
+      --ink: #1B1640;
+      --mute: #6B6890;
+      --bg: #F6F4FF;
+      --line: #E4E0F5;
+      --err: #D6336C;
+      --ok: #12926E;
+      box-sizing: border-box;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    html {
+      scroll-padding-top: env(safe-area-inset-top, 0px);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font: 15px/1.6 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 8%, rgba(124, 63, 224, 0.08), transparent 36%),
+        radial-gradient(circle at 88% 12%, rgba(28, 200, 200, 0.09), transparent 36%),
+        var(--bg);
+      overflow-x: hidden;
+    }
+
+    :focus-visible {
+      outline: 3px solid rgba(95, 111, 238, 0.55);
+      outline-offset: 2px;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      font: inherit;
+      color: inherit;
+      cursor: pointer;
+    }
+
+    h1, h2, h3 {
+      margin: 0;
+      letter-spacing: -0.01em;
+    }
+
+    .go {
+      height: 46px;
+      border: 0;
+      border-radius: 13px;
+      padding: 0 20px;
+      font-weight: 700;
+      color: #fff;
+      background: linear-gradient(100deg, var(--violet), var(--blue) 70%, var(--cyan));
+      box-shadow: 0 10px 22px rgba(95, 63, 200, 0.28);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .go:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 26px rgba(95, 63, 200, 0.34);
+    }
+
+    .go:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+
+    .sm {
+      height: 36px;
+      padding: 0 14px;
+      font-size: 13.5px;
+      border-radius: 10px;
+      box-shadow: none;
+    }
+
+    .gh {
+      height: 36px;
+      border: 1.5px solid var(--line);
+      background: rgba(255, 255, 255, 0.86);
+      backdrop-filter: blur(8px);
+      border-radius: 10px;
+      padding: 0 14px;
+      font-weight: 600;
+      font-size: 13.5px;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .gh:hover {
+      border-color: var(--indigo);
+      background: #fff;
+    }
+
+    .rd {
+      background: var(--err) !important;
+      color: #fff;
+      box-shadow: none;
+    }
+
+    input[type=text],
+    input[type=email],
+    input[type=password],
+    select,
+    textarea {
+      width: 100%;
+      border: 1.5px solid var(--line);
+      border-radius: 12px;
+      padding: 0 13px;
+      height: 44px;
+      font: inherit;
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.95);
+    }
+
+    textarea {
+      height: auto;
+      padding: 11px 13px;
+      resize: vertical;
+      min-height: 110px;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--indigo);
+      box-shadow: 0 0 0 4px rgba(95, 111, 238, 0.16);
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin: 0 0 6px;
+    }
+
+    .f {
+      margin-bottom: 14px;
+    }
+
+    .err {
+      color: var(--err);
+      font-size: 13px;
+      line-height: 1.45;
+      margin: 0 0 12px;
+      min-height: 0;
+    }
+
+    .ok-msg {
+      color: var(--ok);
+      font-size: 13px;
+      line-height: 1.45;
+      margin: 0 0 12px;
+      min-height: 0;
+    }
+
+    .hide {
+      display: none !important;
+    }
+
+    .chip {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 2px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      background: #EFEBFF;
+      color: var(--violet);
+      white-space: nowrap;
+    }
+
+    .chip.ex {
+      background: #FFE4EC;
+      color: var(--err);
+    }
+
+    .chip.ok {
+      background: #DDF6EE;
+      color: var(--ok);
+    }
+
+    .chip.wr {
+      background: #FFF0DF;
+      color: #B25E12;
+    }
+
+    .chip.bl {
+      background: #E1EEFF;
+      color: var(--blue);
+    }
+
+    .mt {
+      font-size: 12.5px;
+      color: var(--mute);
+    }
+
+    .empty {
+      padding: 22px;
+      text-align: center;
+      color: var(--mute);
+      border: 1.5px dashed var(--line);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(10px);
+    }
+
+    /* portal publik */
+    .wrap {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .ph {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--line);
+      padding-top: env(safe-area-inset-top, 0px);
+    }
+
+    .ph .wrap {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      height: 68px;
+    }
+
+    .ph img {
+      height: 46px;
+      display: block;
+    }
+
+    .cats {
+      display: flex;
+      gap: 4px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      margin: 0 auto;
+    }
+
+    .cats::-webkit-scrollbar {
+      display: none;
+    }
+
+    .cats button {
+      border: 0;
+      background: none;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--mute);
+      white-space: nowrap;
+    }
+
+    .cats button:hover {
+      background: #F0EDFB;
+    }
+
+    .cats button.on {
+      background: #EFEBFF;
+      color: var(--violet);
+    }
+
+    .hero {
+      margin: 26px 0;
+      border-radius: 24px;
+      padding: 36px;
+      min-height: 340px;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      gap: 12px;
+      background:
+        radial-gradient(circle at 88% 10%, rgba(255, 154, 85, 0.55), transparent 28%),
+        linear-gradient(145deg, #2A1470, #5B2FD0 40%, #2B7BEA 80%, #1CC8C8);
+      box-shadow: 0 20px 46px rgba(42, 20, 112, 0.16);
+    }
+
+    .hero h1 {
+      font-size: clamp(26px, 4.4vw, 44px);
+      line-height: 1.12;
+      font-weight: 800;
+      max-width: 22ch;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 60ch;
+      color: rgba(255, 255, 255, 0.88);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+      margin-bottom: 50px;
+    }
+
+    .nc {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .nc:hover {
+      transform: translateY(-3px);
+      border-color: var(--indigo);
+      box-shadow: 0 14px 30px rgba(95, 63, 200, 0.1);
+    }
+
+    .nc h3 {
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    .nc p {
+      margin: 0;
+      color: var(--mute);
+      font-size: 14px;
+    }
+
+    .art {
+      max-width: 720px;
+      margin: 34px auto 60px;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 32px;
+    }
+
+    .art h1 {
+      font-size: clamp(28px, 4.5vw, 42px);
+      line-height: 1.15;
+      font-weight: 800;
+      margin: 14px 0;
+    }
+
+    .art .by {
+      display: flex;
+      gap: 6px 16px;
+      flex-wrap: wrap;
+      color: var(--mute);
+      font-size: 13px;
+      margin-bottom: 24px;
+    }
+
+    .art .tx {
+      white-space: pre-wrap;
+      font-size: 17px;
+      line-height: 1.8;
+      max-width: 68ch;
+    }
+
+    .pf {
+      border-top: 1px solid var(--line);
+      padding: 26px 0 40px;
+      color: var(--mute);
+      font-size: 13px;
+      margin-top: 20px;
+    }
+
+    .notice {
+      background: rgba(255, 244, 234, 0.95);
+      border: 1px solid #FFD9B8;
+      color: #8A4A12;
+      border-radius: 14px;
+      padding: 16px;
+      margin: 20px 0;
+    }
+
+    /* login & daftar */
+    .lg {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1.05fr 1fr;
+    }
+
+    .brand {
+      color: #fff;
+      padding: 40px 48px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background:
+        radial-gradient(circle at 85% 12%, rgba(255, 154, 85, 0.55), transparent 28%),
+        linear-gradient(145deg, #2A1470, #5B2FD0 38%, #2B7BEA 78%, #1CC8C8);
+    }
+
+    .brand .cw {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      border-radius: 18px;
+      padding: 14px 20px;
+      align-self: flex-start;
+      box-shadow: 0 18px 40px rgba(20, 8, 70, 0.35);
+    }
+
+    .brand .cw img {
+      display: block;
+      height: 92px;
+    }
+
+    .brand h1 {
+      font-size: clamp(28px, 3.4vw, 42px);
+      line-height: 1.12;
+      font-weight: 800;
+      max-width: 15ch;
+      margin-bottom: 12px;
+    }
+
+    .brand p {
+      margin: 0;
+      max-width: 42ch;
+      color: rgba(255, 255, 255, 0.88);
+    }
+
+    .side {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 30px 20px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 430px;
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: 0 24px 60px rgba(95, 63, 200, 0.14);
+    }
+
+    .ml {
+      display: none;
+      height: 54px;
+      margin: 0 auto 16px;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+      background: #F0EDFB;
+      border-radius: 14px;
+      padding: 4px;
+      margin-bottom: 20px;
+    }
+
+    .tabs button {
+      border: 0;
+      background: none;
+      border-radius: 11px;
+      padding: 9px;
+      font-weight: 600;
+      color: var(--mute);
+    }
+
+    .tabs button[aria-selected=true] {
+      background: #fff;
+      color: var(--violet);
+      box-shadow: 0 4px 14px rgba(95, 63, 200, 0.16);
+    }
+
+    .card h2 {
+      font-size: 23px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .sub {
+      margin: 0 0 18px;
+      color: var(--mute);
+      font-size: 14px;
+    }
+
+    .in {
+      position: relative;
+    }
+
+    .eye {
+      position: absolute;
+      right: 5px;
+      top: 5px;
+      height: 34px;
+      border: 0;
+      background: none;
+      color: var(--violet);
+      font-weight: 600;
+      font-size: 13px;
+      padding: 0 10px;
+    }
+
+    .forgot-wrap {
+      margin-top: 12px;
+      text-align: center;
+    }
+
+    .forgot-link {
+      display: inline-block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--violet);
+      cursor: pointer;
+    }
+
+    .forgot-link:hover {
+      text-decoration: underline;
+    }
+
+    /* ruang redaksi */
+    .shell {
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      min-height: 100vh;
+    }
+
+    .sb {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(14px);
+      border-right: 1px solid var(--line);
+      padding: 18px 14px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: auto;
+    }
+
+    .sb img {
+      height: 64px;
+      display: block;
+      margin: 0 auto 14px;
+    }
+
+    .sb nav {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .sb nav button {
+      text-align: left;
+      border: 0;
+      background: none;
+      border-radius: 12px;
+      padding: 10px 13px;
+      font-weight: 600;
+      color: var(--mute);
+    }
+
+    .sb nav button:hover {
+      background: #F4F1FF;
+    }
+
+    .sb nav button.on {
+      background: linear-gradient(100deg, rgba(124, 63, 224, 0.14), rgba(28, 200, 200, 0.14));
+      color: var(--violet);
+    }
+
+    .tp {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 24px;
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      flex-wrap: wrap;
+    }
+
+    .tp .sp {
+      flex: 1;
+    }
+
+    .tp select {
+      width: auto;
+      height: 36px;
+      font-size: 13px;
+    }
+
+    .ct {
+      padding: 26px 24px 60px;
+      max-width: 1000px;
+    }
+
+    .ct h2 {
+      font-size: 26px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .lead {
+      color: var(--mute);
+      margin: 0 0 20px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .st {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px 16px;
+    }
+
+    .st b {
+      display: block;
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--violet);
+    }
+
+    .st span {
+      font-size: 13px;
+      color: var(--mute);
+    }
+
+    .panel {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 18px;
+    }
+
+    .rw {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      width: 100%;
+      text-align: left;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin-bottom: 8px;
+    }
+
+    button.rw:hover {
+      border-color: var(--indigo);
+    }
+
+    .rw b {
+      flex: 1 1 260px;
+      font-weight: 600;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+    }
+
+    th, td {
+      padding: 9px 10px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+    }
+
+    th {
+      font-size: 12px;
+      color: var(--mute);
+      font-weight: 600;
+    }
+
+    .tw {
+      overflow-x: auto;
+    }
+
+    .c {
+      text-align: center;
+    }
+
+    .row2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .tog {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 12px;
+      border: 1.5px solid var(--line);
+      border-radius: 12px;
+      font-weight: 500;
+      margin: 0;
+    }
+
+    .tog input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--violet);
+    }
+
+    .dlg {
+      position: fixed;
+      inset: 0;
+      background: rgba(27, 22, 64, 0.5);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 40px 16px;
+      overflow: auto;
+      z-index: 30;
+    }
+
+    .dlg.on {
+      display: flex;
+    }
+
+    .dlg .box {
+      background: #fff;
+      border-radius: 22px;
+      max-width: 680px;
+      width: 100%;
+      padding: 24px;
+      box-shadow: 0 30px 80px rgba(20, 8, 70, 0.4);
+    }
+
+    .body {
+      white-space: pre-wrap;
+      background: #FAF9FF;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+      margin: 12px 0;
+    }
+
+    .log {
+      list-style: none;
+      padding: 0;
+      margin: 8px 0 16px;
+      font-size: 13px;
+      color: var(--mute);
+    }
+
+    .log li {
+      padding: 5px 0 5px 14px;
+      border-left: 2px solid var(--line);
+    }
+
+    .acts {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(22px + env(safe-area-inset-bottom, 0px));
+      transform: translate(-50%, 30px);
+      opacity: 0;
+      pointer-events: none;
+      background: var(--ink);
+      color: #fff;
+      padding: 11px 20px;
+      border-radius: 999px;
+      font-weight: 600;
+      transition: 0.3s;
+      z-index: 60;
+      max-width: 90vw;
+      text-align: center;
+    }
+
+    .toast.on {
+      transform: translate(-50%, 0);
+      opacity: 1;
+    }
+
+    @media (max-width: 860px) {
+      .lg {
+        grid-template-columns: 1fr;
+      }
+      .brand {
+        display: none;
+      }
+      .ml {
+        display: block;
+      }
+      .side {
+        align-items: flex-start;
+      }
+      .cats {
+        display: none;
+      }
+      .ph .wrap {
+        justify-content: space-between;
+      }
+      .shell {
+        grid-template-columns: 1fr;
+      }
+      .sb {
+        position: static;
+        height: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .sb img {
+        height: 48px;
+      }
+      .sb nav {
+        flex-direction: row;
+        overflow-x: auto;
+      }
+      .sb nav button {
+        white-space: nowrap;
+      }
+      .row2 {
+        grid-template-columns: 1fr;
+      }
+      .tp {
+        padding: 10px 16px;
+      }
+      .ct {
+        padding: 20px 16px 60px;
+      }
+      .hero {
+        padding: 24px;
+      }
+      .art {
+        padding: 20px;
+        margin: 20px auto 48px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        transition: none !important;
+      }
+    }
+  </style>
 </head>
 <body>
-<div id="root"></div>
-<div class="dlg" id="dlg"><div class="box" id="box"></div></div>
-<div class="toast" id="ts" role="status"></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="config.js"></script>
-<script>
-var $=function(i){return document.getElementById(i)};
-var esc=function(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
-var fmt=function(d){return d?new Date(d).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'}):''};
-var fmtT=function(d){return new Date(d).toLocaleString('id-ID',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})};
-var CFG=window.LANGKATALK_CONFIG||{},ready=!!(CFG.SUPABASE_URL&&CFG.SUPABASE_ANON_KEY&&CFG.SUPABASE_URL.indexOf('GANTI')<0&&window.supabase);
-var API=CFG.USE_PROXY?location.origin+'/supabase':CFG.SUPABASE_URL;
-var sb=ready?supabase.createClient(API,CFG.SUPABASE_ANON_KEY):null;
-var root=$('root'),me=null,view='direktur',page='home',pre=null,cat='',D={arts:[],ideas:[],profs:[]};
-var CATS=['Investigasi','Ruang Gelap','Politik','Panggung','Ekonomi Gelap','Opini'];
-var ROLES={direktur:'Direktur',pemred:'Pemimpin Redaksi',redaktur:'Redaktur',editor:'Editor',reporter:'Reporter',kontributor:'Kontributor'};
-var MENUS=[['home','Ringkasan'],['usul','Usulan dan penugasan'],['tulis','Tulis naskah'],['antre','Antrean kerja'],['semua','Semua naskah'],['user','Pengguna dan peran'],['matrix','Matriks akses']];
-var ACC={direktur:['home','usul','tulis','antre','semua','user','matrix'],pemred:['home','usul','tulis','antre','semua','matrix'],redaktur:['home','usul','tulis','antre','semua'],editor:['home','antre','semua'],reporter:['home','usul','tulis','antre'],kontributor:['home','tulis','antre']};
-var CAN={'Menulis':['direktur','pemred','redaktur','reporter','kontributor'],'Menyunting isi':['direktur','pemred','redaktur','editor'],'Meneruskan ke pemred':['direktur','redaktur'],'Menerbitkan':['direktur','pemred'],'Kelola pengguna':['direktur']};
-var ST={draf:'Draf',diajukan:'Menunggu editor',disunting:'Menunggu redaktur',ditinjau:'Menunggu pemred',revisi:'Perlu revisi',terbit:'Terbit'};
-var RET=['editor','redaktur','pemred'];
-var TR={draf:[{to:'diajukan',l:'Ajukan ke editor',w:['author']}],revisi:[{to:'diajukan',l:'Ajukan ulang',w:['author']}],
- diajukan:[{to:'disunting',l:'Selesai disunting',w:['editor']},{to:'revisi',l:'Kembalikan',w:RET,r:1}],
- disunting:[{to:'ditinjau',l:'Teruskan ke pemred',w:['redaktur']},{to:'revisi',l:'Kembalikan',w:RET,r:1}],
- ditinjau:[{to:'terbit',l:'Setujui dan terbitkan',w:['pemred']},{to:'revisi',l:'Kembalikan',w:RET,r:1}]};
-function toast(t){var e=$('ts');e.textContent=t;e.classList.add('on');clearTimeout(toast.k);toast.k=setTimeout(function(){e.classList.remove('on')},3200)}
-var eff=function(){return me.r==='direktur'?view:me.r};
-var pn=function(id){var p=D.profs.filter(function(x){return x.id===id})[0];return p?p.full_name:'-'};
-function setup(){var why=!window.supabase?'Pustaka Supabase gagal dimuat dari CDN (jaringan atau pemblokiran). Coba muat ulang atau ganti jaringan.':(!CFG.SUPABASE_URL||CFG.SUPABASE_URL.indexOf('GANTI')>-1||!CFG.SUPABASE_ANON_KEY||CFG.SUPABASE_ANON_KEY.indexOf('GANTI')>-1)?'File <code>config.js</code> yang tampil di situs ini masih berisi nilai contoh. Pastikan <code>config.js</code> di <b>akar</b> repositori GitHub sudah diisi, lalu deploy ulang di Vercel.':'Konfigurasi tidak terbaca.';
- return'<div class="wrap"><div class="notice"><b>Supabase belum disambungkan.</b><br>'+why+' Langkahnya ada di README.md.</div></div>'}
-/* ---------- router ---------- */
-function route(){var p=location.hash.replace(/^#\/?/,'').split('/');$('dlg').classList.remove('on');
- if(p[0]==='baca')return showArticle(decodeURIComponent(p[1]||''));if(p[0]==='masuk')return showLogin();if(p[0]==='redaksi')return showNewsroom();showHome()}
-addEventListener('hashchange',route);
-/* ---------- portal publik ---------- */
-function pub(inner){return'<header class="ph"><div class="wrap"><a href="#/"><img src="assets/logo.png" alt="Langkatalk"></a><nav class="cats"><button class="'+(cat?'':'on')+'" onclick="setCat(\'\')">Terbaru</button>'+CATS.map(function(c){return'<button class="'+(cat===c?'on':'')+'" onclick="setCat(\''+c+'\')">'+c+'</button>'}).join('')+'</nav><a class="go sm" href="#/'+(me?'redaksi':'masuk')+'">'+(me?'Ruang redaksi':'Masuk')+'</a></div></header><main>'+inner+'</main><footer class="wrap pf">Langkatalk • Menghubungkan Cerita Langkat</footer>'}
-function setCat(c){cat=c;if(location.hash.replace('#','').length>1)location.hash='#/';else showHome()}
-async function showHome(){document.title='Langkatalk – Menghubungkan Cerita Langkat';root.innerHTML=pub(ready?'<div class="wrap"><div class="empty" style="margin-top:30px">Memuat berita…</div></div>':setup());if(!ready)return;
- await loadMe();var q=sb.from('articles').select('id,title,slug,category,body,author_name,published_at,is_exclusive').eq('status','terbit').order('published_at',{ascending:false}).limit(40);if(cat)q=q.eq('category',cat);
- var r=await q,l=r.data||[],ex=function(a){return esc(a.body.replace(/\s+/g,' ').slice(0,150))+'…'};
- var h='<div class="wrap">';if(r.error)h+='<div class="notice">Gagal memuat berita: '+esc(r.error.message)+'</div>';
- if(!l.length&&!r.error)h+='<div class="empty" style="margin-top:30px">Belum ada berita terbit'+(cat?' di kategori ini':'')+'.</div>';
- else if(l.length){var a=l[0];h+='<a class="hero" href="#/baca/'+encodeURIComponent(a.slug)+'"><div>'+(a.is_exclusive?'<span class="chip ex">EKSKLUSIF</span> ':'')+'<span class="chip">'+esc(a.category)+'</span></div><h1>'+esc(a.title)+'</h1><p>'+ex(a)+'</p></a><div class="grid">'
- +l.slice(1).map(function(a){return'<a class="nc" href="#/baca/'+encodeURIComponent(a.slug)+'"><div>'+(a.is_exclusive?'<span class="chip ex">EKSKLUSIF</span> ':'')+'<span class="chip">'+esc(a.category)+'</span></div><h3>'+esc(a.title)+'</h3><p>'+ex(a)+'</p><span class="mt">'+esc(a.author_name)+' • '+fmt(a.published_at)+'</span></a>'}).join('')+'</div>'}
- root.innerHTML=pub(h+'</div>')}
-async function showArticle(slug){root.innerHTML=pub('<div class="wrap"><div class="empty" style="margin-top:30px">Memuat…</div></div>');if(!ready)return root.innerHTML=pub(setup());
- await loadMe();var r=await sb.from('articles').select('*').eq('slug',slug).eq('status','terbit').maybeSingle(),a=r.data;
- if(!a){root.innerHTML=pub('<div class="wrap"><div class="empty" style="margin-top:30px">Berita tidak ditemukan. <a href="#/" style="color:var(--violet);font-weight:600">Kembali ke beranda</a></div></div>');return}
- document.title=a.title+' – Langkatalk';var m=document.querySelector('meta[name=description]');if(m)m.content=a.body.replace(/\s+/g,' ').slice(0,150);
- root.innerHTML=pub('<article class="wrap art">'+(a.is_exclusive?'<span class="chip ex">EKSKLUSIF</span> ':'')+'<span class="chip">'+esc(a.category)+'</span><span class="chip wr" style="margin-left:6px">Bukti: '+esc(a.evidence_level)+'</span><h1>'+esc(a.title)+'</h1><div class="by"><span>Oleh <b>'+esc(a.author_name)+'</b></span><span>'+fmt(a.published_at)+'</span>'+(a.source?'<span>Sumber: '+esc(a.source)+'</span>':'')+'</div><div class="tx">'+esc(a.body)+'</div>'+(a.right_of_reply?'<p class="mt" style="margin-top:24px">Hak jawab pihak terkait telah dicatat redaksi.</p>':'')+'<p style="margin-top:30px"><a href="#/" style="color:var(--violet);font-weight:600">← Kembali ke beranda</a></p></article>')}
-/* ---------- auth ---------- */
-async function loadMe(){if(!ready)return;var s=(await sb.auth.getSession()).data.session;if(!s){me=null;return}
- var r=await sb.from('profiles').select('*').eq('id',s.user.id).maybeSingle();me=r.data?{id:r.data.id,n:r.data.full_name,r:r.data.role,u:r.data.username}:null}
-function showLogin(){document.title='Masuk – Langkatalk';if(!ready){root.innerHTML=pub(setup());return}
- root.innerHTML='<div class="lg"><aside class="brand"><div class="cw"><img src="assets/logo.png" alt="Langkatalk"></div><div><h1>Ruang redaksi Langkatalk</h1><p>Setiap tulisan melewati reporter, editor, redaktur, dan pemimpin redaksi sebelum terbit. Masuk untuk melihat bagianmu.</p></div><a href="#/" style="color:#fff;font-weight:600">← Ke beranda</a></aside><main class="side"><div class="card"><img class="ml" src="assets/logo.png" alt="Langkatalk"><div class="tabs"><button id="ti" aria-selected="true">Masuk</button><button id="tu" aria-selected="false">Daftar penulis</button></div>'
- +'<form id="fi"><h2>Masuk</h2><p class="sub">Pakai nama pengguna atau email.</p><div class="f"><label for="u1">Nama pengguna atau email</label><input type="text" id="u1" autocomplete="username" autocapitalize="none"></div><div class="f"><label for="p1">Kata sandi</label><div class="in"><input type="password" id="p1" autocomplete="current-password"><button type="button" class="eye" data-f="p1">Lihat</button></div></div><p class="err" id="e1"></p><button class="go" style="width:100%" type="submit">Masuk</button></form>'
- +'<form id="fu" class="hide"><h2>Daftar penulis</h2><p class="sub">Siapa pun boleh menulis. Naskahmu disunting redaksi sebelum terbit.</p><div class="f"><label for="n2">Nama yang tampil</label><input type="text" id="n2"></div><div class="f"><label for="u2">Nama pengguna</label><input type="text" id="u2" autocapitalize="none" placeholder="huruf kecil, angka, titik"></div><div class="f"><label for="m2">Email</label><input type="email" id="m2" autocomplete="email"></div><div class="f"><label for="p2">Kata sandi</label><div class="in"><input type="password" id="p2" placeholder="Minimal 8 karakter" autocomplete="new-password"><button type="button" class="eye" data-f="p2">Lihat</button></div></div><p class="err" id="e2"></p><button class="go" style="width:100%" type="submit">Daftar sebagai kontributor</button></form></div></main></div>';
- var tb=function(w){$('ti').setAttribute('aria-selected',w==='i');$('tu').setAttribute('aria-selected',w==='u');$('fi').classList.toggle('hide',w!=='i');$('fu').classList.toggle('hide',w!=='u')};
- $('ti').onclick=function(){tb('i')};$('tu').onclick=function(){tb('u')};
- document.querySelectorAll('.eye').forEach(function(b){b.onclick=function(){var i=$(b.dataset.f),s=i.type==='password';i.type=s?'text':'password';b.textContent=s?'Sembunyikan':'Lihat'}});
- $('fi').onsubmit=async function(e){e.preventDefault();var b=this.querySelector('.go'),id=$('u1').value.trim(),p=$('p1').value;$('e1').textContent='';if(!id||!p)return $('e1').textContent='Isi nama pengguna dan kata sandi.';
-  b.disabled=true;var em=id;if(id.indexOf('@')<0){var r=await sb.rpc('email_for_username',{p_username:id});em=r.data||''}
-  var s=em?await sb.auth.signInWithPassword({email:em,password:p}):{error:1};b.disabled=false;
-  if(s.error)return $('e1').textContent=(s.error.message&&/confirm/i.test(s.error.message))?'Email belum dikonfirmasi. Cek kotak masukmu.':'Nama pengguna atau kata sandi salah.';
-  view='direktur';page='home';location.hash='#/redaksi'};
- $('fu').onsubmit=async function(e){e.preventDefault();var b=this.querySelector('.go'),n=$('n2').value.trim(),u=$('u2').value.trim().toLowerCase(),m=$('m2').value.trim(),p=$('p2').value,er=$('e2');er.textContent='';
-  if(!n||!m)return er.textContent='Nama dan email wajib diisi.';if(!/^[a-z0-9_.]{3,30}$/.test(u))return er.textContent='Nama pengguna: huruf kecil, angka, titik atau garis bawah, 3-30 karakter.';if(p.length<8)return er.textContent='Kata sandi minimal 8 karakter.';
-  b.disabled=true;var r=await sb.auth.signUp({email:m,password:p,options:{data:{username:u,full_name:n}}});b.disabled=false;
-  if(r.error)return er.textContent=/database error/i.test(r.error.message)?'Nama pengguna sudah dipakai.':r.error.message;
-  if(r.data.session){location.hash='#/redaksi'}else{er.style.color='var(--ok)';er.textContent='Akun dibuat. Cek email untuk konfirmasi, lalu masuk.'}}}
-async function logout(){await sb.auth.signOut();me=null;location.hash='#/'}
-/* ---------- ruang redaksi ---------- */
-async function showNewsroom(){if(!ready){root.innerHTML=pub(setup());return}await loadMe();if(!me){location.hash='#/masuk';return}document.title='Ruang redaksi – Langkatalk';root.innerHTML='<div class="wrap"><div class="empty" style="margin-top:30px">Memuat ruang redaksi…</div></div>';await refresh();draw()}
-async function refresh(){var a=await sb.from('articles').select('*').order('created_at',{ascending:false});D.arts=a.data||[];if(a.error)toast(a.error.message);
- if(['direktur','pemred','redaktur','reporter'].indexOf(me.r)>-1)D.ideas=(await sb.from('ideas').select('*').order('created_at',{ascending:false})).data||[];else D.ideas=[];
- D.profs=(await sb.from('profiles').select('id,username,full_name,role').order('created_at')).data||[]}
-function acts(a){var e=eff();return(TR[a.status]||[]).filter(function(x){return e==='direktur'||x.w.some(function(r){return r==='author'?a.author_id===me.id:r===e})})}
-var canEdit=function(a){return a.status!=='terbit'&&CAN['Menyunting isi'].indexOf(eff())>-1};
-var tasks=function(){return D.arts.filter(function(a){return acts(a).length})};
-async function step(id,to){var n=$('note')?$('note').value.trim():'',x=D.arts.filter(function(a){return a.id===id})[0];if(to==='revisi'&&!n)return toast('Tulis catatan revisi dulu');
- var r=await sb.rpc('advance_article',{p_id:id,p_to:to,p_note:n||null});if(r.error)return toast(r.error.message);await refresh();draw(1);openA(id);toast('Berhasil')}
-async function saveBody(id){var r=await sb.from('articles').update({body:$('eb').value}).eq('id',id).select();if(r.error||!r.data.length)return toast(r.error?r.error.message:'Tidak ada perubahan tersimpan');await refresh();openA(id);toast('Suntingan disimpan')}
-async function openA(id){var a=D.arts.filter(function(x){return x.id===id})[0];if(!a)return;var ev=(await sb.from('article_events').select('*').eq('article_id',id).order('created_at')).data||[],ac=acts(a),ret=ac.some(function(x){return x.r});
- $('box').innerHTML='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">'+(a.is_exclusive?'<span class="chip ex">EKSKLUSIF</span>':'')+'<span class="chip">'+esc(a.category)+'</span><span class="chip bl">'+ST[a.status]+'</span><span class="chip wr">Bukti: '+esc(a.evidence_level)+'</span>'+(a.right_of_reply?'<span class="chip ok">Hak jawab tercatat</span>':'')+'</div><h2 style="font-size:22px;font-weight:800">'+esc(a.title)+'</h2><div class="mt">Oleh '+esc(a.author_name)+' • Sumber: '+esc(a.source||'-')+'</div>'
- +(a.status==='revisi'&&a.review_note?'<div class="notice" style="margin:12px 0"><b>Catatan revisi:</b> '+esc(a.review_note)+'</div>':'')
- +(canEdit(a)?'<textarea id="eb" style="margin:12px 0 8px;min-height:180px">'+esc(a.body)+'</textarea><button class="gh" onclick="saveBody('+id+')">Simpan suntingan</button>':'<div class="body">'+esc(a.body)+'</div>')
- +'<h3 style="font-size:15px;margin-top:16px">Riwayat</h3><ul class="log">'+ev.map(function(l){return'<li>'+fmtT(l.created_at)+' • '+esc(l.actor_name||'-')+' '+esc(l.action)+(l.note?': '+esc(l.note):'')+'</li>'}).join('')+'</ul>'
- +(ret?'<label for="note">Catatan revisi (wajib saat mengembalikan)</label><textarea id="note" style="min-height:70px"></textarea>':'')
- +'<div class="acts">'+ac.map(function(x){return'<button class="go sm'+(x.r?' rd':'')+'" onclick="step('+id+',\''+x.to+'\')">'+x.l+'</button>'}).join('')+'<button class="gh" onclick="$(\'dlg\').classList.remove(\'on\')">Tutup</button></div>'
- +(ac.length||a.status==='terbit'?'':'<p class="mt" style="margin-top:12px">Tidak ada tindakan untuk peranmu di tahap ini.</p>');$('dlg').classList.add('on')}
-$('dlg').onclick=function(e){if(e.target===this)this.classList.remove('on')};
-function row(a){return'<button class="rw" onclick="openA('+a.id+')">'+(a.is_exclusive?'<span class="chip ex">EKSKLUSIF</span>':'')+'<b>'+esc(a.title)+'</b><span class="chip">'+esc(a.category)+'</span><span class="chip bl">'+ST[a.status]+'</span><span class="mt">'+esc(a.author_name)+'</span></button>'}
-var V={
-home:function(){var t=tasks(),cnt=function(s){return D.arts.filter(function(a){return a.status===s}).length};
- return'<h2>Halo, '+esc(me.n)+'</h2><p class="lead">Kamu bertugas sebagai <b>'+ROLES[eff()]+'</b>. Menu di kiri hanya menampilkan bagian yang boleh kamu akses.</p>'
- +(ACC[eff()].indexOf('semua')>-1?'<div class="cards">'+['diajukan','disunting','ditinjau','revisi','terbit'].map(function(s){return'<div class="st"><b>'+cnt(s)+'</b><span>'+ST[s]+'</span></div>'}).join('')+'</div>':'')
- +'<h3 style="margin-bottom:10px">Menunggu tindakanmu</h3>'+(t.length?t.map(row).join(''):'<div class="empty">Tidak ada naskah yang menunggu kamu.</div>')},
-antre:function(){var l=D.arts.filter(function(a){return acts(a).length||a.author_id===me.id});return'<h2>Antrean kerja</h2><p class="lead">Naskah yang menunggu tindakanmu dan naskah tulisanmu sendiri.</p>'+(l.length?l.map(row).join(''):'<div class="empty">Belum ada naskah. Mulai dari menu Tulis naskah.</div>')},
-semua:function(){return'<h2>Semua naskah</h2><p class="lead">Klik naskah untuk melihat isi, riwayat, dan tindakan yang tersedia.</p>'+(D.arts.length?D.arts.map(row).join(''):'<div class="empty">Belum ada naskah.</div>')},
-tulis:function(){var p=pre||{};pre=null;return'<h2>Tulis naskah</h2><p class="lead">Simpan sebagai draf, atau ajukan ke editor.</p><div class="panel"><div class="f"><label for="wt">Judul</label><input type="text" id="wt" value="'+esc(p.title||'')+'"></div>'
- +'<div class="row2"><div class="f"><label for="wc">Kategori</label><select id="wc">'+CATS.map(function(c){return'<option>'+c+'</option>'}).join('')+'</select></div><div class="f"><label for="ws">Narasumber</label><input type="text" id="ws" placeholder="Nama atau Anonim"></div></div>'
- +'<div class="f"><label for="wb">Isi naskah</label><textarea id="wb" style="min-height:200px"></textarea></div>'
- +'<div class="row2"><div class="f"><label for="wl">Level bukti</label><select id="wl"><option>Kuat</option><option>Sedang</option><option>Awal</option></select></div><div class="f" style="display:flex;align-items:flex-end"><label class="tog" style="width:100%"><input type="checkbox" id="wx"> Jadikan EKSKLUSIF</label></div></div>'
- +'<label class="tog" style="margin-bottom:16px"><input type="checkbox" id="wh"> Hak jawab pihak terkait sudah dicatat</label><div class="acts"><button class="gh" onclick="saveA(0)">Simpan draf</button><button class="go sm" onclick="saveA(1)">Ajukan ke editor</button></div></div>'},
-usul:function(){var e=eff(),pr=['direktur','pemred','redaktur','reporter'].indexOf(e)>-1,as=['direktur','pemred','redaktur'].indexOf(e)>-1;
- return'<h2>Usulan dan penugasan</h2><p class="lead">Ide dibahas dulu, lalu ditugaskan ke penulis.</p>'+(pr?'<div class="panel"><label for="it">Usulkan ide liputan</label><div style="display:flex;gap:8px"><input type="text" id="it"><button class="go sm" style="height:44px" onclick="addIdea()">Usulkan</button></div></div>':'')
- +(D.ideas.length?D.ideas.map(function(i){return'<div class="rw"><b>'+esc(i.title)+'</b><span class="mt">Diusulkan '+esc(pn(i.proposed_by))+'</span>'+(i.assigned_to?'<span class="chip ok">Ditugaskan: '+esc(pn(i.assigned_to))+'</span>':'<span class="chip wr">Belum ditugaskan</span>')
- +(as&&!i.assigned_to?'<select style="width:auto;height:36px" onchange="assign('+i.id+',this.value)"><option value="">Tugaskan ke…</option>'+D.profs.filter(function(u){return u.role!=='editor'}).map(function(u){return'<option value="'+u.id+'">'+esc(u.full_name)+'</option>'}).join('')+'</select>':'')
- +((i.assigned_to===me.id||(e==='direktur'&&i.assigned_to))?'<button class="go sm" onclick="startIdea('+i.id+')">Mulai menulis</button>':'')+'</div>'}).join(''):'<div class="empty">Belum ada usulan.</div>')},
-user:function(){return'<h2>Pengguna dan peran</h2><p class="lead">Hanya direktur yang bisa mengatur siapa memegang peran apa. Semua pendaftar baru otomatis kontributor.</p><div class="panel tw"><table><tr><th>Nama</th><th>Pengguna</th><th>Peran</th></tr>'
- +D.profs.map(function(u){return'<tr><td>'+esc(u.full_name)+'</td><td>'+esc(u.username)+'</td><td>'+(u.id===me.id?'<span class="chip">'+ROLES[u.role]+' (kamu)</span>':'<select style="height:36px" onchange="setRole(\''+u.id+'\',this.value)">'+Object.keys(ROLES).map(function(r){return'<option value="'+r+'"'+(r===u.role?' selected':'')+'>'+ROLES[r]+'</option>'}).join('')+'</select>')+'</td></tr>'}).join('')+'</table></div><div class="notice">Untuk membuat akun staf: minta orangnya daftar lewat halaman Masuk, lalu ubah perannya di tabel ini. Akun dibuat langsung (tanpa daftar) lewat Supabase > Authentication > Users > Add user.</div>'},
-matrix:function(){var cols=Object.keys(CAN),R=Object.keys(ROLES),ck=function(b){return b?'<span style="color:var(--ok);font-weight:800">✓</span>':'<span style="color:#c9c5df">–</span>'};
- return'<h2>Matriks akses</h2><p class="lead">Siapa boleh membuka menu apa, dan siapa boleh melakukan apa. Aturan ini juga dijaga di database.</p><div class="panel tw"><table><tr><th>Peran</th>'+MENUS.map(function(m){return'<th class="c">'+m[1]+'</th>'}).join('')+'</tr>'
- +R.map(function(r){return'<tr><td><b>'+ROLES[r]+'</b></td>'+MENUS.map(function(m){return'<td class="c">'+ck(ACC[r].indexOf(m[0])>-1)+'</td>'}).join('')+'</tr>'}).join('')+'</table></div><div class="panel tw"><table><tr><th>Peran</th>'+cols.map(function(c){return'<th class="c">'+c+'</th>'}).join('')+'</tr>'
- +R.map(function(r){return'<tr><td><b>'+ROLES[r]+'</b></td>'+cols.map(function(c){return'<td class="c">'+ck(CAN[c].indexOf(r)>-1)+'</td>'}).join('')+'</tr>'}).join('')+'</table></div><p class="mt">Redaktur dan pemred bisa mengembalikan naskah. Terbit selalu lewat persetujuan pemimpin redaksi atau direktur.</p>'}};
-function draw(keep){var e=eff();if(ACC[e].indexOf(page)<0)page='home';var n=tasks().length;
- root.innerHTML='<div class="shell"><aside class="sb"><a href="#/"><img src="assets/logo.png" alt="Langkatalk"></a><nav>'+MENUS.filter(function(m){return ACC[e].indexOf(m[0])>-1}).map(function(m){return'<button class="'+(m[0]===page?'on':'')+'" onclick="go(\''+m[0]+'\')">'+m[1]+(m[0]==='antre'&&n?'<span class="badge">'+n+'</span>':'')+'</button>'}).join('')+'</nav></aside>'
- +'<div><header class="tp"><div><b>'+esc(me.n)+'</b> <span class="chip">'+ROLES[me.r]+'</span></div><span class="sp"></span>'
- +(me.r==='direktur'?'<label for="vs" class="mt" style="margin:0">Lihat sebagai</label><select id="vs" onchange="view=this.value;page=\'home\';draw()">'+Object.keys(ROLES).map(function(r){return'<option value="'+r+'"'+(r===view?' selected':'')+'>'+(r==='direktur'?'Direktur (semua akses)':ROLES[r])+'</option>'}).join('')+'</select>':'')
- +'<a class="gh" href="#/">Lihat situs</a><button class="gh" onclick="logout()">Keluar</button></header><div class="ct">'+V[page]()+'</div></div></div>';if(keep!==1)scrollTo(0,0)}
-function go(p){page=p;draw()}
-async function saveA(sub){var t=$('wt').value.trim(),b=$('wb').value.trim();if(t.length<5||!b)return toast('Judul (min. 5 huruf) dan isi wajib diisi');
- var r=await sb.from('articles').insert({title:t,category:$('wc').value,body:b,source:$('ws').value.trim()||null,evidence_level:$('wl').value,is_exclusive:$('wx').checked,right_of_reply:$('wh').checked,status:sub?'diajukan':'draf',author_id:me.id});
- if(r.error)return toast(r.error.message);await refresh();toast(sub?'Naskah diajukan ke editor':'Draf disimpan');go('antre')}
-async function addIdea(){var t=$('it').value.trim();if(t.length<5)return toast('Tulis ide minimal 5 huruf');var r=await sb.from('ideas').insert({title:t,proposed_by:me.id});if(r.error)return toast(r.error.message);await refresh();draw(1);toast('Usulan ditambahkan')}
-async function assign(id,u){if(!u)return;var r=await sb.from('ideas').update({assigned_to:u}).eq('id',id);if(r.error)return toast(r.error.message);await refresh();draw(1);toast('Penugasan dibuat')}
-function startIdea(id){pre=D.ideas.filter(function(i){return i.id===id})[0];go('tulis')}
-async function setRole(id,r){var x=await sb.rpc('set_user_role',{target:id,new_role:r});if(x.error)toast(x.error.message);else toast('Peran diubah menjadi '+ROLES[r]);await refresh();draw(1)}
-if(ready)sb.auth.onAuthStateChange(function(ev){if(ev==='SIGNED_OUT'){me=null;if(location.hash.indexOf('#/redaksi')===0)location.hash='#/masuk'}});
-route();
-</script>
+  <div id="root"></div>
+  <div class="dlg" id="dlg"><div class="box" id="box"></div></div>
+  <div class="toast" id="ts" role="status"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+  <script src="config.js"></script>
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+    const fmt = (d) => d ? new Date(d).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+    const fmtT = (d) => new Date(d).toLocaleString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+
+    function resolveConfig() {
+      const raw = window.APP_CONFIG || window.LANGKATALK_CONFIG || {};
+      const supaUrl = (raw.SUPABASE_URL || '').trim();
+      const pubKey = (raw.SUPABASE_PUBLISHABLE_KEY || raw.SUPABASE_ANON_KEY || '').trim();
+      const useProxy = raw.USE_PROXY !== false;
+      const proxyPath = (raw.PROXY_PATH || '/supabase').replace(/\/+$/, '');
+      const apiUrl = useProxy ? `${location.origin}${proxyPath}` : supaUrl;
+      const hasValidKey = !!pubKey && pubKey.length >= 20 && !pubKey.includes('GANTI_') && !pubKey.startsWith('TEMPEL_');
+      const hasValidUrl = !!apiUrl && !apiUrl.includes('GANTI_');
+      return { supaUrl, pubKey, useProxy, proxyPath, apiUrl, ready: Boolean(window.supabase && hasValidUrl && hasValidKey) };
+    }
+
+    const CFG = resolveConfig();
+    const ready = CFG.ready;
+    const sb = ready ? window.supabase.createClient(CFG.apiUrl, CFG.pubKey) : null;
+
+    let me = null;
+    let view = 'direktur';
+    let page = 'home';
+    let pre = null;
+    let cat = '';
+    const D = { arts: [], ideas: [], profs: [] };
+
+    const CATS = ['Investigasi', 'Ruang Gelap', 'Politik', 'Panggung', 'Ekonomi Gelap', 'Opini'];
+    const ROLES = {
+      direktur: 'Direktur',
+      pemred: 'Pemimpin Redaksi',
+      redaktur: 'Redaktur',
+      editor: 'Editor',
+      reporter: 'Reporter',
+      kontributor: 'Kontributor'
+    };
+    const MENUS = [
+      ['home', 'Ringkasan'],
+      ['usul', 'Usulan dan penugasan'],
+      ['tulis', 'Tulis naskah'],
+      ['antre', 'Antrean kerja'],
+      ['semua', 'Semua naskah'],
+      ['user', 'Pengguna dan peran'],
+      ['matrix', 'Matriks akses']
+    ];
+    const ACC = {
+      direktur: ['home', 'usul', 'tulis', 'antre', 'semua', 'user', 'matrix'],
+      pemred: ['home', 'usul', 'tulis', 'antre', 'semua', 'matrix'],
+      redaktur: ['home', 'usul', 'tulis', 'antre', 'semua'],
+      editor: ['home', 'antre', 'semua'],
+      reporter: ['home', 'usul', 'tulis', 'antre'],
+      kontributor: ['home', 'tulis', 'antre']
+    };
+    const CAN = {
+      'Menulis': ['direktur', 'pemred', 'redaktur', 'reporter', 'kontributor'],
+      'Menyunting isi': ['direktur', 'pemred', 'redaktur', 'editor'],
+      'Meneruskan ke pemred': ['direktur', 'redaktur'],
+      'Menerbitkan': ['direktur', 'pemred'],
+      'Kelola pengguna': ['direktur']
+    };
+    const ST = {
+      draf: 'Draf',
+      diajukan: 'Menunggu editor',
+      disunting: 'Menunggu redaktur',
+      ditinjau: 'Menunggu pemred',
+      revisi: 'Perlu revisi',
+      terbit: 'Terbit'
+    };
+    const RET = ['editor', 'redaktur', 'pemred'];
+    const TR = {
+      draf: [{ to: 'diajukan', l: 'Ajukan ke editor', w: ['author'] }],
+      revisi: [{ to: 'diajukan', l: 'Ajukan ulang', w: ['author'] }],
+      diajukan: [
+        { to: 'disunting', l: 'Selesai disunting', w: ['editor'] },
+        { to: 'revisi', l: 'Kembalikan', w: RET, r: 1 }
+      ],
+      disunting: [
+        { to: 'ditinjau', l: 'Teruskan ke pemred', w: ['redaktur'] },
+        { to: 'revisi', l: 'Kembalikan', w: RET, r: 1 }
+      ],
+      ditinjau: [
+        { to: 'terbit', l: 'Setujui dan terbitkan', w: ['pemred'] },
+        { to: 'revisi', l: 'Kembalikan', w: RET, r: 1 }
+      ]
+    };
+
+    function toast(t) {
+      const e = $('ts');
+      e.textContent = t;
+      e.classList.add('on');
+      clearTimeout(toast.k);
+      toast.k = setTimeout(() => e.classList.remove('on'), 3400);
+    }
+
+    const eff = () => (me && me.r === 'direktur' ? view : me.r);
+    const pn = (id) => {
+      const p = D.profs.find((x) => x.id === id);
+      return p ? p.full_name : '-';
+    };
+
+    function setupNotice() {
+      let why = 'Konfigurasi Supabase belum lengkap.';
+      if (!window.supabase) {
+        why = 'Pustaka Supabase gagal dimuat dari CDN. Periksa koneksi internet atau coba muat ulang.';
+      } else if (!CFG.pubKey || CFG.pubKey.includes('GANTI_') || CFG.pubKey.startsWith('TEMPEL_')) {
+        why = 'Publishable key di <code>config.js</code> belum diisi utuh atau masih berisi placeholder. Salin kunci utuh lewat tombol Copy di Supabase lalu push ulang ke GitHub dan cek deployment Vercel.';
+      } else if (!CFG.apiUrl) {
+        why = 'URL Supabase atau jalur proxy belum terbaca di <code>config.js</code>.';
+      }
+      return `<div class="wrap"><div class="notice"><b>Supabase belum tersambung.</b><br>${why}</div></div>`;
+    }
+
+    /* ---------- router ---------- */
+    function route() {
+      const p = location.hash.replace(/^#\/?/, '').split('/');
+      $('dlg').classList.remove('on');
+      if (p[0] === 'baca') return showArticle(decodeURIComponent(p[1] || ''));
+      if (p[0] === 'masuk') return showLogin();
+      if (p[0] === 'redaksi') return showNewsroom();
+      return showHome();
+    }
+    addEventListener('hashchange', route);
+
+    /* ---------- portal publik ---------- */
+    function pub(inner) {
+      return `
+        <header class="ph">
+          <div class="wrap">
+            <a href="#/"><img src="assets/logo.png" alt="Langkatalk"></a>
+            <nav class="cats">
+              <button class="${cat ? '' : 'on'}" onclick="setCat('')">Terbaru</button>
+              ${CATS.map((c) => `<button class="${cat === c ? 'on' : ''}" onclick="setCat('${c}')">${c}</button>`).join('')}
+            </nav>
+            <a class="go sm" href="#/${me ? 'redaksi' : 'masuk'}">${me ? 'Ruang redaksi' : 'Masuk'}</a>
+          </div>
+        </header>
+        <main>${inner}</main>
+        <footer class="wrap pf">Langkatalk • Menghubungkan Cerita Langkat</footer>
+      `;
+    }
+
+    function setCat(c) {
+      cat = c;
+      if (location.hash.replace('#', '').length > 1) location.hash = '#/';
+      else showHome();
+    }
+
+    async function showHome() {
+      document.title = 'Langkatalk – Menghubungkan Cerita Langkat';
+      $('root').innerHTML = pub(ready ? '<div class="wrap"><div class="empty" style="margin-top:30px">Memuat berita…</div></div>' : setupNotice());
+      if (!ready) return;
+
+      await loadMe();
+      let q = sb.from('articles')
+        .select('id,title,slug,category,body,author_name,published_at,is_exclusive')
+        .eq('status', 'terbit')
+        .order('published_at', { ascending: false })
+        .limit(40);
+      if (cat) q = q.eq('category', cat);
+
+      const r = await q;
+      const l = r.data || [];
+      const ex = (a) => `${esc((a.body || '').replace(/\s+/g, ' ').slice(0, 150))}…`;
+
+      let h = '<div class="wrap">';
+      if (r.error) {
+        h += `<div class="notice">Gagal memuat berita: ${esc(r.error.message)}</div>`;
+      }
+      if (!l.length && !r.error) {
+        h += `<div class="empty" style="margin-top:30px">Belum ada berita terbit${cat ? ` di kategori ${esc(cat)}` : ''}.</div>`;
+      } else if (l.length) {
+        const a = l[0];
+        h += `
+          <a class="hero" href="#/baca/${encodeURIComponent(a.slug || a.id)}">
+            <div>
+              ${a.is_exclusive ? '<span class="chip ex">EKSKLUSIF</span> ' : ''}
+              <span class="chip">${esc(a.category)}</span>
+            </div>
+            <h1>${esc(a.title)}</h1>
+            <p>${ex(a)}</p>
+          </a>
+          <div class="grid">
+            ${l.slice(1).map((item) => `
+              <a class="nc" href="#/baca/${encodeURIComponent(item.slug || item.id)}">
+                <div>
+                  ${item.is_exclusive ? '<span class="chip ex">EKSKLUSIF</span> ' : ''}
+                  <span class="chip">${esc(item.category)}</span>
+                </div>
+                <h3>${esc(item.title)}</h3>
+                <p>${ex(item)}</p>
+                <span class="mt">${esc(item.author_name || '-')} • ${fmt(item.published_at)}</span>
+              </a>
+            `).join('')}
+          </div>
+        `;
+      }
+      $('root').innerHTML = pub(`${h}</div>`);
+    }
+
+    async function showArticle(slug) {
+      $('root').innerHTML = pub('<div class="wrap"><div class="empty" style="margin-top:30px">Memuat…</div></div>');
+      if (!ready) {
+        $('root').innerHTML = pub(setupNotice());
+        return;
+      }
+      await loadMe();
+      const r = await sb.from('articles').select('*').eq('slug', slug).eq('status', 'terbit').maybeSingle();
+      const a = r.data;
+      if (!a) {
+        $('root').innerHTML = pub('<div class="wrap"><div class="empty" style="margin-top:30px">Berita tidak ditemukan. <a href="#/" style="color:var(--violet);font-weight:600">Kembali ke beranda</a></div></div>');
+        return;
+      }
+      document.title = `${a.title} – Langkatalk`;
+      const m = document.querySelector('meta[name=description]');
+      if (m) m.content = (a.body || '').replace(/\s+/g, ' ').slice(0, 150);
+
+      $('root').innerHTML = pub(`
+        <article class="wrap art">
+          ${a.is_exclusive ? '<span class="chip ex">EKSKLUSIF</span> ' : ''}
+          <span class="chip">${esc(a.category)}</span>
+          <span class="chip wr" style="margin-left:6px">Bukti: ${esc(a.evidence_level)}</span>
+          <h1>${esc(a.title)}</h1>
+          <div class="by">
+            <span>Oleh <b>${esc(a.author_name || '-')}</b></span>
+            <span>${fmt(a.published_at)}</span>
+            ${a.source ? `<span>Sumber: ${esc(a.source)}</span>` : ''}
+          </div>
+          <div class="tx">${esc(a.body)}</div>
+          ${a.right_of_reply ? '<p class="mt" style="margin-top:24px">Hak jawab pihak terkait telah dicatat redaksi.</p>' : ''}
+          <p style="margin-top:30px"><a href="#/" style="color:var(--violet);font-weight:600">← Kembali ke beranda</a></p>
+        </article>
+      `);
+    }
+
+    /* ---------- auth (wajib email + error asli + lupa sandi) ---------- */
+    function buildAuthErrorHint(err) {
+      const msg = (err && err.message) ? String(err.message) : 'Terjadi kesalahan saat autentikasi.';
+      const low = msg.toLowerCase();
+
+      if (low.includes('invalid login credentials')) {
+        return `${msg} — Periksa kembali alamat email dan kata sandi. Jika lupa kata sandi, klik "Lupa kata sandi? Reset lewat email" atau reset dari Supabase > Authentication > Users.`;
+      }
+      if (low.includes('email not confirmed')) {
+        return `${msg} — Alamat email belum dikonfirmasi. Cek kotak masuk/spam atau periksa pengaturan Confirm email di Supabase > Authentication > Providers > Email.`;
+      }
+      if (low.includes('failed to fetch') || low.includes('networkerror') || low.includes('network')) {
+        return `${msg} — Koneksi atau proxy Supabase bermasalah. Pastikan USE_PROXY: true dan rewrite /supabase/:path* di vercel.json sudah aktif.`;
+      }
+      return msg;
+    }
+
+    async function loadMe() {
+      if (!ready) return;
+      const { data: sessData } = await sb.auth.getSession();
+      const s = sessData && sessData.session;
+      if (!s) {
+        me = null;
+        return;
+      }
+      const r = await sb.from('profiles').select('*').eq('id', s.user.id).maybeSingle();
+      me = r.data ? { id: r.data.id, n: r.data.full_name, r: r.data.role, u: r.data.username } : null;
+    }
+
+    function showLogin() {
+      document.title = 'Masuk – Langkatalk';
+      if (!ready) {
+        $('root').innerHTML = pub(setupNotice());
+        return;
+      }
+
+      $('root').innerHTML = `
+        <div class="lg">
+          <aside class="brand">
+            <div class="cw"><img src="assets/logo.png" alt="Langkatalk"></div>
+            <div>
+              <h1>Ruang redaksi Langkatalk</h1>
+              <p>Setiap tulisan melewati reporter, editor, redaktur, dan pemimpin redaksi sebelum terbit. Masuk menggunakan email terdaftar untuk melihat bagianmu.</p>
+            </div>
+            <a href="#/" style="color:#fff;font-weight:600">← Ke beranda</a>
+          </aside>
+          <main class="side">
+            <div class="card">
+              <img class="ml" src="assets/logo.png" alt="Langkatalk">
+              <div class="tabs">
+                <button id="ti" aria-selected="true" type="button">Masuk</button>
+                <button id="tu" aria-selected="false" type="button">Daftar penulis</button>
+              </div>
+
+              <form id="fi" novalidate>
+                <h2>Masuk</h2>
+                <p class="sub">Wajib memakai alamat email terdaftar (bukan nama pengguna).</p>
+                <div class="f">
+                  <label for="u1">Email (wajib pakai email)</label>
+                  <input type="email" id="u1" placeholder="email@contoh.com" autocomplete="email" autocapitalize="none" required>
+                </div>
+                <div class="f">
+                  <label for="p1">Kata sandi</label>
+                  <div class="in">
+                    <input type="password" id="p1" autocomplete="current-password" required>
+                    <button type="button" class="eye" data-f="p1">Lihat</button>
+                  </div>
+                </div>
+                <p class="err" id="e1"></p>
+                <p class="ok-msg" id="ok1"></p>
+                <button class="go" style="width:100%" type="submit">Masuk</button>
+                <div class="forgot-wrap">
+                  <a id="forgot" class="forgot-link" role="button" tabindex="0">Lupa kata sandi? Reset lewat email</a>
+                </div>
+              </form>
+
+              <form id="fu" class="hide" novalidate>
+                <h2>Daftar penulis</h2>
+                <p class="sub">Siapa pun boleh menulis. Naskahmu disunting redaksi sebelum terbit.</p>
+                <div class="f">
+                  <label for="n2">Nama yang tampil</label>
+                  <input type="text" id="n2" placeholder="Nama lengkapmu" required>
+                </div>
+                <div class="f">
+                  <label for="u2">Nama pengguna</label>
+                  <input type="text" id="u2" autocapitalize="none" placeholder="huruf kecil, angka, titik atau garis bawah">
+                </div>
+                <div class="f">
+                  <label for="m2">Email</label>
+                  <input type="email" id="m2" placeholder="email@contoh.com" autocomplete="email" required>
+                </div>
+                <div class="f">
+                  <label for="p2">Kata sandi</label>
+                  <div class="in">
+                    <input type="password" id="p2" placeholder="Minimal 8 karakter" autocomplete="new-password" required>
+                    <button type="button" class="eye" data-f="p2">Lihat</button>
+                  </div>
+                </div>
+                <p class="err" id="e2"></p>
+                <p class="ok-msg" id="ok2"></p>
+                <button class="go" style="width:100%" type="submit">Daftar sebagai kontributor</button>
+              </form>
+            </div>
+          </main>
+        </div>
+      `;
+
+      const tb = (w) => {
+        $('ti').setAttribute('aria-selected', w === 'i');
+        $('tu').setAttribute('aria-selected', w === 'u');
+        $('fi').classList.toggle('hide', w !== 'i');
+        $('fu').classList.toggle('hide', w !== 'u');
+      };
+      $('ti').onclick = () => tb('i');
+      $('tu').onclick = () => tb('u');
+
+      document.querySelectorAll('.eye').forEach((b) => {
+        b.onclick = () => {
+          const inp = $(b.dataset.f);
+          const show = inp.type === 'password';
+          inp.type = show ? 'text' : 'password';
+          b.textContent = show ? 'Sembunyikan' : 'Lihat';
+        };
+      });
+
+      $('fi').onsubmit = async (e) => {
+        e.preventDefault();
+        const btn = e.currentTarget.querySelector('.go');
+        const em = $('u1').value.trim().toLowerCase();
+        const p = $('p1').value;
+        $('e1').textContent = '';
+        $('ok1').textContent = '';
+
+        if (!em || !p) {
+          $('e1').textContent = 'Email dan kata sandi wajib diisi.';
+          return;
+        }
+        if (!em.includes('@')) {
+          $('e1').textContent = 'Login wajib memakai format email (contoh: nama@email.com), bukan nama pengguna.';
+          return;
+        }
+
+        btn.disabled = true;
+        const res = await sb.auth.signInWithPassword({ email: em, password: p });
+        btn.disabled = false;
+
+        if (res.error) {
+          $('e1').textContent = buildAuthErrorHint(res.error);
+          return;
+        }
+
+        view = 'direktur';
+        page = 'home';
+        location.hash = '#/redaksi';
+      };
+
+      const triggerReset = async (ev) => {
+        if (ev) ev.preventDefault();
+        $('e1').textContent = '';
+        $('ok1').textContent = '';
+        const em = $('u1').value.trim().toLowerCase();
+        if (!em || !em.includes('@')) {
+          $('e1').textContent = 'Ketik dulu alamat email kamu di kolom Email, lalu klik "Lupa kata sandi? Reset lewat email".';
+          return;
+        }
+
+        const { error } = await sb.auth.resetPasswordForEmail(em, {
+          redirectTo: `${location.origin}/#/masuk`
+        });
+        if (error) {
+          $('e1').textContent = buildAuthErrorHint(error);
+          return;
+        }
+        $('ok1').textContent = 'Link reset dikirim ke emailmu. Cek inbox / spam.';
+        toast('Link reset dikirim ke emailmu. Cek inbox / spam.');
+      };
+
+      $('forgot').onclick = triggerReset;
+      $('forgot').onkeydown = (ev) => {
+        if (ev.key === 'Enter' || ev.key === ' ') triggerReset(ev);
+      };
+
+      $('fu').onsubmit = async (e) => {
+        e.preventDefault();
+        const btn = e.currentTarget.querySelector('.go');
+        const n = $('n2').value.trim();
+        let u = $('u2').value.trim().toLowerCase();
+        const m = $('m2').value.trim().toLowerCase();
+        const p = $('p2').value;
+        $('e2').textContent = '';
+        $('ok2').textContent = '';
+
+        if (!n || !m) {
+          $('e2').textContent = 'Nama yang tampil dan email wajib diisi.';
+          return;
+        }
+        if (!u) {
+          u = m.split('@')[0].replace(/[^a-z0-9_.]/g, '').slice(0, 24) || 'penulis';
+        }
+        if (!/^[a-z0-9_.]{3,30}$/.test(u)) {
+          $('e2').textContent = 'Nama pengguna: huruf kecil, angka, titik atau garis bawah, 3–30 karakter.';
+          return;
+        }
+        if (p.length < 8) {
+          $('e2').textContent = 'Kata sandi minimal 8 karakter.';
+          return;
+        }
+
+        btn.disabled = true;
+        const r = await sb.auth.signUp({
+          email: m,
+          password: p,
+          options: { data: { username: u, full_name: n } }
+        });
+        btn.disabled = false;
+
+        if (r.error) {
+          $('e2').textContent = r.error.message || 'Gagal mendaftar.';
+          return;
+        }
+
+        if (r.data && r.data.session) {
+          location.hash = '#/redaksi';
+        } else {
+          $('ok2').textContent = 'Akun dibuat. Cek email untuk konfirmasi (atau periksa pengaturan Confirm email di Supabase > Authentication > Providers > Email), lalu login.';
+        }
+      };
+    }
+
+    async function logout() {
+      await sb.auth.signOut();
+      me = null;
+      location.hash = '#/';
+    }
+
+    /* ---------- ruang redaksi ---------- */
+    async function showNewsroom() {
+      if (!ready) {
+        $('root').innerHTML = pub(setupNotice());
+        return;
+      }
+      await loadMe();
+      if (!me) {
+        location.hash = '#/masuk';
+        return;
+      }
+      document.title = 'Ruang redaksi – Langkatalk';
+      $('root').innerHTML = '<div class="wrap"><div class="empty" style="margin-top:30px">Memuat ruang redaksi…</div></div>';
+      await refresh();
+      draw();
+    }
+
+    async function refresh() {
+      const a = await sb.from('articles').select('*').order('created_at', { ascending: false });
+      D.arts = a.data || [];
+      if (a.error) toast(a.error.message);
+
+      if (['direktur', 'pemred', 'redaktur', 'reporter'].includes(me.r)) {
+        const idRes = await sb.from('ideas').select('*').order('created_at', { ascending: false });
+        D.ideas = idRes.data || [];
+      } else {
+        D.ideas = [];
+      }
+
+      const prRes = await sb.from('profiles').select('id,username,full_name,role').order('created_at');
+      D.profs = prRes.data || [];
+    }
+
+    function acts(a) {
+      const e = eff();
+      return (TR[a.status] || []).filter((x) =>
+        e === 'direktur' || x.w.some((r) => (r === 'author' ? a.author_id === me.id : r === e))
+      );
+    }
+
+    const canEdit = (a) => a.status !== 'terbit' && CAN['Menyunting isi'].includes(eff());
+    const tasks = () => D.arts.filter((a) => acts(a).length);
+
+    async function step(id, to) {
+      const n = $('note') ? $('note').value.trim() : '';
+      if (to === 'revisi' && !n) {
+        toast('Tulis catatan revisi dulu');
+        return;
+      }
+      const r = await sb.rpc('advance_article', { p_id: id, p_to: to, p_note: n || null });
+      if (r.error) {
+        toast(r.error.message);
+        return;
+      }
+      await refresh();
+      draw(1);
+      openA(id);
+      toast('Status naskah diperbarui');
+    }
+
+    async function saveBody(id) {
+      const r = await sb.from('articles').update({ body: $('eb').value }).eq('id', id).select();
+      if (r.error || !r.data || !r.data.length) {
+        toast(r.error ? r.error.message : 'Tidak ada perubahan tersimpan');
+        return;
+      }
+      await refresh();
+      openA(id);
+      toast('Suntingan disimpan');
+    }
+
+    async function openA(id) {
+      const a = D.arts.find((x) => x.id === id);
+      if (!a) return;
+      const evRes = await sb.from('article_events').select('*').eq('article_id', id).order('created_at');
+      const ev = evRes.data || [];
+      const ac = acts(a);
+      const ret = ac.some((x) => x.r);
+
+      $('box').innerHTML = `
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+          ${a.is_exclusive ? '<span class="chip ex">EKSKLUSIF</span>' : ''}
+          <span class="chip">${esc(a.category)}</span>
+          <span class="chip bl">${ST[a.status]}</span>
+          <span class="chip wr">Bukti: ${esc(a.evidence_level)}</span>
+          ${a.right_of_reply ? '<span class="chip ok">Hak jawab tercatat</span>' : ''}
+        </div>
+        <h2 style="font-size:22px;font-weight:800">${esc(a.title)}</h2>
+        <div class="mt">Oleh ${esc(a.author_name || '-')} • Sumber: ${esc(a.source || '-')}</div>
+        ${a.status === 'revisi' && a.review_note ? `<div class="notice" style="margin:12px 0"><b>Catatan revisi:</b> ${esc(a.review_note)}</div>` : ''}
+        ${canEdit(a)
+          ? `<textarea id="eb" style="margin:12px 0 8px;min-height:180px">${esc(a.body)}</textarea><button class="gh" onclick="saveBody(${id})">Simpan suntingan</button>`
+          : `<div class="body">${esc(a.body)}</div>`}
+        <h3 style="font-size:15px;margin-top:16px">Riwayat</h3>
+        <ul class="log">
+          ${ev.map((l) => `<li>${fmtT(l.created_at)} • ${esc(l.actor_name || '-')} ${esc(l.action)}${l.note ? `: ${esc(l.note)}` : ''}</li>`).join('')}
+        </ul>
+        ${ret ? '<label for="note">Catatan revisi (wajib saat mengembalikan)</label><textarea id="note" style="min-height:70px"></textarea>' : ''}
+        <div class="acts">
+          ${ac.map((x) => `<button class="go sm${x.r ? ' rd' : ''}" onclick="step(${id},'${x.to}')">${x.l}</button>`).join('')}
+          <button class="gh" onclick="$('dlg').classList.remove('on')">Tutup</button>
+        </div>
+        ${ac.length || a.status === 'terbit' ? '' : '<p class="mt" style="margin-top:12px">Tidak ada tindakan untuk peranmu di tahap ini.</p>'}
+      `;
+      $('dlg').classList.add('on');
+    }
+
+    $('dlg').onclick = function (e) {
+      if (e.target === this) this.classList.remove('on');
+    };
+
+    function row(a) {
+      return `
+        <button class="rw" onclick="openA(${a.id})">
+          ${a.is_exclusive ? '<span class="chip ex">EKSKLUSIF</span>' : ''}
+          <b>${esc(a.title)}</b>
+          <span class="chip">${esc(a.category)}</span>
+          <span class="chip bl">${ST[a.status]}</span>
+          <span class="mt">${esc(a.author_name || '-')}</span>
+        </button>
+      `;
+    }
+
+    const V = {
+      home: () => {
+        const t = tasks();
+        const cnt = (s) => D.arts.filter((a) => a.status === s).length;
+        return `
+          <h2>Halo, ${esc(me.n)}</h2>
+          <p class="lead">Kamu bertugas sebagai <b>${ROLES[eff()]}</b>. Menu di kiri hanya menampilkan bagian yang boleh kamu akses.</p>
+          ${ACC[eff()].includes('semua')
+            ? `<div class="cards">${['diajukan', 'disunting', 'ditinjau', 'revisi', 'terbit'].map((s) => `<div class="st"><b>${cnt(s)}</b><span>${ST[s]}</span></div>`).join('')}</div>`
+            : ''}
+          <h3 style="margin-bottom:10px">Menunggu tindakanmu</h3>
+          ${t.length ? t.map(row).join('') : '<div class="empty">Tidak ada naskah yang menunggu kamu.</div>'}
+        `;
+      },
+      antre: () => {
+        const l = D.arts.filter((a) => acts(a).length || a.author_id === me.id);
+        return `
+          <h2>Antrean kerja</h2>
+          <p class="lead">Naskah yang menunggu tindakanmu dan naskah tulisanmu sendiri.</p>
+          ${l.length ? l.map(row).join('') : '<div class="empty">Belum ada naskah. Mulai dari menu Tulis naskah.</div>'}
+        `;
+      },
+      semua: () => `
+        <h2>Semua naskah</h2>
+        <p class="lead">Klik naskah untuk melihat isi, riwayat, dan tindakan yang tersedia.</p>
+        ${D.arts.length ? D.arts.map(row).join('') : '<div class="empty">Belum ada naskah.</div>'}
+      `,
+      tulis: () => {
+        const p = pre || {};
+        pre = null;
+        return `
+          <h2>Tulis naskah</h2>
+          <p class="lead">Simpan sebagai draf, atau ajukan ke editor.</p>
+          <div class="panel">
+            <div class="f"><label for="wt">Judul</label><input type="text" id="wt" value="${esc(p.title || '')}"></div>
+            <div class="row2">
+              <div class="f"><label for="wc">Kategori</label><select id="wc">${CATS.map((c) => `<option>${c}</option>`).join('')}</select></div>
+              <div class="f"><label for="ws">Narasumber</label><input type="text" id="ws" placeholder="Nama atau Anonim"></div>
+            </div>
+            <div class="f"><label for="wb">Isi naskah</label><textarea id="wb" style="min-height:200px"></textarea></div>
+            <div class="row2">
+              <div class="f"><label for="wl">Level bukti</label><select id="wl"><option>Kuat</option><option>Sedang</option><option>Awal</option></select></div>
+              <div class="f" style="display:flex;align-items:flex-end"><label class="tog" style="width:100%"><input type="checkbox" id="wx"> Jadikan EKSKLUSIF</label></div>
+            </div>
+            <label class="tog" style="margin-bottom:16px"><input type="checkbox" id="wh"> Hak jawab pihak terkait sudah dicatat</label>
+            <div class="acts">
+              <button class="gh" onclick="saveA(0)">Simpan draf</button>
+              <button class="go sm" onclick="saveA(1)">Ajukan ke editor</button>
+            </div>
+          </div>
+        `;
+      },
+      usul: () => {
+        const e = eff();
+        const pr = ['direktur', 'pemred', 'redaktur', 'reporter'].includes(e);
+        const as = ['direktur', 'pemred', 'redaktur'].includes(e);
+        return `
+          <h2>Usulan dan penugasan</h2>
+          <p class="lead">Ide dibahas dulu, lalu ditugaskan ke penulis.</p>
+          ${pr ? '<div class="panel"><label for="it">Usulkan ide liputan</label><div style="display:flex;gap:8px"><input type="text" id="it"><button class="go sm" style="height:44px" onclick="addIdea()">Usulkan</button></div></div>' : ''}
+          ${D.ideas.length ? D.ideas.map((i) => `
+            <div class="rw">
+              <b>${esc(i.title)}</b>
+              <span class="mt">Diusulkan ${esc(pn(i.proposed_by))}</span>
+              ${i.assigned_to ? `<span class="chip ok">Ditugaskan: ${esc(pn(i.assigned_to))}</span>` : '<span class="chip wr">Belum ditugaskan</span>'}
+              ${as && !i.assigned_to
+                ? `<select style="width:auto;height:36px" onchange="assign(${i.id},this.value)"><option value="">Tugaskan ke…</option>${D.profs.filter((u) => u.role !== 'editor').map((u) => `<option value="${u.id}">${esc(u.full_name)}</option>`).join('')}</select>`
+                : ''}
+              ${(i.assigned_to === me.id || (e === 'direktur' && i.assigned_to))
+                ? `<button class="go sm" onclick="startIdea(${i.id})">Mulai menulis</button>`
+                : ''}
+            </div>
+          `).join('') : '<div class="empty">Belum ada usulan.</div>'}
+        `;
+      },
+      user: () => `
+        <h2>Pengguna dan peran</h2>
+        <p class="lead">Hanya direktur yang bisa mengatur siapa memegang peran apa. Semua pendaftar baru otomatis kontributor.</p>
+        <div class="panel tw">
+          <table>
+            <tr><th>Nama</th><th>Pengguna</th><th>Peran</th></tr>
+            ${D.profs.map((u) => `
+              <tr>
+                <td>${esc(u.full_name)}</td>
+                <td>${esc(u.username)}</td>
+                <td>${u.id === me.id
+                  ? `<span class="chip">${ROLES[u.role]} (kamu)</span>`
+                  : `<select style="height:36px" onchange="setRole('${u.id}',this.value)">${Object.keys(ROLES).map((r) => `<option value="${r}"${r === u.role ? ' selected' : ''}>${ROLES[r]}</option>`).join('')}</select>`}</td>
+              </tr>
+            `).join('')}
+          </table>
+        </div>
+        <div class="notice">Untuk membuat akun staf: minta orangnya daftar lewat halaman Masuk, lalu ubah perannya di tabel ini. Akun dibuat langsung lewat Supabase &gt; Authentication &gt; Users &gt; Add user.</div>
+      `,
+      matrix: () => {
+        const cols = Object.keys(CAN);
+        const R = Object.keys(ROLES);
+        const ck = (b) => (b ? '<span style="color:var(--ok);font-weight:700">✓</span>' : '<span class="mt">–</span>');
+        return `
+          <h2>Matriks akses</h2>
+          <p class="lead">Batasan peran di sistem.</p>
+          <div class="panel tw">
+            <table>
+              <tr><th>Peran</th>${cols.map((c) => `<th class="c">${c}</th>`).join('')}</tr>
+              ${R.map((r) => `<tr><td><b>${ROLES[r]}</b></td>${cols.map((c) => `<td class="c">${ck(CAN[c].includes(r))}</td>`).join('')}</tr>`).join('')}
+            </table>
+          </div>
+          <div class="panel">
+            <b>Aturan khusus:</b> naskah berlabel <b>EKSKLUSIF</b> tidak bisa diterbitkan bila hak jawab belum dicatat, dan wajib disetujui pemred (atau direktur sesuai alur).
+          </div>
+        `;
+      }
+    };
+
+    async function saveA(sub) {
+      const title = $('wt').value.trim();
+      const body = $('wb').value.trim();
+      if (title.length < 5) {
+        toast('Judul minimal 5 karakter');
+        return;
+      }
+      if (!body) {
+        toast('Isi naskah wajib diisi');
+        return;
+      }
+      const r = await sb.from('articles').insert({
+        title,
+        category: $('wc').value,
+        source: $('ws').value.trim() || null,
+        body,
+        evidence_level: $('wl').value,
+        is_exclusive: $('wx').checked,
+        right_of_reply: $('wh').checked,
+        status: sub ? 'diajukan' : 'draf',
+        author_id: me.id
+      }).select().single();
+
+      if (r.error) {
+        toast(r.error.message);
+        return;
+      }
+      await refresh();
+      page = 'antre';
+      draw();
+      toast(sub ? 'Naskah diajukan ke editor' : 'Draf disimpan');
+    }
+
+    async function addIdea() {
+      const t = $('it').value.trim();
+      if (t.length < 5) {
+        toast('Usulan minimal 5 karakter');
+        return;
+      }
+      const r = await sb.from('ideas').insert({ title: t, proposed_by: me.id });
+      if (r.error) {
+        toast(r.error.message);
+        return;
+      }
+      await refresh();
+      draw();
+      toast('Ide diusulkan');
+    }
+
+    async function assign(id, uid) {
+      if (!uid) return;
+      const r = await sb.from('ideas').update({ assigned_to: uid }).eq('id', id);
+      if (r.error) {
+        toast(r.error.message);
+        return;
+      }
+      await refresh();
+      draw();
+      toast('Penugasan disimpan');
+    }
+
+    function startIdea(id) {
+      const i = D.ideas.find((x) => x.id === id);
+      pre = { title: i ? i.title : '' };
+      page = 'tulis';
+      draw();
+    }
+
+    async function setRole(uid, r) {
+      const res = await sb.rpc('set_user_role', { target: uid, new_role: r });
+      if (res.error) {
+        toast(res.error.message);
+        await refresh();
+        draw();
+        return;
+      }
+      await refresh();
+      toast('Peran diperbarui');
+    }
+
+    function draw(keep) {
+      const menuList = ACC[me.r] || ['home'];
+      if (!menuList.includes(page)) page = menuList[0] || 'home';
+      const tCount = tasks().length;
+
+      if (!keep) {
+        $('root').innerHTML = `
+          <div class="shell">
+            <aside class="sb">
+              <img src="assets/logo.png" alt="Langkatalk">
+              <nav id="nav">
+                ${MENUS.filter((m) => menuList.includes(m[0])).map((m) => `
+                  <button data-p="${m[0]}" class="${m[0] === page ? 'on' : ''}">${m[1]}${m[0] === 'antre' && tCount ? ` <span class="badge">${tCount}</span>` : ''}</button>
+                `).join('')}
+              </nav>
+            </aside>
+            <div>
+              <header class="tp">
+                <span class="chip">${ROLES[me.r]}</span>
+                <b>${esc(me.n)}</b>
+                <span class="sp"></span>
+                ${me.r === 'direktur'
+                  ? `<label for="vw" class="mt" style="margin:0">Lihat sebagai:</label><select id="vw">${Object.keys(ROLES).map((r) => `<option value="${r}"${r === view ? ' selected' : ''}>${ROLES[r]}</option>`).join('')}</select>`
+                  : ''}
+                <a class="gh" href="#/">Portal</a>
+                <button class="gh" onclick="logout()">Keluar</button>
+              </header>
+              <main class="ct" id="ct"></main>
+            </div>
+          </div>
+        `;
+
+        document.querySelectorAll('#nav button').forEach((b) => {
+          b.onclick = () => {
+            page = b.dataset.p;
+            draw();
+          };
+        });
+
+        if ($('vw')) {
+          $('vw').onchange = function () {
+            view = this.value;
+            draw();
+          };
+        }
+      }
+
+      if ($('ct')) $('ct').innerHTML = (V[page] || V.home)();
+    }
+
+    route();
+  </script>
 </body>
 </html>

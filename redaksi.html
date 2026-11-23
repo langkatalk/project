@@ -20,17 +20,17 @@
     .r-brand .sub{font-size:12px;color:var(--mute)}
     .r-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
     .r-tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
-    .r-tab{border:1px solid var(--line);background:#fff;color:var(--ink);padding:8px 14px;border-radius:999px;font-size:13px;font-weight:700;cursor:pointer;transition:.15s}
-    .r-tab.on{background:var(--grad);color:#fff;border-color:transparent;box-shadow:0 6px 18px rgba(95,111,238,.25)}
+    .r-tab{border:1px solid rgba(255,255,255,.75);background:rgba(255,255,255,.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:var(--ink);padding:8px 14px;border-radius:999px;font-size:13px;font-weight:700;cursor:pointer;transition:.15s}
+    .r-tab.on{background:var(--grad);color:#fff;border-color:transparent;box-shadow:0 8px 22px rgba(95,111,238,.28)}
     .r-grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px}
-    .r-stat{background:var(--glass-strong);border:1px solid var(--line);border-radius:var(--r-md);padding:14px 16px;box-shadow:var(--shadow-sm)}
+    .r-stat{background:rgba(255,255,255,.74);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.85);border-radius:18px;padding:14px 16px;box-shadow:0 10px 30px rgba(22,17,51,.06)}
     .r-stat .k{font-size:12px;color:var(--mute);font-weight:700}
     .r-stat .v{font-family:'Sora',sans-serif;font-size:24px;font-weight:800;margin-top:4px;color:var(--ink)}
-    .r-card{background:var(--glass-strong);border:1px solid var(--line);border-radius:var(--r-lg);padding:18px;box-shadow:var(--shadow-md);margin-bottom:16px}
+    .r-card{background:rgba(255,255,255,.76);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.88);border-radius:22px;padding:18px;box-shadow:0 14px 36px rgba(22,17,51,.07);margin-bottom:16px}
     .r-card h2{font-family:'Sora',sans-serif;font-size:16px;margin:0 0 12px}
     .r-table-wrap{overflow-x:auto}
     table.r-tbl{width:100%;border-collapse:collapse;font-size:13px}
-    table.r-tbl th,table.r-tbl td{padding:10px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+    table.r-tbl th,table.r-tbl td{padding:10px 10px;border-bottom:1px solid rgba(22,17,51,.08);text-align:left;vertical-align:top}
     table.r-tbl th{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--mute);font-weight:800}
     .badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:800}
     .b-terbit{background:#DCFCE7;color:#166534}
@@ -38,19 +38,31 @@
     .b-arsip{background:#E2E8F0;color:#334155}
     .b-pending{background:#FFEDD5;color:#9A3412}
     .r-row-act{display:flex;flex-wrap:wrap;gap:6px}
-    .btn-xs{border:1px solid var(--line);background:#fff;color:var(--ink);padding:5px 9px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer}
+    .btn-xs{border:1px solid var(--line);background:rgba(255,255,255,.9);color:var(--ink);padding:5px 9px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer}
     .btn-xs:hover{border-color:var(--violet)}
     .btn-xs.pri{background:var(--grad);color:#fff;border:0}
     .btn-xs.del{background:#FEE2E2;color:#991B1B;border-color:#FECACA}
     .r-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-    .r-field{display:flex;flex-direction:column;gap:5px}
+    .r-field{display:flex;flex-direction:column;gap:6px}
     .r-field.full{grid-column:1 / -1}
     .r-field label{font-size:12px;font-weight:700;color:var(--ink)}
-    .r-field input,.r-field select,.r-field textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);font-family:inherit;font-size:13px}
+    .r-field input,.r-field select,.r-field textarea{width:100%;padding:11px 13px;border:1px solid rgba(22,17,51,.12);border-radius:12px;background:rgba(255,255,255,.86);color:var(--ink);font-family:inherit;font-size:13px;outline:none;transition:.15s}
+    .r-field input:focus,.r-field select:focus,.r-field textarea:focus{border-color:var(--violet);background:#fff;box-shadow:0 0 0 3px rgba(124,63,224,.14)}
     .r-field textarea{min-height:84px;resize:vertical}
-    .login-box{max-width:420px;margin:56px auto;background:var(--glass-strong);border:1px solid var(--line);border-radius:var(--r-lg);padding:24px;box-shadow:var(--shadow-lg)}
-    .login-box h1{font-family:'Sora',sans-serif;font-size:20px;margin:0 0 6px}
-    .login-box p{font-size:13px;color:var(--mute);margin:0 0 16px}
+
+    .glass-auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px}
+    .glass-auth-card{width:100%;max-width:410px;background:rgba(255,255,255,.78);backdrop-filter:blur(24px) saturate(150%);-webkit-backdrop-filter:blur(24px) saturate(150%);border:1px solid rgba(255,255,255,.92);border-radius:26px;padding:28px 24px;box-shadow:0 20px 50px rgba(22,17,51,.09)}
+    .glass-auth-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+    .glass-brand{display:flex;align-items:center;gap:11px}
+    .glass-brand img{width:40px;height:40px;border-radius:13px;object-fit:cover;box-shadow:0 6px 16px rgba(124,63,224,.18)}
+    .glass-auth-card h1{font-family:'Sora',sans-serif;font-size:21px;font-weight:800;margin:0 0 6px;color:var(--ink)}
+    .glass-auth-card p.lead{font-size:13px;color:var(--mute);margin:0 0 18px;line-height:1.5}
+    .auth-row-meta{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:4px;margin-bottom:14px}
+    .link-btn{background:none;border:0;padding:0;font-family:inherit;font-size:12px;font-weight:700;color:var(--violet);cursor:pointer}
+    .link-btn:hover{text-decoration:underline}
+    .auth-msg-err{color:var(--err);font-size:12px;font-weight:700;margin-bottom:12px}
+    .auth-msg-ok{color:#15803D;background:rgba(220,252,231,.8);border:1px solid #BBF7D0;border-radius:12px;padding:10px 12px;font-size:12px;font-weight:700;margin-bottom:12px}
+
     @media (max-width:820px){
       .r-grid4{grid-template-columns:repeat(2,minmax(0,1fr))}
       .r-form-grid{grid-template-columns:1fr}
@@ -59,18 +71,23 @@
 </head>
 <body>
   <div id="root">
-  <div class="login-box">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
-      <img src="favicon.png" alt="Langkatalk" width="36" height="36" style="border-radius:10px">
-      <div>
-        <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:15px">Langkatalk</div>
-        <div style="font-size:12px;color:var(--mute)">Ruang Redaksi</div>
+    <div class="glass-auth-wrap">
+      <div class="glass-auth-card">
+        <div class="glass-auth-head">
+          <div class="glass-brand">
+            <img src="favicon.png" alt="Langkatalk">
+            <div>
+              <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:15px">Langkatalk</div>
+              <div style="font-size:12px;color:var(--mute)">Ruang Redaksi</div>
+            </div>
+          </div>
+          <a href="index.html" style="font-size:12px;font-weight:700;color:var(--mute)">Beranda</a>
+        </div>
+        <h1>Masuk Redaksi</h1>
+        <p class="lead">Menyiapkan formulir masuk &amp; koneksi Supabase...</p>
       </div>
     </div>
-    <h1>Masuk Redaksi</h1>
-    <p>Memuat sesi redaksi...</p>
   </div>
-</div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="config.js"></script>
@@ -79,6 +96,7 @@
     const redaksiState = {
       user: null,
       profile: null,
+      authMode: 'login', // 'login' | 'forgot' | 'recovery'
       tab: 'artikel',
       articles: [],
       comments: [],
@@ -91,29 +109,51 @@
       return ['direktur', 'pemred', 'admin', 'owner'].includes(role);
     }
 
-    async function loadRedaksiSession() {
-      const sb = getSupabase();
-      const { data: { session } } = await sb.auth.getSession();
-      redaksiState.user = session?.user || null;
+    function getClient() {
+      if (typeof getSupabase === 'function') {
+        const client = getSupabase();
+        if (client) return client;
+      }
+      const cfg = window.APP_CONFIG || {};
+      if (window.supabase && cfg.SUPABASE_URL && cfg.SUPABASE_PUBLISHABLE_KEY) {
+        return window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_PUBLISHABLE_KEY);
+      }
+      return null;
+    }
 
-      if (redaksiState.user) {
-        const { data } = await sb
-          .from('profiles')
-          .select('*')
-          .eq('id', redaksiState.user.id)
-          .single();
-        redaksiState.profile = data || {
-          id: redaksiState.user.id,
-          full_name: redaksiState.user.email,
-          role: 'penulis'
-        };
-      } else {
+    async function loadRedaksiSession() {
+      const sb = getClient();
+      if (!sb || !sb.auth) {
+        redaksiState.user = null;
+        redaksiState.profile = null;
+        return;
+      }
+      try {
+        const { data } = await sb.auth.getSession();
+        redaksiState.user = data?.session?.user || null;
+        if (redaksiState.user) {
+          const { data: prof } = await sb
+            .from('profiles')
+            .select('*')
+            .eq('id', redaksiState.user.id)
+            .single();
+          redaksiState.profile = prof || {
+            id: redaksiState.user.id,
+            full_name: redaksiState.user.email,
+            role: 'penulis'
+          };
+        } else {
+          redaksiState.profile = null;
+        }
+      } catch (_) {
+        redaksiState.user = null;
         redaksiState.profile = null;
       }
     }
 
     async function loadRedaksiData() {
-      const sb = getSupabase();
+      const sb = getClient();
+      if (!sb) return;
       const [artRes, comRes, adRes, setRes] = await Promise.all([
         sb.from('articles').select('*').order('created_at', { ascending: false }),
         sb.from('comments').select('*').order('created_at', { ascending: false }),
@@ -136,30 +176,100 @@
       ev.preventDefault();
       const email = document.getElementById('rEmail').value.trim();
       const password = document.getElementById('rPassword').value;
-      const errEl = document.getElementById('rLoginErr');
-      errEl.textContent = '';
+      const errEl = document.getElementById('rAuthErr');
+      const okEl = document.getElementById('rAuthOk');
+      if (errEl) errEl.textContent = '';
+      if (okEl) { okEl.style.display = 'none'; okEl.textContent = ''; }
 
-      const sb = getSupabase();
-      const { error } = await sb.auth.signInWithPassword({ email, password });
-      if (error) {
-        errEl.textContent = 'Gagal masuk: ' + error.message;
+      const sb = getClient();
+      if (!sb) {
+        if (errEl) errEl.textContent = 'Koneksi Supabase belum siap. Periksa config.js.';
         return;
       }
+
+      const { error } = await sb.auth.signInWithPassword({ email, password });
+      if (error) {
+        if (errEl) errEl.textContent = 'Gagal masuk: ' + error.message;
+        return;
+      }
+      redaksiState.authMode = 'login';
+      await loadRedaksiSession();
+      await loadRedaksiData();
+      renderRedaksiPage();
+    }
+
+    async function handleForgotPassword(ev) {
+      ev.preventDefault();
+      const email = document.getElementById('rResetEmail').value.trim();
+      const errEl = document.getElementById('rAuthErr');
+      const okEl = document.getElementById('rAuthOk');
+      if (errEl) errEl.textContent = '';
+      if (okEl) { okEl.style.display = 'none'; okEl.textContent = ''; }
+
+      const sb = getClient();
+      if (!sb) {
+        if (errEl) errEl.textContent = 'Koneksi Supabase belum siap. Periksa config.js.';
+        return;
+      }
+
+      const redirectUrl = window.location.origin + '/redaksi.html';
+      const { error } = await sb.auth.resetPasswordForEmail(email, {
+        redirectTo: redirectUrl
+      });
+
+      if (error) {
+        if (errEl) errEl.textContent = 'Gagal mengirim tautan reset: ' + error.message;
+        return;
+      }
+
+      if (okEl) {
+        okEl.style.display = 'block';
+        okEl.textContent = 'Tautan reset kata sandi telah dikirim ke ' + email + '. Cek kotak masuk atau folder spam email kamu.';
+      }
+    }
+
+    async function handleUpdateRecoveredPassword(ev) {
+      ev.preventDefault();
+      const newPassword = document.getElementById('rNewPassword').value;
+      const confirmPassword = document.getElementById('rConfirmPassword').value;
+      const errEl = document.getElementById('rAuthErr');
+      const okEl = document.getElementById('rAuthOk');
+      if (errEl) errEl.textContent = '';
+      if (okEl) { okEl.style.display = 'none'; okEl.textContent = ''; }
+
+      if (newPassword.length < 6) {
+        if (errEl) errEl.textContent = 'Kata sandi baru minimal 6 karakter.';
+        return;
+      }
+      if (newPassword !== confirmPassword) {
+        if (errEl) errEl.textContent = 'Konfirmasi kata sandi belum sama.';
+        return;
+      }
+
+      const sb = getClient();
+      const { error } = await sb.auth.updateUser({ password: newPassword });
+      if (error) {
+        if (errEl) errEl.textContent = 'Gagal memperbarui kata sandi: ' + error.message;
+        return;
+      }
+
+      redaksiState.authMode = 'login';
       await loadRedaksiSession();
       await loadRedaksiData();
       renderRedaksiPage();
     }
 
     async function handleRedaksiLogout() {
-      const sb = getSupabase();
-      await sb.auth.signOut();
+      const sb = getClient();
+      if (sb) await sb.auth.signOut();
       redaksiState.user = null;
       redaksiState.profile = null;
+      redaksiState.authMode = 'login';
       renderRedaksiPage();
     }
 
     async function setArticleStatus(id, status) {
-      const sb = getSupabase();
+      const sb = getClient();
       const payload = { status };
       if (status === 'terbit') payload.published_at = new Date().toISOString();
       const { error } = await sb.from('articles').update(payload).eq('id', id);
@@ -170,7 +280,7 @@
 
     async function deleteArticleRow(id) {
       if (!confirm('Hapus artikel ini secara permanen?')) return;
-      const sb = getSupabase();
+      const sb = getClient();
       const { error } = await sb.from('articles').delete().eq('id', id);
       if (error) return alert('Gagal menghapus artikel: ' + error.message);
       await loadRedaksiData();
@@ -178,7 +288,7 @@
     }
 
     async function setCommentStatus(id, status) {
-      const sb = getSupabase();
+      const sb = getClient();
       const { error } = await sb.from('comments').update({ status }).eq('id', id);
       if (error) return alert('Gagal memoderasi komentar: ' + error.message);
       await loadRedaksiData();
@@ -187,7 +297,7 @@
 
     async function deleteCommentRow(id) {
       if (!confirm('Hapus komentar ini?')) return;
-      const sb = getSupabase();
+      const sb = getClient();
       const { error } = await sb.from('comments').delete().eq('id', id);
       if (error) return alert('Gagal menghapus komentar: ' + error.message);
       await loadRedaksiData();
@@ -196,7 +306,7 @@
 
     async function saveAdRow(ev) {
       ev.preventDefault();
-      const sb = getSupabase();
+      const sb = getClient();
       const title = document.getElementById('adTitle').value.trim();
       const placement = document.getElementById('adPlacement').value;
       const image_url = document.getElementById('adImageUrl').value.trim();
@@ -219,7 +329,7 @@
     }
 
     async function toggleAdActive(id, currentActive) {
-      const sb = getSupabase();
+      const sb = getClient();
       const { error } = await sb.from('ads').update({ is_active: !currentActive }).eq('id', id);
       if (error) return alert('Gagal mengubah status iklan: ' + error.message);
       await loadRedaksiData();
@@ -228,7 +338,7 @@
 
     async function deleteAdRow(id) {
       if (!confirm('Hapus slot iklan ini?')) return;
-      const sb = getSupabase();
+      const sb = getClient();
       const { error } = await sb.from('ads').delete().eq('id', id);
       if (error) return alert('Gagal menghapus iklan: ' + error.message);
       await loadRedaksiData();
@@ -237,7 +347,7 @@
 
     async function saveSiteSettings(ev) {
       ev.preventDefault();
-      const sb = getSupabase();
+      const sb = getClient();
       const pairs = [
         { key: 'site_title', value: document.getElementById('setTitle').value.trim() },
         { key: 'tagline', value: document.getElementById('setTagline').value.trim() },
@@ -256,31 +366,83 @@
     }
 
     function renderLoginView() {
-      document.getElementById('root').innerHTML = `
-        <div class="login-box">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
-            <img src="favicon.png" alt="Langkatalk" width="36" height="36" style="border-radius:10px">
-            <div>
-              <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:15px">Langkatalk</div>
-              <div style="font-size:12px;color:var(--mute)">Ruang Redaksi</div>
+      const isForgot = redaksiState.authMode === 'forgot';
+      const isRecovery = redaksiState.authMode === 'recovery';
+
+      let formHtml = '';
+      if (isRecovery) {
+        formHtml = `
+          <h1>Atur Kata Sandi Baru</h1>
+          <p class="lead">Masukkan kata sandi baru untuk akun redaksi kamu.</p>
+          <form onsubmit="handleUpdateRecoveredPassword(event)">
+            <div class="r-field" style="margin-bottom:12px">
+              <label for="rNewPassword">Kata Sandi Baru</label>
+              <input id="rNewPassword" type="password" required minlength="6" placeholder="Minimal 6 karakter">
             </div>
+            <div class="r-field" style="margin-bottom:14px">
+              <label for="rConfirmPassword">Konfirmasi Kata Sandi Baru</label>
+              <input id="rConfirmPassword" type="password" required minlength="6" placeholder="Ulangi kata sandi baru">
+            </div>
+            <div id="rAuthErr" class="auth-msg-err"></div>
+            <div id="rAuthOk" class="auth-msg-ok" style="display:none"></div>
+            <button type="submit" class="go" style="width:100%;justify-content:center">Simpan Kata Sandi</button>
+          </form>
+        `;
+      } else if (isForgot) {
+        formHtml = `
+          <h1>Lupa Kata Sandi</h1>
+          <p class="lead">Masukkan email akun redaksi yang terdaftar di Supabase. Kami akan mengirim tautan reset ke email kamu.</p>
+          <form onsubmit="handleForgotPassword(event)">
+            <div class="r-field" style="margin-bottom:14px">
+              <label for="rResetEmail">Email Redaksi</label>
+              <input id="rResetEmail" type="email" required placeholder="nama@email.com">
+            </div>
+            <div id="rAuthErr" class="auth-msg-err"></div>
+            <div id="rAuthOk" class="auth-msg-ok" style="display:none"></div>
+            <button type="submit" class="go" style="width:100%;justify-content:center">Kirim Link Reset ke Email</button>
+          </form>
+          <div style="margin-top:14px;text-align:center">
+            <button type="button" class="link-btn" onclick="redaksiState.authMode='login';renderRedaksiPage()">← Kembali ke Halaman Masuk</button>
           </div>
+        `;
+      } else {
+        formHtml = `
           <h1>Masuk Redaksi</h1>
-          <p>Gunakan akun tim redaksi yang terdaftar di Supabase Auth.</p>
+          <p class="lead">Masuk menggunakan akun tim redaksi yang terhubung dengan Supabase.</p>
           <form onsubmit="handleRedaksiLogin(event)">
             <div class="r-field" style="margin-bottom:12px">
               <label for="rEmail">Email</label>
               <input id="rEmail" type="email" required placeholder="redaksi@langkatalk.id">
             </div>
-            <div class="r-field" style="margin-bottom:14px">
+            <div class="r-field" style="margin-bottom:6px">
               <label for="rPassword">Kata Sandi</label>
               <input id="rPassword" type="password" required placeholder="••••••••">
             </div>
-            <div id="rLoginErr" style="color:var(--err);font-size:12px;font-weight:700;margin-bottom:10px"></div>
-            <button type="submit" class="go" style="width:100%;justify-content:center">Masuk ke Dashboard</button>
+            <div class="auth-row-meta">
+              <span style="font-size:11px;color:var(--mute)">Supabase Auth</span>
+              <button type="button" class="link-btn" onclick="redaksiState.authMode='forgot';renderRedaksiPage()">Lupa kata sandi?</button>
+            </div>
+            <div id="rAuthErr" class="auth-msg-err"></div>
+            <div id="rAuthOk" class="auth-msg-ok" style="display:none"></div>
+            <button type="submit" class="go" style="width:100%;justify-content:center">Masuk ke Ruang Redaksi</button>
           </form>
-          <div style="margin-top:14px;text-align:center">
-            <a href="index.html" style="font-size:12px;color:var(--mute);font-weight:700">← Kembali ke Beranda</a>
+        `;
+      }
+
+      document.getElementById('root').innerHTML = `
+        <div class="glass-auth-wrap">
+          <div class="glass-auth-card">
+            <div class="glass-auth-head">
+              <div class="glass-brand">
+                <img src="favicon.png" alt="Langkatalk">
+                <div>
+                  <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:15px">Langkatalk</div>
+                  <div style="font-size:12px;color:var(--mute)">Ruang Redaksi</div>
+                </div>
+              </div>
+              <a href="index.html" style="font-size:12px;font-weight:700;color:var(--mute)">← Beranda</a>
+            </div>
+            ${formHtml}
           </div>
         </div>
       `;
@@ -313,7 +475,7 @@
 
       return `
         <div class="r-card">
-          <h2>Daftar Artikel & Status</h2>
+          <h2>Daftar Artikel &amp; Status</h2>
           <div class="r-table-wrap">
             <table class="r-tbl">
               <thead>
@@ -488,7 +650,7 @@
     }
 
     function renderRedaksiPage() {
-      if (!redaksiState.user) {
+      if (!redaksiState.user || redaksiState.authMode === 'recovery') {
         renderLoginView();
         return;
       }
@@ -529,9 +691,9 @@
           </div>
 
           <div class="r-tabs">
-            <button type="button" class="r-tab ${redaksiState.tab === 'artikel' ? 'on' : ''}" onclick="redaksiState.tab='artikel';renderRedaksiPage()">Artikel & Status</button>
+            <button type="button" class="r-tab ${redaksiState.tab === 'artikel' ? 'on' : ''}" onclick="redaksiState.tab='artikel';renderRedaksiPage()">Artikel &amp; Status</button>
             <button type="button" class="r-tab ${redaksiState.tab === 'komentar' ? 'on' : ''}" onclick="redaksiState.tab='komentar';renderRedaksiPage()">Moderasi Komentar</button>
-            <button type="button" class="r-tab ${redaksiState.tab === 'iklan' ? 'on' : ''}" onclick="redaksiState.tab='iklan';renderRedaksiPage()">Iklan & AdSense</button>
+            <button type="button" class="r-tab ${redaksiState.tab === 'iklan' ? 'on' : ''}" onclick="redaksiState.tab='iklan';renderRedaksiPage()">Iklan &amp; AdSense</button>
             <button type="button" class="r-tab ${redaksiState.tab === 'pengaturan' ? 'on' : ''}" onclick="redaksiState.tab='pengaturan';renderRedaksiPage()">Pengaturan Situs</button>
           </div>
 
@@ -541,8 +703,23 @@
     }
 
     (async function initRedaksi() {
+      const sb = getClient();
+      if (sb && sb.auth && sb.auth.onAuthStateChange) {
+        sb.auth.onAuthStateChange(async (event) => {
+          if (event === 'PASSWORD_RECOVERY') {
+            redaksiState.authMode = 'recovery';
+            renderRedaksiPage();
+          }
+        });
+      }
+
+      if (window.location.hash && window.location.hash.includes('type=recovery')) {
+        redaksiState.authMode = 'recovery';
+      }
+
+      renderRedaksiPage();
       await loadRedaksiSession();
-      if (redaksiState.user) {
+      if (redaksiState.user && redaksiState.authMode !== 'recovery') {
         await loadRedaksiData();
       }
       renderRedaksiPage();

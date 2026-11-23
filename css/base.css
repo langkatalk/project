@@ -1,0 +1,109 @@
+/* css/base.css
+   Pondasi warna, font, dan tombol Langkatalk.
+   Dipakai oleh semua halaman. Jangan isi layout di sini. */
+
+:root {
+  /* Warna brand */
+  --lk-ungu: #7C3FE0;
+  --lk-indigo: #5F6FEE;
+  --lk-biru: #2B7BEA;
+  --lk-cyan: #1CC8C8;
+  --lk-jingga: #FF9A55;
+  --lk-navy: #161133;
+  --lk-malam: #0D0A2C;
+  --lk-lavender: #F3F0FF;
+  --lk-kabut: #DCC8FF;
+  --lk-teks: #161133;
+  --lk-body: #3A3760;
+  --lk-muted: #6B6890;
+  --lk-garis: #E4E0F5;
+
+  /* Warna tombol setuju dan tolak (di luar guideline, khusus aksi) */
+  --lk-hijau-1: #12926E;
+  --lk-hijau-2: #22C55E;
+  --lk-merah-1: #DC2626;
+  --lk-merah-2: #F43F5E;
+
+  /* Gradasi */
+  --lk-grad-brand: linear-gradient(135deg, #7C3FE0 0%, #5F6FEE 40%, #2B7BEA 75%, #1CC8C8 100%);
+  --lk-grad-tombol: linear-gradient(135deg, #7C3FE0, #2B7BEA);
+  --lk-grad-keluar: linear-gradient(135deg, #0D0A2C, #161133);
+  --lk-grad-setuju: linear-gradient(135deg, #12926E, #22C55E);
+  --lk-grad-tolak: linear-gradient(135deg, #DC2626, #F43F5E);
+
+  /* Kaca (glassmorphism terang) */
+  --lk-kaca: rgba(255, 255, 255, 0.7);
+  --lk-kaca-garis: rgba(255, 255, 255, 0.85);
+  --lk-bayangan: 0 14px 36px rgba(95, 63, 200, 0.14);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--lk-body);
+  background:
+    radial-gradient(circle at 8% 6%, rgba(124, 63, 224, 0.16), transparent 36%),
+    radial-gradient(circle at 92% 10%, rgba(28, 200, 200, 0.14), transparent 36%),
+    var(--lk-lavender);
+  background-attachment: fixed;
+}
+
+h1, h2, h3 {
+  font-family: 'Sora', 'Plus Jakarta Sans', sans-serif;
+  color: var(--lk-teks);
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+a { color: inherit; text-decoration: none; }
+
+/* Dasar tombol: semua tombol pakai kelas ini */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 14px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 120ms ease, filter 180ms ease;
+}
+.btn:active { transform: scale(0.96); }
+.btn:disabled { opacity: 0.6; cursor: wait; }
+
+/* Tombol standar: ungu ke biru */
+.btn-utama { background: var(--lk-grad-tombol); box-shadow: 0 10px 22px rgba(95, 63, 200, 0.25); }
+
+/* Tombol keluar: hitam di mana pun */
+.btn-keluar { background: var(--lk-grad-keluar); box-shadow: 0 10px 22px rgba(13, 10, 44, 0.3); }
+
+/* Tombol setuju: hijau */
+.btn-setuju { background: var(--lk-grad-setuju); box-shadow: 0 10px 22px rgba(18, 146, 110, 0.25); }
+
+/* Tombol tolak: merah */
+.btn-tolak { background: var(--lk-grad-tolak); box-shadow: 0 10px 22px rgba(220, 38, 38, 0.25); }
+
+/* Kartu kaca */
+.kartu-kaca {
+  background: var(--lk-kaca);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--lk-kaca-garis);
+  border-radius: 22px;
+  box-shadow: var(--lk-bayangan);
+}
+
+/* Bantuan */
+.sembunyi { display: none !important; }

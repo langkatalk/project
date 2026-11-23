@@ -1,6 +1,6 @@
 // js/dashboard.js
-// Ruang Redaksi: masuk, kerangka tab, dan tab Naskah & Status.
-// Semua perubahan status lewat fungsi resmi di database.
+// Ruang Redaksi: masuk, menu sesuai peran, Naskah (dengan submenu status), Komentar, dan Log.
+// Perubahan status naskah lewat fungsi resmi di database.
 (function () {
   'use strict';
 
@@ -12,12 +12,26 @@
   };
   var LABEL_STATUS = {
     draf: 'Draf', draft: 'Draf', diajukan: 'Diajukan', disunting: 'Disunting',
-    ditinjau: 'Ditinjau', revisi: 'Revisi', terbit: 'Terbit', arsip: 'Arsip',
-    scheduled: 'Terjadwal'
+    ditinjau: 'Ditinjau', revisi: 'Revisi', terbit: 'Terbit', arsip: 'Arsip'
   };
   var STAF = ['direktur', 'pemred', 'redaktur', 'editor'];
+  var SUDAH_DIBUAT = ['naskah', 'komentar', 'log'];
+  var FILTER_NASKAH = [
+    { id: 'semua', nama: 'Semua' },
+    { id: 'draf', nama: 'Draf' },
+    { id: 'proses', nama: 'Diajukan & proses' },
+    { id: 'revisi', nama: 'Revisi' },
+    { id: 'terbit', nama: 'Terbit' },
+    { id: 'arsip', nama: 'Arsip' },
+    { id: 'sampah', nama: 'Sampah' }
+  ];
+  var FILTER_KOMEN = [
+    { id: 'menunggu', nama: 'Menunggu' },
+    { id: 'disetujui', nama: 'Disetujui' },
+    { id: 'ditolak', nama: 'Ditolak' }
+  ];
 
-  var state = { profil: null, tab: 'naskah', filter: '', daftar: [] };
+  var state = { profil: null, tab: 'naskah', fNaskah: 'semua', fKomen: 'menunggu', naskah: [], komen: [] };
 
   var el = {
     masuk: document.getElementById('layarMasuk'),
@@ -55,8 +69,54 @@
     kabarkan.t = setTimeout(function () { el.toast.classList.remove('on'); }, 2800);
   }
 
-  function isiPesan(teks, kelas) {
-    el.isi.innerHTML = '<section class="rd-kotak"><p class="' + (kelas || 'rd-kotak-kosong') + '">' + esc(teks) + '</p></section>';
+  function isi(html) { el.isi.innerHTML = html; }
+
+  function pesan(teks, kelas) {
+    isi('<section class="rd-kotak"><p class="' + (kelas || 'rd-kotak-kosong') + '">' + esc(teks) + '</p></section>');
+  }
+
+  /* ---------- Menu sesuai peran ---------- */
+
+  function menuUntuk(r) {
+    var m = [{ id: 'naskah', nama: 'Naskah' }];
+    if (STAF.indexOf(r) !== -1) m.push({ id: 'komentar', nama: 'Komentar' });
+    if (r === 'direktur' || r === 'pemred') m.push({ id: 'iklan', nama: 'Iklan' });
+    if (r === 'direktur') {
+      m.push({ id: 'pengguna', nama: 'Pengguna & Jabatan' });
+      m.push({ id: 'pengaturan', nama: 'Pengaturan Situs' });
+      m.push({ id: 'builder', nama: 'Builder Level 1' });
+      m.push({ id: 'log', nama: 'Log Aktivitas' });
+    }
+    if (r === 'direktur' || r === 'pemred') {
+      m.push({ id: 'galeri', nama: 'Galeri' });
+      m.push({ id: 'notifikasi', nama: 'Notifikasi' });
+      m.push({ id: 'breaking', nama: 'Breaking News' });
+      m.push({ id: 'web', nama: 'Manajemen Web' });
+    }
+    return m;
+  }
+
+  function namaMenu(id) {
+    var m = menuUntuk(state.profil.role).find(function (x) { return x.id === id; });
+    return m ? m.nama : id;
+  }
+
+  function gambarTab() {
+    el.tabs.innerHTML = menuUntuk(state.profil.role).map(function (m) {
+      var kelas = (m.id === state.tab ? ' on' : '') + (SUDAH_DIBUAT.indexOf(m.id) === -1 ? ' segera' : '');
+      return '<button type="button" data-tab="' + m.id + '" class="' + kelas.trim() + '">' + esc(m.nama) + '</button>';
+    }).join('');
+  }
+
+  function bukaTab(id) {
+    var ada = menuUntuk(state.profil.role).some(function (m) { return m.id === id; });
+    state.tab = ada ? id : 'naskah';
+    gambarTab();
+
+    if (state.tab === 'naskah') return muatNaskah();
+    if (state.tab === 'komentar') return muatKomentar();
+    if (state.tab === 'log') return muatLog();
+    pesan('Menu "' + namaMenu(state.tab) + '" dibuat di tahap berikutnya.');
   }
 
   /* ---------- Layar masuk dan sesi ---------- */
@@ -79,7 +139,6 @@
       '<small>@' + esc(p.username) + '</small></div>' +
       '<span class="rd-lencana-peran">' + esc(peran) + '</span>';
 
-    gambarTab();
     bukaTab(state.tab);
   }
 
@@ -112,89 +171,62 @@
     tampilRedaksi(p);
   }
 
-  /* ---------- Tab ---------- */
+  /* ---------- Naskah ---------- */
 
-  function daftarTab() {
-    var r = state.profil.role;
-    var t = [{ id: 'naskah', nama: 'Naskah & Status' }];
-    if (STAF.indexOf(r) !== -1) t.push({ id: 'komentar', nama: 'Komentar' });
-    if (r === 'direktur') t.push({ id: 'pengguna', nama: 'Pengguna & Peran' });
-    if (r === 'direktur' || r === 'pemred') t.push({ id: 'iklan', nama: 'Iklan' });
-    if (r === 'direktur') t.push({ id: 'pengaturan', nama: 'Pengaturan Situs' });
-    return t;
+  function cocokFilter(a, f) {
+    var sampah = !!a.deleted_at;
+    var st = a.status || 'draf';
+    if (f === 'sampah') return sampah;
+    if (sampah) return false;
+    if (f === 'semua') return true;
+    if (f === 'draf') return st === 'draf' || st === 'draft';
+    if (f === 'proses') return ['diajukan', 'disunting', 'ditinjau'].indexOf(st) !== -1;
+    if (f === 'revisi') return st === 'revisi';
+    if (f === 'terbit') return st === 'terbit';
+    if (f === 'arsip') return st === 'arsip';
+    return false;
   }
-
-  function gambarTab() {
-    el.tabs.innerHTML = daftarTab().map(function (t) {
-      return '<button type="button" data-tab="' + t.id + '" class="' + (t.id === state.tab ? 'on' : '') + '">' +
-        esc(t.nama) + '</button>';
-    }).join('');
-  }
-
-  function bukaTab(id) {
-    var ada = daftarTab().some(function (t) { return t.id === id; });
-    state.tab = ada ? id : 'naskah';
-    gambarTab();
-
-    if (state.tab === 'naskah') return muatNaskah();
-    isiPesan('Bagian ini dibuat di tahap berikutnya.');
-  }
-
-  /* ---------- Tab Naskah & Status ---------- */
 
   async function muatNaskah() {
-    isiPesan('Memuat naskah…');
-
+    pesan('Memuat naskah…');
     var r = await sb.from('articles')
-      .select('id,title,status,category,author_id,author_name,created_at,published_at,is_exclusive,is_breaking,right_of_reply,hak_jawab,review_note')
-      .is('deleted_at', null)
+      .select('id,title,status,category,author_id,author_name,created_at,is_exclusive,is_breaking,hak_jawab,review_note,deleted_at')
       .order('created_at', { ascending: false })
-      .limit(100);
+      .limit(200);
 
-    if (r.error) return isiPesan('Gagal memuat naskah: ' + r.error.message, 'rd-err');
-
-    state.daftar = r.data || [];
+    if (r.error) return pesan('Gagal memuat naskah: ' + r.error.message, 'rd-err');
+    state.naskah = r.data || [];
     tampilNaskah();
   }
 
   function tampilNaskah() {
-    var semua = state.daftar;
-    var hitung = function (daftarStatus) {
-      return semua.filter(function (a) { return daftarStatus.indexOf(a.status) !== -1; }).length;
-    };
-    var tampil = state.filter
-      ? semua.filter(function (a) { return a.status === state.filter; })
-      : semua;
-
-    var opsi = ['', 'draf', 'diajukan', 'disunting', 'ditinjau', 'revisi', 'terbit', 'arsip'];
-    var pilihan = opsi.map(function (o) {
-      return '<option value="' + o + '"' + (o === state.filter ? ' selected' : '') + '>' +
-        (o ? esc(LABEL_STATUS[o]) : 'Semua status') + '</option>';
+    var semua = state.naskah;
+    var chips = FILTER_NASKAH.map(function (f) {
+      var n = semua.filter(function (a) { return cocokFilter(a, f.id); }).length;
+      return '<button type="button" class="rd-chip' + (f.id === state.fNaskah ? ' on' : '') +
+        '" data-fn="' + f.id + '">' + esc(f.nama) + ' <span>' + n + '</span></button>';
     }).join('');
 
-    el.isi.innerHTML =
-      '<div class="rd-ringkas">' +
-        '<div class="rd-angka"><small>Naskah</small><b>' + semua.length + '</b></div>' +
-        '<div class="rd-angka"><small>Terbit</small><b>' + hitung(['terbit']) + '</b></div>' +
-        '<div class="rd-angka"><small>Dalam proses</small><b>' + hitung(['diajukan', 'disunting', 'ditinjau', 'revisi']) + '</b></div>' +
-        '<div class="rd-angka"><small>Draf</small><b>' + hitung(['draf', 'draft']) + '</b></div>' +
-      '</div>' +
+    var tampil = semua.filter(function (a) { return cocokFilter(a, state.fNaskah); });
+
+    isi(
       '<section class="rd-kotak">' +
-        '<div class="rd-tombol-baris" style="justify-content:space-between;align-items:center;margin-bottom:12px">' +
-          '<h2 style="margin:0">Daftar naskah</h2>' +
-          '<select id="filterStatus" class="rd-filter">' + pilihan + '</select>' +
-        '</div>' +
+        '<h2>Naskah</h2>' +
+        '<div class="rd-chips">' + chips + '</div>' +
         (tampil.length
-          ? tampil.map(baris).join('')
-          : '<p class="rd-kotak-kosong">Belum ada naskah untuk filter ini.</p>') +
-      '</section>';
+          ? tampil.map(barisNaskah).join('')
+          : '<p class="rd-kotak-kosong">Tidak ada naskah di kategori ini.</p>') +
+      '</section>'
+    );
   }
 
-  function baris(a) {
+  function barisNaskah(a) {
     var st = a.status || 'draf';
-    var lencana = '<span class="rd-status ' + esc(st) + '">' + esc(LABEL_STATUS[st] || st) + '</span>' +
-      (a.is_exclusive ? '<span class="rd-status eksklusif">EKSKLUSIF</span>' : '') +
-      (a.is_breaking ? '<span class="rd-status breaking">BREAKING</span>' : '');
+    var lencana = a.deleted_at
+      ? '<span class="rd-status arsip">Sampah</span>'
+      : '<span class="rd-status ' + esc(st) + '">' + esc(LABEL_STATUS[st] || st) + '</span>';
+    lencana += (a.is_exclusive ? ' <span class="rd-status eksklusif">EKSKLUSIF</span>' : '') +
+               (a.is_breaking ? ' <span class="rd-status breaking">BREAKING</span>' : '');
 
     return '<article class="rd-baris">' +
       '<p class="rd-baris-judul">' + esc(a.title || '(Tanpa judul)') + '</p>' +
@@ -203,99 +235,213 @@
       '<div>' + lencana + '</div>' +
       (a.review_note ? '<p class="rd-baris-meta">Catatan revisi: ' + esc(a.review_note) + '</p>' : '') +
       (a.hak_jawab ? '<p class="rd-baris-meta">Hak jawab: ' + esc(a.hak_jawab) + '</p>' : '') +
-      '<div class="rd-baris-aksi">' + aksiUntuk(a) + '</div>' +
+      '<div class="rd-baris-aksi">' + aksiNaskah(a) + '</div>' +
     '</article>';
   }
 
-  // Tombol yang muncul sesuai peran dan status (mengikuti aturan di database)
-  function aksiUntuk(a) {
+  // Tombol mengikuti peran dan status. Aturan sebenarnya tetap dijaga database.
+  function aksiNaskah(a) {
     var p = state.profil;
     var r = p.role;
-    var st = a.status;
+    var st = a.status || 'draf';
     var saya = a.author_id === p.id;
+    var staf = STAF.indexOf(r) !== -1;
     var b = [];
 
-    function tombol(act, teks, kelas) {
+    function t(act, teks, kelas) {
       return '<button type="button" class="btn-xs ' + (kelas || '') + '" data-act="' + act +
         '" data-id="' + a.id + '">' + esc(teks) + '</button>';
     }
 
+    if (a.deleted_at) {
+      if (r === 'direktur' || r === 'pemred' || (saya && st !== 'terbit')) {
+        b.push(t('pulihkan_sampah', 'Pulihkan dari sampah', 'utama'));
+      }
+      return b.join('');
+    }
+
     if ((st === 'draf' || st === 'draft' || st === 'revisi') && (saya || r === 'direktur')) {
-      b.push(tombol('ajukan', 'Ajukan', 'utama'));
+      b.push(t('ajukan', 'Ajukan', 'utama'));
     }
     if (st === 'diajukan' && (r === 'editor' || r === 'direktur')) {
-      b.push(tombol('sunting', 'Mulai sunting', 'utama'));
+      b.push(t('sunting', 'Mulai sunting', 'utama'));
     }
     if (st === 'disunting' && (r === 'redaktur' || r === 'direktur')) {
-      b.push(tombol('tinjau', 'Teruskan ke pemred', 'utama'));
+      b.push(t('tinjau', 'Teruskan ke pemred', 'utama'));
     }
     if (st === 'ditinjau' && (r === 'pemred' || r === 'direktur')) {
-      b.push(tombol('terbitkan', 'Terbitkan', 'setuju'));
+      b.push(t('terbitkan', 'Terbitkan', 'setuju'));
     }
-    if (['diajukan', 'disunting', 'ditinjau'].indexOf(st) !== -1 && STAF.indexOf(r) !== -1) {
-      b.push(tombol('revisi', 'Minta revisi', 'tolak'));
+    if (['diajukan', 'disunting', 'ditinjau'].indexOf(st) !== -1 && staf) {
+      b.push(t('revisi', 'Minta revisi', 'tolak'));
     }
     if (st === 'terbit' && (r === 'pemred' || r === 'direktur')) {
-      b.push(tombol('arsipkan', 'Tarik ke arsip', 'keluar'));
+      b.push(t('arsipkan', 'Tarik ke arsip', 'keluar'));
     }
     if (st === 'arsip' && (saya || r === 'pemred' || r === 'direktur')) {
-      b.push(tombol('pulihkan', 'Pulihkan', 'utama'));
+      b.push(t('pulihkan', 'Pulihkan ke Diajukan', 'utama'));
     }
     if (a.is_exclusive && (r === 'pemred' || r === 'direktur')) {
-      b.push(tombol('hakjawab', a.hak_jawab ? 'Ubah hak jawab' : 'Isi hak jawab', ''));
+      b.push(t('hakjawab', a.hak_jawab ? 'Ubah hak jawab' : 'Isi hak jawab', ''));
     }
-    if ((st === 'draf' || st === 'draft') && saya) {
-      b.push(tombol('hapus', 'Hapus', 'tolak'));
+    if (st !== 'terbit' && ((saya && (st === 'draf' || st === 'draft')) || r === 'direktur')) {
+      b.push(t('ke_sampah', 'Ke sampah', 'tolak'));
     }
     return b.join('');
   }
 
-  async function jalankanAksi(act, id, tombolEl) {
-    var a = state.daftar.find(function (x) { return String(x.id) === String(id); });
+  async function jalankanNaskah(act, id, tombol) {
+    var a = state.naskah.find(function (x) { return String(x.id) === String(id); });
     if (!a) return kabarkan('Naskah tidak ditemukan');
 
     var panggil = null;
+    function pindah(to, note) {
+      return sb.rpc('advance_article', { p_id: a.id, p_to: to, p_note: note || null });
+    }
 
-    if (act === 'ajukan') {
-      panggil = sb.rpc('advance_article', { p_id: a.id, p_to: 'diajukan', p_note: null });
-    } else if (act === 'sunting') {
-      panggil = sb.rpc('advance_article', { p_id: a.id, p_to: 'disunting', p_note: null });
-    } else if (act === 'tinjau') {
-      panggil = sb.rpc('advance_article', { p_id: a.id, p_to: 'ditinjau', p_note: null });
-    } else if (act === 'terbitkan') {
+    if (act === 'ajukan') panggil = pindah('diajukan');
+    else if (act === 'sunting') panggil = pindah('disunting');
+    else if (act === 'tinjau') panggil = pindah('ditinjau');
+    else if (act === 'terbitkan') {
       if (!confirm('Terbitkan naskah ini sekarang?')) return;
-      panggil = sb.rpc('advance_article', { p_id: a.id, p_to: 'terbit', p_note: null });
-    } else if (act === 'revisi') {
+      panggil = pindah('terbit');
+    }
+    else if (act === 'revisi') {
       var catatan = prompt('Tulis catatan revisi untuk penulis (wajib):');
       if (catatan === null) return;
       if (!catatan.trim()) return kabarkan('Catatan revisi wajib diisi');
-      panggil = sb.rpc('advance_article', { p_id: a.id, p_to: 'revisi', p_note: catatan.trim() });
-    } else if (act === 'arsipkan') {
+      panggil = pindah('revisi', catatan.trim());
+    }
+    else if (act === 'arsipkan') {
       if (!confirm('Tarik naskah ini dari situs ke arsip?')) return;
       panggil = sb.rpc('unpublish_article', { p_id: a.id, p_note: null });
-    } else if (act === 'pulihkan') {
-      panggil = sb.rpc('pulihkan_arsip', { p_id: a.id });
-    } else if (act === 'hakjawab') {
+    }
+    else if (act === 'pulihkan') panggil = sb.rpc('pulihkan_arsip', { p_id: a.id });
+    else if (act === 'hakjawab') {
       var teks = prompt('Isi hak jawab (kosongkan lalu OK untuk menghapus):', a.hak_jawab || '');
       if (teks === null) return;
       panggil = sb.rpc('set_hak_jawab', { p_id: a.id, p_teks: teks });
-    } else if (act === 'hapus') {
-      if (!confirm('Pindahkan draf ini ke sampah?')) return;
+    }
+    else if (act === 'ke_sampah') {
+      if (!confirm('Pindahkan naskah ini ke sampah?')) return;
       panggil = sb.from('articles').update({ deleted_at: new Date().toISOString() }).eq('id', a.id);
+    }
+    else if (act === 'pulihkan_sampah') {
+      panggil = sb.from('articles').update({ deleted_at: null }).eq('id', a.id);
     }
 
     if (!panggil) return;
 
-    tombolEl.disabled = true;
+    tombol.disabled = true;
     var r = await panggil;
-    tombolEl.disabled = false;
+    tombol.disabled = false;
 
-    if (r.error) {
-      kabarkan(r.error.message);
-      return;
-    }
+    if (r.error) return kabarkan(r.error.message);
     kabarkan('Berhasil diperbarui');
     muatNaskah();
+  }
+
+  /* ---------- Komentar ---------- */
+
+  async function muatKomentar() {
+    pesan('Memuat komentar…');
+    var lihatKontak = state.profil.role === 'direktur' || state.profil.role === 'pemred';
+    var kolom = 'id,article_id,guest_name,body,status,created_at' + (lihatKontak ? ',guest_email,guest_phone' : '');
+
+    var r = await sb.from('comments')
+      .select(kolom + ',articles(title)')
+      .eq('status', state.fKomen)
+      .order('created_at', { ascending: false })
+      .limit(100);
+
+    if (r.error) {
+      r = await sb.from('comments')
+        .select(kolom)
+        .eq('status', state.fKomen)
+        .order('created_at', { ascending: false })
+        .limit(100);
+    }
+    if (r.error) return pesan('Gagal memuat komentar: ' + r.error.message, 'rd-err');
+
+    state.komen = r.data || [];
+    tampilKomentar();
+  }
+
+  function tampilKomentar() {
+    var lihatKontak = state.profil.role === 'direktur' || state.profil.role === 'pemred';
+
+    var chips = FILTER_KOMEN.map(function (f) {
+      return '<button type="button" class="rd-chip' + (f.id === state.fKomen ? ' on' : '') +
+        '" data-fk="' + f.id + '">' + esc(f.nama) + '</button>';
+    }).join('');
+
+    var daftar = state.komen.map(function (c) {
+      var judul = c.articles && c.articles.title ? c.articles.title : 'Berita #' + c.article_id;
+      var kontak = lihatKontak
+        ? '<p class="rd-baris-meta">Email: ' + esc(c.guest_email || '-') + ' • HP: ' + esc(c.guest_phone || '-') + '</p>'
+        : '';
+      var aksi = '';
+      if (c.status !== 'disetujui') {
+        aksi += '<button type="button" class="btn-xs setuju" data-kact="setuju" data-id="' + c.id + '">Setujui</button>';
+      }
+      if (c.status !== 'ditolak') {
+        aksi += '<button type="button" class="btn-xs tolak" data-kact="tolak" data-id="' + c.id + '">Tolak</button>';
+      }
+      return '<article class="rd-baris">' +
+        '<p class="rd-baris-judul">' + esc(c.guest_name) + ' <span class="rd-baris-meta">• ' + tgl(c.created_at) + '</span></p>' +
+        '<p class="rd-baris-meta">Untuk: ' + esc(judul) + '</p>' +
+        kontak +
+        '<p class="rd-baris-isi">' + esc(c.body) + '</p>' +
+        '<div class="rd-baris-aksi">' + aksi + '</div>' +
+      '</article>';
+    }).join('');
+
+    isi(
+      '<section class="rd-kotak">' +
+        '<h2>Komentar</h2>' +
+        '<div class="rd-chips">' + chips + '</div>' +
+        (daftar || '<p class="rd-kotak-kosong">Tidak ada komentar di kategori ini.</p>') +
+      '</section>'
+    );
+  }
+
+  async function jalankanKomentar(act, id, tombol) {
+    var status = act === 'setuju' ? 'disetujui' : 'ditolak';
+    tombol.disabled = true;
+    var r = await sb.from('comments').update({ status: status }).eq('id', id);
+    tombol.disabled = false;
+
+    if (r.error) return kabarkan('Gagal: ' + r.error.message);
+    kabarkan(status === 'disetujui' ? 'Komentar disetujui' : 'Komentar ditolak');
+    muatKomentar();
+  }
+
+  /* ---------- Log ---------- */
+
+  async function muatLog() {
+    pesan('Memuat log…');
+    var r = await sb.from('audit_logs')
+      .select('created_at,actor_name,actor_role,action,target_type,target_id')
+      .order('created_at', { ascending: false })
+      .limit(100);
+
+    if (r.error) return pesan('Gagal memuat log: ' + r.error.message, 'rd-err');
+
+    var data = r.data || [];
+    isi(
+      '<section class="rd-kotak"><h2>Log Aktivitas</h2>' +
+        (data.length
+          ? data.map(function (l) {
+              return '<article class="rd-baris">' +
+                '<p class="rd-baris-judul">' + esc(l.action) + '</p>' +
+                '<p class="rd-baris-meta">' + tgl(l.created_at) + ' • ' + esc(l.actor_name || '-') +
+                  ' (' + esc(l.actor_role || '-') + ')</p>' +
+                '<p class="rd-baris-meta">' + esc(l.target_type || '') + ' #' + esc(l.target_id || '-') + '</p>' +
+              '</article>';
+            }).join('')
+          : '<p class="rd-kotak-kosong">Belum ada log.</p>') +
+      '</section>'
+    );
   }
 
   /* ---------- Kejadian ---------- */
@@ -324,6 +470,7 @@
     }
 
     el.sandi.value = '';
+    state.tab = 'naskah';
     await cekSesi();
   });
 
@@ -350,7 +497,9 @@
   el.keluar.addEventListener('click', async function () {
     if (sb) await sb.auth.signOut();
     state.profil = null;
-    state.daftar = [];
+    state.naskah = [];
+    state.komen = [];
+    state.tab = 'naskah';
     tampilMasuk();
     kabarkan('Kamu sudah keluar');
   });
@@ -361,15 +510,11 @@
   });
 
   el.isi.addEventListener('click', function (ev) {
-    var t = ev.target.closest('[data-act]');
-    if (t) jalankanAksi(t.dataset.act, t.dataset.id, t);
-  });
-
-  el.isi.addEventListener('change', function (ev) {
-    if (ev.target.id === 'filterStatus') {
-      state.filter = ev.target.value;
-      tampilNaskah();
-    }
+    var t;
+    if ((t = ev.target.closest('[data-fn]'))) { state.fNaskah = t.dataset.fn; return tampilNaskah(); }
+    if ((t = ev.target.closest('[data-fk]'))) { state.fKomen = t.dataset.fk; return muatKomentar(); }
+    if ((t = ev.target.closest('[data-act]'))) return jalankanNaskah(t.dataset.act, t.dataset.id, t);
+    if ((t = ev.target.closest('[data-kact]'))) return jalankanKomentar(t.dataset.kact, t.dataset.id, t);
   });
 
   cekSesi();

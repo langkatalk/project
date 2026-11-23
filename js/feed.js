@@ -1,11 +1,20 @@
 // js/feed.js
-// Beranda: kategori, kartu berita, suka, simpan, bagikan, dan muat lagi saat digulir.
-// Hanya membaca artikel terbit. Nama kolom dan status sudah disesuaikan dengan database.
+// Beranda: kartu gaya Instagram, suka (dengan nama dan email), komentar (dengan nama, email, isi), simpan, bagikan.
 (function () {
+  'use strict';
+
   var UKURAN = 10;
+  var JEDA_KOMENTAR_MS = 30000;
   var KATEGORI_CADANGAN = ['Investigasi', 'Ruang Gelap', 'Politik', 'Panggung', 'Ekonomi Gelap', 'Opini', 'Kilas Info'];
-  // Body tidak diambil di beranda supaya ringan. Isi lengkap dibaca di baca.html.
   var KOLOM = 'id,title,slug,category,description,cover_url,author_name,published_at,like_count,comment_count,is_exclusive,is_breaking';
+  var REGEX_EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+
+  var IKON = {
+    hati: '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>',
+    komen: '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.6 8.6 0 0 1-3.7-.8L3 21l1.9-5.1A8.4 8.4 0 1 1 21 11.5z"/></svg>',
+    kirim: '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>',
+    simpan: '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>'
+  };
 
   var sb = window.LK && window.LK.sb;
   var el = {
@@ -16,23 +25,27 @@
     toast: document.getElementById('toast')
   };
 
+  var st = {
+    filter: '',
+    dari: 0,
+    selesai: false,
+    sedangMuat: false,
+    gen: 0,
+    sheetId: null,
+    disimpan: new Set(ambilLokal('lk_saved_ids')),
+    disukai: new Set(ambilLokal('lk_liked_ids'))
+  };
+
+  /* ---------- Utilitas ---------- */
+
   function ambilLokal(kunci) {
     try { return JSON.parse(localStorage.getItem(kunci) || '[]'); }
     catch (e) { return []; }
   }
+
   function simpanLokal(kunci, himpunan) {
     localStorage.setItem(kunci, JSON.stringify(Array.from(himpunan)));
   }
-
-  var st = {
-    filter: '',                 // '' = semua, '__simpan' = yang disimpan, selain itu nama kategori
-    dari: 0,
-    selesai: false,
-    sedangMuat: false,
-    gen: 0,                     // penanda permintaan; hasil lama diabaikan jika filter sudah berganti
-    disimpan: new Set(ambilLokal('lk_saved_ids')),
-    disukai: new Set(ambilLokal('lk_liked_ids'))
-  };
 
   function idPerangkat() {
     var id = localStorage.getItem('lk_device_id');
@@ -66,7 +79,79 @@
     el.status.textContent = pesan || '';
   }
 
-  // Kategori dari tabel categories. Kalau kosong, pakai daftar cadangan.
+  function nilai(id) {
+    var e = document.getElementById(id);
+    return e ? e.value.trim() : '';
+  }
+
+  function tampilErr(id, pesan) {
+    var e = document.getElementById(id);
+    if (e) e.textContent = pesan || '';
+  }
+
+  function setSibuk(id, sibuk) {
+    var e = document.getElementById(id);
+    if (e) e.disabled = !!sibuk;
+  }
+
+  function validasiNamaEmail(nama, email) {
+    if (nama.length < 3) return 'Nama minimal 3 huruf.';
+    if (!REGEX_EMAIL.test(email)) return 'Email belum benar.';
+    return '';
+  }
+
+  function kartuDari(id) {
+    return el.feed.querySelector('.ig-kartu[data-id="' + id + '"]');
+  }
+
+  /* ---------- Panel bawah ---------- */
+
+  function buatSheet() {
+    var bg = document.createElement('div');
+    bg.className = 'lk-sheet-bg';
+    bg.id = 'sheetBg';
+
+    var sh = document.createElement('div');
+    sh.className = 'lk-sheet';
+    sh.id = 'sheet';
+    sh.setAttribute('role', 'dialog');
+    sh.setAttribute('aria-modal', 'true');
+    sh.innerHTML = '<div class="lk-grip"></div><div id="sheetIsi"></div>';
+
+    document.body.appendChild(bg);
+    document.body.appendChild(sh);
+
+    bg.addEventListener('click', tutupSheet);
+    sh.addEventListener('click', function (ev) {
+      if (ev.target.closest('[data-tutup]')) tutupSheet();
+    });
+    document.addEventListener('keydown', function (ev) {
+      if (ev.key === 'Escape') tutupSheet();
+    });
+  }
+
+  function bukaSheet(html) {
+    document.getElementById('sheetIsi').innerHTML = html;
+    document.getElementById('sheet').classList.add('on');
+    document.getElementById('sheetBg').classList.add('on');
+  }
+
+  function tutupSheet() {
+    var sh = document.getElementById('sheet');
+    var bg = document.getElementById('sheetBg');
+    if (sh) sh.classList.remove('on');
+    if (bg) bg.classList.remove('on');
+    st.sheetId = null;
+  }
+
+  function campo(id, label, tipe, placeholder) {
+    return '<label class="sh-label">' + label +
+      '<input id="' + id + '" type="' + tipe + '" placeholder="' + placeholder +
+      '" autocomplete="' + (tipe === 'email' ? 'email' : 'name') + '"></label>';
+  }
+
+  /* ---------- Kategori ---------- */
+
   async function muatKategori() {
     var daftar = [];
     if (sb) {
@@ -81,11 +166,12 @@
 
     el.chips.innerHTML = pilihan.map(function (p) {
       return '<button type="button" class="chip-kat' + (p.nilai === st.filter ? ' on' : '') +
-             '" data-filter="' + esc(p.nilai) + '">' + esc(p.nama) + '</button>';
+        '" data-filter="' + esc(p.nilai) + '">' + esc(p.nama) + '</button>';
     }).join('');
   }
 
-  // Dasar query: hanya artikel terbit, tidak di trash, dan sudah lewat jadwalnya.
+  /* ---------- Muat berita ---------- */
+
   function dasarQuery() {
     return sb.from('articles')
       .select(KOLOM)
@@ -107,8 +193,7 @@
     tulisStatus('Memuat…');
 
     try {
-      var data = null;
-      var error = null;
+      var data, error;
 
       if (st.filter === '__simpan') {
         var ids = Array.from(st.disimpan);
@@ -117,18 +202,16 @@
           tulisStatus('Belum ada berita yang kamu simpan.');
           return;
         }
-        var rSimpan = await dasarQuery().in('id', ids);
-        data = rSimpan.data;
-        error = rSimpan.error;
+        var rs = await dasarQuery().in('id', ids);
+        data = rs.data; error = rs.error;
       } else {
         var q = dasarQuery().range(st.dari, st.dari + UKURAN - 1);
         if (st.filter) q = q.eq('category', st.filter);
-        var rBiasa = await q;
-        data = rBiasa.data;
-        error = rBiasa.error;
+        var rb = await q;
+        data = rb.data; error = rb.error;
       }
 
-      if (gen !== st.gen) return; // filter sudah berganti, hasil ini tidak dipakai
+      if (gen !== st.gen) return;
       if (error) throw error;
 
       if (st.filter !== '__simpan') {
@@ -155,58 +238,220 @@
 
   function kartu(a) {
     var id = a.id;
-    var suka = st.disukai.has(id);
-    var simpan = st.disimpan.has(id);
+    var disukai = st.disukai.has(id);
+    var disimpan = st.disimpan.has(id);
     var tujuan = 'baca.html?s=' + encodeURIComponent(a.slug || id);
     var inisial = esc(String(a.author_name || 'R').charAt(0).toUpperCase());
 
+    var gambar = a.cover_url
+      ? '<a href="' + tujuan + '" class="ig-media"><img class="ig-gambar" src="' + esc(a.cover_url) +
+        '" alt="' + esc(a.title) + '" width="1200" height="600" loading="lazy" decoding="async"></a>'
+      : '<a href="' + tujuan + '" class="ig-media ig-media-kosong"><span>Langkatalk</span></a>';
+
     return '' +
-      '<article class="kartu-berita" data-id="' + esc(id) + '">' +
-        '<header class="kb-kepala">' +
+      '<article class="ig-kartu" data-id="' + esc(id) + '">' +
+        '<header class="ig-kepala">' +
           '<span class="av">' + inisial + '</span>' +
-          '<div class="kb-info">' +
+          '<div class="ig-info">' +
             '<b>' + esc(a.author_name || 'Redaksi') + '</b>' +
             '<small>' + esc(a.category || 'Umum') + ' • ' + tgl(a.published_at) + '</small>' +
           '</div>' +
           (a.is_breaking ? '<span class="lencana">BREAKING</span>' : '') +
           (a.is_exclusive ? '<span class="lencana">EKSKLUSIF</span>' : '') +
         '</header>' +
-        (a.cover_url
-          ? '<a href="' + tujuan + '"><img class="kb-gambar" src="' + esc(a.cover_url) +
-            '" alt="' + esc(a.title) + '" loading="lazy" width="1200" height="675"></a>'
-          : '') +
-        '<div class="kb-isi">' +
-          '<h2 class="kb-judul"><a href="' + tujuan + '">' + esc(a.title) + '</a></h2>' +
-          '<p class="kb-desk">' + esc(a.description || '') + '</p>' +
+        gambar +
+        '<div class="ig-aksi">' +
+          '<button type="button" class="ig-ikon suka' + (disukai ? ' aktif' : '') + '" data-aksi="suka"' +
+            ' aria-label="Suka" aria-pressed="' + disukai + '">' + IKON.hati + '</button>' +
+          '<button type="button" class="ig-ikon" data-aksi="komen" aria-label="Komentar">' + IKON.komen + '</button>' +
+          '<button type="button" class="ig-ikon" data-aksi="bagi" data-slug="' + esc(a.slug || id) +
+            '" aria-label="Bagikan">' + IKON.kirim + '</button>' +
+          '<button type="button" class="ig-ikon ig-simpan' + (disimpan ? ' aktif' : '') + '" data-aksi="simpan"' +
+            ' aria-label="Simpan">' + IKON.simpan + '</button>' +
         '</div>' +
-        '<footer class="kb-aksi">' +
-          '<button type="button" class="btn-aksi suka' + (suka ? ' aktif' : '') + '" data-aksi="suka">' +
-            (suka ? '♥' : '♡') + ' <span>' + (a.like_count || 0) + '</span></button>' +
-          '<a class="btn-aksi" href="' + tujuan + '">💬 ' + (a.comment_count || 0) + '</a>' +
-          '<button type="button" class="btn-aksi" data-aksi="bagi" data-slug="' + esc(a.slug || id) + '">↗ Bagikan</button>' +
-          '<button type="button" class="btn-aksi simpan' + (simpan ? ' aktif' : '') + '" data-aksi="simpan">' +
-            (simpan ? '🔖 Tersimpan' : '🔖 Simpan') + '</button>' +
-        '</footer>' +
+        '<div class="ig-isi">' +
+          '<p class="ig-jumlah"><span data-jumlah-suka>' + (a.like_count || 0) + '</span> suka</p>' +
+          '<h2 class="ig-judul"><a href="' + tujuan + '">' + esc(a.title) + '</a></h2>' +
+          (a.description ? '<p class="ig-desk">' + esc(a.description) + '</p>' : '') +
+          '<button type="button" class="ig-lihat" data-aksi="komen">Lihat ' + (a.comment_count || 0) + ' komentar</button>' +
+        '</div>' +
       '</article>';
   }
 
-  async function suka(id, tombol) {
-    if (!sb) return;
-    tombol.disabled = true;
-    var r = await sb.rpc('toggle_like', { p_article_id: id, p_device_id: idPerangkat() });
-    tombol.disabled = false;
+  /* ---------- Suka ---------- */
 
-    if (r.error) {
-      kabarkan('Gagal menyukai: ' + r.error.message);
-      return;
-    }
-    var d = r.data || {};
-    if (d.liked) st.disukai.add(id); else st.disukai.delete(id);
+  function panggilSuka(id, nama, email) {
+    return sb.rpc('suka_berita', {
+      p_article_id: id,
+      p_device_id: idPerangkat(),
+      p_nama: nama,
+      p_email: email
+    });
+  }
+
+  // Menerapkan hasil dari server. Mengembalikan true jika sekarang disukai.
+  function terapkanSuka(id, data) {
+    var d = Array.isArray(data) ? data[0] : data;
+    if (!d) return false;
+
+    if (d.disukai) st.disukai.add(id); else st.disukai.delete(id);
     simpanLokal('lk_liked_ids', st.disukai);
 
-    tombol.classList.toggle('aktif', !!d.liked);
-    tombol.innerHTML = (d.liked ? '♥' : '♡') + ' <span>' + (d.like_count || 0) + '</span>';
+    var kartuEl = kartuDari(id);
+    if (kartuEl) {
+      var tombol = kartuEl.querySelector('.ig-ikon.suka');
+      tombol.classList.toggle('aktif', !!d.disukai);
+      tombol.setAttribute('aria-pressed', String(!!d.disukai));
+      kartuEl.querySelector('[data-jumlah-suka]').textContent = d.jumlah || 0;
+    }
+    return !!d.disukai;
   }
+
+  async function tanganiSuka(id) {
+    if (!sb) return kabarkan('Koneksi belum siap');
+
+    // Sudah pernah disukai di perangkat ini: batalkan langsung, tanpa form
+    if (st.disukai.has(id)) {
+      var r = await panggilSuka(id, null, null);
+      if (r.error) {
+        // Kalau data lokal tidak cocok dengan server, minta nama dan email
+        if (/Nama|Email/i.test(r.error.message)) return formSuka(id);
+        return kabarkan('Gagal: ' + r.error.message);
+      }
+      terapkanSuka(id, r.data);
+      kabarkan('Suka dibatalkan');
+      return;
+    }
+
+    formSuka(id);
+  }
+
+  function formSuka(id) {
+    st.sheetId = id;
+    bukaSheet(
+      '<h3 class="sh-judul">Suka berita ini</h3>' +
+      '<p class="sh-catatan">Isi nama dan email dulu. Data ini hanya untuk redaksi dan tidak ditampilkan ke publik.</p>' +
+      '<form id="fSuka" class="sh-form" novalidate>' +
+        campo('sNama', 'Nama', 'text', 'Nama kamu (minimal 3 huruf)') +
+        campo('sEmail', 'Email', 'email', 'nama@email.com') +
+        '<p class="sh-err" id="sErr"></p>' +
+        '<div class="sh-tombol">' +
+          '<button type="button" class="btn-tutup" data-tutup>Batal</button>' +
+          '<button type="submit" class="btn btn-utama" id="sKirim">Suka</button>' +
+        '</div>' +
+      '</form>'
+    );
+
+    document.getElementById('fSuka').addEventListener('submit', async function (ev) {
+      ev.preventDefault();
+      var nama = nilai('sNama');
+      var email = nilai('sEmail').toLowerCase();
+
+      var salah = validasiNamaEmail(nama, email);
+      if (salah) return tampilErr('sErr', salah);
+
+      setSibuk('sKirim', true);
+      var r = await panggilSuka(id, nama, email);
+      setSibuk('sKirim', false);
+
+      if (r.error) return tampilErr('sErr', r.error.message);
+
+      var disukai = terapkanSuka(id, r.data);
+      tutupSheet();
+      kabarkan(disukai ? 'Berita disukai' : 'Suka dibatalkan');
+    });
+  }
+
+  /* ---------- Komentar ---------- */
+
+  function formKomen(id) {
+    st.sheetId = id;
+    bukaSheet(
+      '<h3 class="sh-judul">Komentar</h3>' +
+      '<div class="k-list" id="kList"><p class="sh-catatan">Memuat komentar…</p></div>' +
+      '<form id="fKomen" class="sh-form" novalidate>' +
+        campo('kNama', 'Nama', 'text', 'Nama kamu (minimal 3 huruf)') +
+        campo('kEmail', 'Email', 'email', 'nama@email.com') +
+        '<label class="sh-label">Komentar' +
+          '<textarea id="kIsi" rows="3" maxlength="500" placeholder="Tulis komentar (3–500 karakter)"></textarea>' +
+        '</label>' +
+        '<p class="sh-catatan">Email tidak ditampilkan ke publik. Komentar tampil setelah disetujui redaksi.</p>' +
+        '<p class="sh-err" id="kErr"></p>' +
+        '<div class="sh-tombol">' +
+          '<button type="button" class="btn-tutup" data-tutup>Tutup</button>' +
+          '<button type="submit" class="btn btn-utama" id="kKirim">Kirim komentar</button>' +
+        '</div>' +
+      '</form>'
+    );
+
+    muatKomentar(id);
+    document.getElementById('fKomen').addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      kirimKomentar(id);
+    });
+  }
+
+  async function muatKomentar(id) {
+    if (!sb) return;
+    var r = await sb.from('public_comments')
+      .select('guest_name,body,created_at')
+      .eq('article_id', id)
+      .order('created_at', { ascending: false })
+      .limit(30);
+
+    // Sheet sudah ditutup atau pindah ke berita lain
+    if (st.sheetId !== id) return;
+    var box = document.getElementById('kList');
+    if (!box) return;
+
+    if (r.error) {
+      box.innerHTML = '<p class="sh-catatan">Komentar belum bisa dimuat.</p>';
+      return;
+    }
+    var data = r.data || [];
+    box.innerHTML = data.length
+      ? data.map(function (c) {
+          return '<div class="k-item"><b>' + esc(c.guest_name) + '</b><small>' + tgl(c.created_at) +
+            '</small><p>' + esc(c.body) + '</p></div>';
+        }).join('')
+      : '<p class="sh-catatan">Belum ada komentar. Jadilah yang pertama.</p>';
+  }
+
+  async function kirimKomentar(id) {
+    var nama = nilai('kNama');
+    var email = nilai('kEmail').toLowerCase();
+    var isi = nilai('kIsi');
+
+    var salah = validasiNamaEmail(nama, email);
+    if (!salah && isi.length < 3) salah = 'Komentar minimal 3 karakter.';
+    if (salah) return tampilErr('kErr', salah);
+
+    var kunciJeda = 'lk_cmt_rate_' + id;
+    var sisa = JEDA_KOMENTAR_MS - (Date.now() - Number(localStorage.getItem(kunciJeda) || 0));
+    if (sisa > 0) {
+      return tampilErr('kErr', 'Tunggu ' + Math.ceil(sisa / 1000) + ' detik sebelum mengirim lagi.');
+    }
+
+    setSibuk('kKirim', true);
+    var r = await sb.from('comments').insert({
+      article_id: id,
+      guest_name: nama,
+      guest_email: email,
+      body: isi,
+      device_id: idPerangkat(),
+      status: 'menunggu'
+    });
+    setSibuk('kKirim', false);
+
+    if (r.error) return tampilErr('kErr', 'Komentar belum terkirim: ' + r.error.message);
+
+    localStorage.setItem(kunciJeda, String(Date.now()));
+    document.getElementById('fKomen').reset();
+    tampilErr('kErr', '');
+    kabarkan('Komentar terkirim, menunggu persetujuan redaksi');
+  }
+
+  /* ---------- Simpan dan bagikan ---------- */
 
   function simpanBerita(id, tombol, kartuEl) {
     if (st.disimpan.has(id)) {
@@ -220,7 +465,6 @@
 
     var on = st.disimpan.has(id);
     tombol.classList.toggle('aktif', on);
-    tombol.textContent = on ? '🔖 Tersimpan' : '🔖 Simpan';
 
     // Di tab Disimpan, berita yang dibuang langsung hilang dari daftar
     if (!on && st.filter === '__simpan') kartuEl.remove();
@@ -239,25 +483,26 @@
     }
   }
 
-  // Klik kartu: suka, simpan, bagikan
-  el.feed.addEventListener('click', function (ev) {
-    var tombol = ev.target.closest('[data-aksi]');
-    if (!tombol) return;
-    var kartuEl = tombol.closest('.kartu-berita');
-    var id = Number(kartuEl.dataset.id);
-    var aksi = tombol.dataset.aksi;
+  /* ---------- Kejadian ---------- */
 
-    if (aksi === 'suka') suka(id, tombol);
-    else if (aksi === 'simpan') simpanBerita(id, tombol, kartuEl);
-    else if (aksi === 'bagi') bagi(tombol.dataset.slug);
+  el.feed.addEventListener('click', function (ev) {
+    var t = ev.target.closest('[data-aksi]');
+    if (!t) return;
+    var kartuEl = t.closest('.ig-kartu');
+    var id = Number(kartuEl.dataset.id);
+    var aksi = t.dataset.aksi;
+
+    if (aksi === 'suka') tanganiSuka(id);
+    else if (aksi === 'komen') formKomen(id);
+    else if (aksi === 'bagi') bagi(t.dataset.slug);
+    else if (aksi === 'simpan') simpanBerita(id, t, kartuEl);
   });
 
-  // Ganti kategori
   el.chips.addEventListener('click', function (ev) {
     var b = ev.target.closest('[data-filter]');
     if (!b) return;
 
-    st.gen++;               // batalkan permintaan yang sedang jalan
+    st.gen++;
     st.sedangMuat = false;
     st.filter = b.dataset.filter;
     st.dari = 0;
@@ -272,7 +517,6 @@
     muatBerikutnya();
   });
 
-  // Muat lagi saat pengguna mendekati bagian bawah
   function pasangPengamat() {
     if (!('IntersectionObserver' in window)) return;
     var pengamat = new IntersectionObserver(function (entri) {
@@ -282,6 +526,7 @@
   }
 
   async function mulai() {
+    buatSheet();
     await muatKategori();
     pasangPengamat();
     muatBerikutnya();

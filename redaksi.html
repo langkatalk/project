@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <style>
-    .r-wrap{max-width:1120px;margin:22px auto 64px;padding:0 18px}
+    .r-wrap{max-width:1140px;margin:22px auto 64px;padding:0 18px}
     .r-top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;margin-bottom:18px}
     .r-brand{display:flex;align-items:center;gap:12px}
     .r-brand img{width:40px;height:40px;border-radius:12px;object-fit:cover;box-shadow:var(--shadow-sm)}
@@ -39,7 +39,7 @@
     .r-card h2{font-family:'Sora',sans-serif;font-size:16px;margin:0 0 12px}
     .r-table-wrap{overflow-x:auto}
     table.r-tbl{width:100%;border-collapse:collapse;font-size:13px}
-    table.r-tbl th,table.r-tbl td{padding:10px 10px;border-bottom:1px solid rgba(22,17,51,.08);text-align:left;vertical-align:top}
+    table.r-tbl th,table.r-tbl td{padding:10px;border-bottom:1px solid rgba(22,17,51,.08);text-align:left;vertical-align:top}
     table.r-tbl th{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--mute);font-weight:800}
     .badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:800}
     .b-terbit{background:#DCFCE7;color:#166534}
@@ -82,7 +82,24 @@
   </style>
 </head>
 <body>
-  <div id="root"></div>
+  <div id="root">
+    <div class="glass-auth-wrap">
+      <div class="glass-auth-card">
+        <div class="glass-auth-head">
+          <div class="glass-brand">
+            <img src="favicon.png" alt="Langkatalk">
+            <div>
+              <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:15px">Langkatalk</div>
+              <div style="font-size:12px;color:var(--mute)">Ruang Redaksi</div>
+            </div>
+          </div>
+          <a href="index.html" style="font-size:12px;font-weight:700;color:var(--mute)">Beranda</a>
+        </div>
+        <h1>Masuk Redaksi</h1>
+        <p class="lead">Memuat Ruang Redaksi...</p>
+      </div>
+    </div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="config.js"></script>
@@ -96,6 +113,7 @@
       articles: [],
       comments: [],
       ads: [],
+      profilesList: [],
       settings: {},
       notice: null
     };
@@ -127,10 +145,12 @@
     }
 
     function getClient() {
-      if (typeof getSupabase === 'function') {
-        const client = getSupabase();
-        if (client) return client;
-      }
+      try {
+        if (typeof getSupabase === 'function') {
+          const client = getSupabase();
+          if (client) return client;
+        }
+      } catch (_) {}
       const cfg = window.APP_CONFIG || {};
       if (window.supabase && cfg.SUPABASE_URL && cfg.SUPABASE_PUBLISHABLE_KEY) {
         return window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_PUBLISHABLE_KEY);
@@ -171,22 +191,28 @@
     async function loadRedaksiData() {
       const sb = getClient();
       if (!sb) return;
-      const [artRes, comRes, adRes, setRes] = await Promise.all([
-        sb.from('articles').select('*').order('created_at', { ascending: false }),
-        sb.from('comments').select('*').order('created_at', { ascending: false }),
-        sb.from('ads').select('*').order('created_at', { ascending: false }),
-        sb.from('site_settings').select('*')
-      ]);
+      try {
+        const [artRes, comRes, adRes, setRes, profRes] = await Promise.all([
+          sb.from('articles').select('*').order('created_at', { ascending: false }),
+          sb.from('comments').select('*').order('created_at', { ascending: false }),
+          sb.from('ads').select('*').order('created_at', { ascending: false }),
+          sb.from('site_settings').select('*'),
+          sb.from('profiles').select('*')
+        ]);
 
-      redaksiState.articles = artRes.data || [];
-      redaksiState.comments = comRes.data || [];
-      redaksiState.ads = adRes.data || [];
+        redaksiState.articles = artRes.data || [];
+        redaksiState.comments = comRes.data || [];
+        redaksiState.ads = adRes.data || [];
+        redaksiState.profilesList = profRes.data || [];
 
-      const settingsMap = {};
-      (setRes.data || []).forEach(row => {
-        settingsMap[row.key] = row.value;
-      });
-      redaksiState.settings = settingsMap;
+        const settingsMap = {};
+        (setRes.data || []).forEach(row => {
+          settingsMap[row.key] = row.value;
+        });
+        redaksiState.settings = settingsMap;
+      } catch (err) {
+        setNotice('err', 'Gagal memuat sebagian data: ' + (err?.message || err));
+      }
     }
 
     async function handleRedaksiLogin(ev) {
@@ -305,6 +331,17 @@
       }
       await loadRedaksiData();
       setNotice('ok', 'Artikel berhasil dihapus.');
+    }
+
+    async function updateProfileRole(profileId, newRole) {
+      const sb = getClient();
+      if (!sb) return setNotice('err', 'Koneksi Supabase tidak tersedia.');
+      const { error } = await sb.from('profiles').update({ role: newRole }).eq('id', profileId);
+      if (error) {
+        return setNotice('err', 'Gagal mengubah peran akses: ' + error.message);
+      }
+      await loadRedaksiData();
+      setNotice('ok', 'Peran akses diperbarui menjadi "' + newRole + '".');
     }
 
     async function setCommentStatus(id, status) {
@@ -510,6 +547,51 @@
       `;
     }
 
+    function renderAccessTab() {
+      const roles = ['direktur', 'pemred', 'editor', 'penulis'];
+      const rows = redaksiState.profilesList.map(p => {
+        const curRole = (p.role || 'penulis').toLowerCase();
+        const opts = roles.map(r => `<option value="${r}" ${curRole === r ? 'selected' : ''}>${r}</option>`).join('');
+        return `
+          <tr>
+            <td>
+              <div style="font-weight:700">${rEsc(p.full_name || p.email || p.id)}</div>
+              <div style="font-size:11px;color:var(--mute)">ID: ${rEsc(p.id)}</div>
+            </td>
+            <td><span class="badge b-terbit">${rEsc(curRole)}</span></td>
+            <td>
+              <select class="btn-xs" data-role-select="${rEsc(p.id)}">
+                ${opts}
+              </select>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      return `
+        <div class="r-card">
+          <h2>Manajemen Akses &amp; Peran Tim</h2>
+          <p style="font-size:12px;color:var(--mute);margin:0 0 12px">
+            Atur peran anggota tim redaksi (<b>direktur</b> / <b>pemred</b> memiliki akses penuh &amp; nomor HP pada moderasi komentar).
+          </p>
+          <div class="r-table-wrap">
+            <table class="r-tbl">
+              <thead>
+                <tr>
+                  <th>Pengguna</th>
+                  <th>Peran Saat Ini</th>
+                  <th>Ubah Peran</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rows || '<tr><td colspan="3">Belum ada data profil di tabel profiles.</td></tr>'}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
     function renderCommentsTab() {
       const canSeePhone = isDirectorOrEditor();
       const rows = redaksiState.comments.map(c => {
@@ -684,6 +766,13 @@
         });
       });
 
+      root.querySelectorAll('[data-role-select]').forEach(sel => {
+        sel.addEventListener('change', async () => {
+          const pid = sel.getAttribute('data-role-select');
+          if (pid) await updateProfileRole(pid, sel.value);
+        });
+      });
+
       root.querySelectorAll('[data-com-act]').forEach(btn => {
         btn.addEventListener('click', async () => {
           const act = btn.getAttribute('data-com-act');
@@ -728,6 +817,7 @@
 
       let tabContent = '';
       if (redaksiState.tab === 'artikel') tabContent = renderArticlesTab();
+      else if (redaksiState.tab === 'akses') tabContent = renderAccessTab();
       else if (redaksiState.tab === 'komentar') tabContent = renderCommentsTab();
       else if (redaksiState.tab === 'iklan') tabContent = renderAdsTab();
       else if (redaksiState.tab === 'pengaturan') tabContent = renderSettingsTab();
@@ -758,6 +848,7 @@
 
           <div class="r-tabs">
             <button type="button" class="r-tab ${redaksiState.tab === 'artikel' ? 'on' : ''}" onclick="redaksiState.notice=null;redaksiState.tab='artikel';renderRedaksiPage()">Artikel &amp; Status</button>
+            <button type="button" class="r-tab ${redaksiState.tab === 'akses' ? 'on' : ''}" onclick="redaksiState.notice=null;redaksiState.tab='akses';renderRedaksiPage()">Manajemen Akses</button>
             <button type="button" class="r-tab ${redaksiState.tab === 'komentar' ? 'on' : ''}" onclick="redaksiState.notice=null;redaksiState.tab='komentar';renderRedaksiPage()">Moderasi Komentar</button>
             <button type="button" class="r-tab ${redaksiState.tab === 'iklan' ? 'on' : ''}" onclick="redaksiState.notice=null;redaksiState.tab='iklan';renderRedaksiPage()">Iklan &amp; AdSense</button>
             <button type="button" class="r-tab ${redaksiState.tab === 'pengaturan' ? 'on' : ''}" onclick="redaksiState.notice=null;redaksiState.tab='pengaturan';renderRedaksiPage()">Pengaturan Situs</button>
@@ -772,26 +863,30 @@
     }
 
     (async function initRedaksi() {
-      const sb = getClient();
-      if (sb && sb.auth && sb.auth.onAuthStateChange) {
-        sb.auth.onAuthStateChange(async (event) => {
-          if (event === 'PASSWORD_RECOVERY') {
-            redaksiState.authMode = 'recovery';
-            renderRedaksiPage();
-          }
-        });
-      }
+      try {
+        const sb = getClient();
+        if (sb && sb.auth && sb.auth.onAuthStateChange) {
+          sb.auth.onAuthStateChange(async (event) => {
+            if (event === 'PASSWORD_RECOVERY') {
+              redaksiState.authMode = 'recovery';
+              renderRedaksiPage();
+            }
+          });
+        }
 
-      if (window.location.hash && window.location.hash.includes('type=recovery')) {
-        redaksiState.authMode = 'recovery';
-      }
+        if (window.location.hash && window.location.hash.includes('type=recovery')) {
+          redaksiState.authMode = 'recovery';
+        }
 
-      renderRedaksiPage();
-      await loadRedaksiSession();
-      if (redaksiState.user && redaksiState.authMode !== 'recovery') {
-        await loadRedaksiData();
+        renderRedaksiPage();
+        await loadRedaksiSession();
+        if (redaksiState.user && redaksiState.authMode !== 'recovery') {
+          await loadRedaksiData();
+        }
+        renderRedaksiPage();
+      } catch (err) {
+        document.getElementById('root').innerHTML = `<div class="r-wrap"><div class="r-card"><h2>Error</h2><p>${rEsc(err?.message || err)}</p></div></div>`;
       }
-      renderRedaksiPage();
     })();
   </script>
 </body>

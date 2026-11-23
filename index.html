@@ -273,7 +273,77 @@
 
     root.innerHTML = renderPublicShell(detailHtml);
   }
+async function loadPublicFeedFromSupabase() {
+    const cfg = window.APP_CONFIG || {};
+    if (!window.supabase || !cfg.SUPABASE_URL || !cfg.SUPABASE_PUBLISHABLE_KEY) return;
+    try {
+      const sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_PUBLISHABLE_KEY);
+      const { data, error } = await sb
+        .from('articles')
+        .select('*')
+        .eq('status', 'terbit')
+        .order('published_at', { ascending: false, nullsFirst: false })
+        .order('created_at', { ascending: false });
 
+      if (!error && Array.isArray(data)) {
+        const activeCat = (typeof ltState !== 'undefined' && ltState.category) ? ltState.category : 'Semua';
+        const filtered = activeCat === 'Semua'
+          ? data
+          : data.filter(item => (item.category || '').toLowerCase() === activeCat.toLowerCase());
+
+        const root = document.getElementById('root');
+        if (!root) return;
+
+        const itemsHtml = filtered.length
+          ? filtered.map(a => {
+              const title = esc(a.title || '(Tanpa Judul)');
+              const cat = esc(a.category || 'Umum');
+              const author = esc(a.author_name || 'Redaksi');
+              const rawText = (a.description || stripHtmlText(a.body || '') || '').slice(0, 145);
+              const thumb = a.cover_url
+                ? `<img class="card-thumb" src="${esc(a.cover_url)}" alt="${title}" loading="lazy">`
+                : `<div class="card-thumb-empty">Langkatalk</div>`;
+              return `
+                <article class="lt-card" onclick="location.hash='#/berita/${encodeURIComponent(a.slug || a.id)}'">
+                  <div class="card-top">
+                    <div class="card-author">
+                      <div class="avatar-sm">${esc(author.charAt(0).toUpperCase())}</div>
+                      <div>
+                        <div class="author-name">${author}</div>
+                        <div class="author-sub">${cat} • ${fmtDate(a.published_at || a.created_at)}</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-body-row">
+                    <div class="card-text">
+                      <h3 class="card-title">${title}</h3>
+                      <p class="card-excerpt">${esc(rawText)}</p>
+                      <div class="card-meta">
+                        <span>${readMinutes(a.body)} mnt baca</span>
+                        <span>•</span>
+                        <span>${Number(a.views || 0)} dibaca</span>
+                      </div>
+                    </div>
+                    ${thumb}
+                  </div>
+                </article>
+              `;
+            }).join('')
+          : `<div class="glass-box mt"><p>Belum ada berita terbit di kategori <b>${esc(activeCat)}</b>.</p></div>`;
+
+        const feedContainer = root.querySelector('.feed-list') || root.querySelector('main.wrap');
+        if (feedContainer && feedContainer.classList && feedContainer.classList.contains('feed-list')) {
+          feedContainer.innerHTML = itemsHtml;
+        } else if (root.querySelector('main.wrap')) {
+          root.querySelector('main.wrap').innerHTML = `<div class="feed-list">${itemsHtml}</div>`;
+        }
+      }
+    } catch (_) {}
+  }
+
+  window.addEventListener('hashchange', () => {
+    setTimeout(loadPublicFeedFromSupabase, 60);
+  });
   renderIndexRoute();
 </script>
 </body>

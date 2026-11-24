@@ -441,3 +441,36 @@
   .rd-pengguna-form { grid-template-columns: 1fr 1fr auto auto; align-items: center; }
   .rd-app { padding: 22px 24px 60px; }
 }
+/* Breaking News */
+.rd-bk-slots {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin-top: 8px;
+}
+.rd-bk-slot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #DC2626, #F43F5E);
+  color: #fff;
+}
+.rd-bk-nomor {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.22);
+  font-weight: 800;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.rd-bk-judul { font-size: 14px; font-weight: 700; line-height: 1.3; }
+.rd-bk-kosong { font-size: 13px; opacity: 0.85; }
+@media (min-width: 768px) {
+  .rd-bk-slots { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}

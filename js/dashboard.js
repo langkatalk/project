@@ -164,6 +164,7 @@
       m.push({ id: 'pengaturan', nama: 'Pengaturan Situs' });
       m.push({ id: 'builder', nama: 'Builder Level 1' });
       m.push({ id: 'log', nama: 'Log Aktivitas' });
+      m.push({ id: 'halaman', nama: 'Halaman Legal' });
     }
     if (r === 'direktur' || r === 'pemred') {
       m.push({ id: 'galeri', nama: 'Galeri' });

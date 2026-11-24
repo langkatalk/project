@@ -513,7 +513,7 @@
   }
 
   function bagi(slug) {
-    var url = location.origin + '/baca.html?s=' + encodeURIComponent(slug);
+    var url = location.origin + '/api/berita?s=' + encodeURIComponent(slug);
     if (navigator.share) {
       navigator.share({ title: 'Langkatalk', url: url }).catch(function () {});
       return;

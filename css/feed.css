@@ -77,7 +77,19 @@
   margin: 14px auto 0;
   padding: 0 12px 8px;
 }
-
+/* Gradasi lembut di belakang kartu agar efek blur kaca terlihat tanpa membebani HP */
+body::before {
+  content: "";
+  position: fixed;
+  inset: -12% -8% auto -8%;
+  height: 68vh;
+  background:
+    radial-gradient(circle at 18% 22%, rgba(255, 154, 85, 0.22), transparent 55%),
+    radial-gradient(circle at 82% 16%, rgba(125, 165, 255, 0.18), transparent 52%),
+    radial-gradient(circle at 50% 65%, rgba(255, 214, 175, 0.2), transparent 60%);
+  pointer-events: none;
+  z-index: -1;
+}
 .ig-kartu {
   background: #fff;
   border: 1px solid var(--lk-garis);

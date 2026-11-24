@@ -108,6 +108,37 @@
     return el.feed.querySelector('.ig-kartu[data-id="' + id + '"]');
   }
 
+  /* ---------- Skeleton ---------- */
+
+  function tampilSkeleton(jumlah) {
+    if (el.feed.querySelector('.lk-skel-kartu')) return;
+    var n = jumlah || 4;
+    var html = '';
+    for (var i = 0; i < n; i++) {
+      html +=
+        '<article class="ig-kartu lk-skel-kartu" aria-hidden="true">' +
+          '<div class="ig-kepala">' +
+            '<span class="lk-skel-blok lk-skel-av"></span>' +
+            '<div class="ig-info">' +
+              '<div class="lk-skel-blok lk-skel-baris lk-skel-pendek"></div>' +
+              '<div class="lk-skel-blok lk-skel-baris" style="width:65%"></div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="lk-skel-blok lk-skel-media"></div>' +
+          '<div class="ig-isi">' +
+            '<div class="lk-skel-blok lk-skel-judul"></div>' +
+            '<div class="lk-skel-blok lk-skel-baris"></div>' +
+            '<div class="lk-skel-blok lk-skel-baris" style="width:74%"></div>' +
+          '</div>' +
+        '</article>';
+    }
+    el.feed.insertAdjacentHTML('beforeend', html);
+  }
+
+  function hapusSkeleton() {
+    el.feed.querySelectorAll('.lk-skel-kartu').forEach(function (k) { k.remove(); });
+  }
+
   /* ---------- Panel bawah ---------- */
 
   function buatSheet() {
@@ -218,6 +249,7 @@
     var gen = st.gen;
     st.sedangMuat = true;
     tulisStatus('Memuat…');
+    tampilSkeleton(window.innerWidth < 768 ? 3 : 4);
 
     try {
       var data, error;
@@ -239,6 +271,7 @@
       }
 
       if (gen !== st.gen) return;
+      hapusSkeleton();
       if (error) throw error;
 
       if (st.filter !== '__simpan') {
@@ -261,6 +294,7 @@
       tulisStatus(st.selesai ? 'Sudah semua berita ditampilkan.' : '');
     } catch (e) {
       if (gen === st.gen) tulisStatus('Gagal memuat berita. Coba lagi sebentar lagi.');
+      if (gen === st.gen) hapusSkeleton();
       console.error('[feed]', e);
     } finally {
       if (gen === st.gen) st.sedangMuat = false;
@@ -553,6 +587,7 @@
 
     el.feed.innerHTML = '';
     tulisStatus('');
+    tampilSkeleton(window.innerWidth < 768 ? 3 : 4);
     el.chips.querySelectorAll('.chip-kat').forEach(function (c) {
       c.classList.toggle('on', c === b);
     });

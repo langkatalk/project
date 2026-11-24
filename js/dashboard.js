@@ -199,6 +199,7 @@
     if (state.tab === 'pengguna') return muatPengguna();
     if (state.tab === 'breaking') return muatBreaking();
     if (state.tab === 'iklan') return muatIklan();
+    if (state.tab === 'halaman') return muatHalamanLegal();
     pesan('Menu "' + namaMenu(state.tab) + '" dibuat di tahap berikutnya.');
   }
 
@@ -1426,6 +1427,89 @@ el.profil.addEventListener('change', async function (ev) {
     if (!f || !wadah) return;
     wadah.innerHTML = '<img class="ik-gambar" alt="Pratinjau">';
     wadah.firstChild.src = URL.createObjectURL(f);
+  });
+  /* ---------- Halaman legal (privasi dan pedoman) ---------- */
+
+  var HALAMAN_LEGAL = [
+    { kunci: 'privasi', judul: 'Kebijakan Privasi', alamat: 'privasi.html' },
+    { kunci: 'pedoman', judul: 'Pedoman Pemberitaan', alamat: 'pedoman.html' }
+  ];
+
+  async function muatHalamanLegal() {
+    pesan('Memuat halaman…');
+    var r = await sb.from('site_settings')
+      .select('key,value')
+      .in('key', ['halaman_privasi', 'halaman_pedoman']);
+    if (r.error) return pesan('Gagal memuat halaman: ' + r.error.message, 'rd-err');
+
+    state.halamanLegal = {};
+    (r.data || []).forEach(function (x) { state.halamanLegal[x.key] = x.value; });
+    tampilHalamanLegal();
+  }
+
+  function tampilHalamanLegal() {
+    var def = window.LK && window.LK.HALAMAN;
+    if (!def) return pesan('Berkas js/halaman.js belum termuat. Periksa redaksi.html.', 'rd-err');
+
+    isi(
+      '<section class="rd-kotak"><h2>Halaman Legal</h2>' +
+        '<p class="rd-catatan">Teks di sini tampil langsung di halaman publik setelah disimpan. Format: baris berawalan “## ” menjadi judul, baris berawalan “- ” menjadi daftar, dan baris kosong memisahkan paragraf.</p>' +
+        HALAMAN_LEGAL.map(function (h) {
+          var teks = (state.halamanLegal && state.halamanLegal['halaman_' + h.kunci]) || def[h.kunci].teks;
+          return '<article class="rd-baris hl-kartu" data-hl="' + h.kunci + '">' +
+            '<div class="hl-atas">' +
+              '<p class="rd-baris-judul">' + esc(h.judul) + '</p>' +
+              '<a class="btn-xs" href="' + h.alamat + '" target="_blank" rel="noopener">Lihat halaman</a>' +
+            '</div>' +
+            '<label class="rd-label">Isi halaman' +
+              '<textarea class="hl-textarea" data-hl-teks="' + h.kunci + '">' + esc(teks) + '</textarea>' +
+            '</label>' +
+            '<div class="rd-baris-aksi">' +
+              '<button type="button" class="btn-xs utama" data-hl-simpan="' + h.kunci + '">Simpan</button>' +
+              '<button type="button" class="btn-xs" data-hl-reset="' + h.kunci + '">Kembalikan ke teks awal</button>' +
+            '</div>' +
+          '</article>';
+        }).join('') +
+      '</section>'
+    );
+  }
+
+  async function simpanHalamanLegal(kunci, teks, tombol) {
+    var key = 'halaman_' + kunci;
+    teks = String(teks || '').trim();
+    if (teks.length < 50) return kabarkan('Isi halaman terlalu pendek');
+
+    tombol.disabled = true;
+    var cek = await sb.from('site_settings').select('key').eq('key', key).maybeSingle();
+    var r = cek.data
+      ? await sb.from('site_settings').update({ value: teks, updated_at: new Date().toISOString() }).eq('key', key)
+      : await sb.from('site_settings').insert({ key: key, value: teks });
+    tombol.disabled = false;
+
+    if (r.error) return kabarkan('Gagal menyimpan: ' + r.error.message);
+    kabarkan('Disimpan. Halaman publik sudah diperbarui.');
+    muatHalamanLegal();
+  }
+
+  el.isi.addEventListener('click', async function (ev) {
+    var s = ev.target.closest ? ev.target.closest('[data-hl-simpan]') : null;
+    if (s) {
+      var k = s.dataset.hlSimpan;
+      var area = el.isi.querySelector('[data-hl-teks="' + k + '"]');
+      return simpanHalamanLegal(k, area ? area.value : '', s);
+    }
+
+    var rs = ev.target.closest ? ev.target.closest('[data-hl-reset]') : null;
+    if (rs) {
+      var k2 = rs.dataset.hlReset;
+      if (!confirm('Kembalikan ke teks awal? Teks yang tersimpan sekarang akan dihapus.')) return;
+      rs.disabled = true;
+      var d = await sb.from('site_settings').delete().eq('key', 'halaman_' + k2);
+      rs.disabled = false;
+      if (d.error) return kabarkan('Gagal: ' + d.error.message);
+      kabarkan('Dikembalikan ke teks awal');
+      muatHalamanLegal();
+    }
   });
   cekSesi();
 })();

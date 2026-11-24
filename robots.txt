@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /redaksi.html
+
+Sitemap: https://langkatalk.vercel.app/api/sitemap

@@ -474,3 +474,43 @@
 @media (min-width: 768px) {
   .rd-bk-slots { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
+/* ===== Menu tab: geser halus ===== */
+.rd-tab {
+  scroll-behavior: smooth;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: 12px;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  padding: 6px 12px 10px;
+  margin: 0 -12px 14px;
+  cursor: grab;
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 12px, #000 calc(100% - 12px), transparent 100%);
+          mask-image: linear-gradient(to right, transparent 0, #000 12px, #000 calc(100% - 12px), transparent 100%);
+}
+.rd-tab.geser-aktif {
+  cursor: grabbing;
+  scroll-behavior: auto;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.rd-tab button {
+  scroll-snap-align: start;
+  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 260ms ease,
+              background 260ms ease,
+              color 260ms ease;
+}
+.rd-tab button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(95, 63, 200, 0.16);
+}
+.rd-tab button:active { transform: scale(0.96); }
+.rd-tab button.on {
+  box-shadow: 0 8px 20px rgba(124, 63, 224, 0.28);
+}
+@media (hover: none) {
+  .rd-tab button:hover { transform: none; box-shadow: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rd-tab, .rd-tab button { scroll-behavior: auto; transition: none; }
+}

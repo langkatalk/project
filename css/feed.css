@@ -716,3 +716,145 @@ body::before {
     animation: none;
   }
 }
+/* ===== Pencarian: ikon kaca dan panel meluncur ===== */
+.cari-btn {
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 14px;
+  border: 1px solid var(--lk-kaca-garis);
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  color: var(--lk-teks);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(95, 63, 200, 0.12);
+  transition: transform 180ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 240ms ease;
+}
+.cari-btn:hover { transform: translateY(-1px); box-shadow: 0 10px 22px rgba(95, 63, 200, 0.18); }
+.cari-btn:active { transform: scale(0.92); }
+
+.cari-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 14px;
+  background: rgba(13, 10, 44, 0.35);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 240ms ease;
+}
+.cari-panel.on { opacity: 1; pointer-events: auto; }
+
+.cari-kaca {
+  width: 100%;
+  max-width: 640px;
+  max-height: 82vh;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(22px) saturate(150%);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+  border: 1px solid var(--lk-kaca-garis);
+  box-shadow: 0 24px 60px rgba(22, 17, 51, 0.22);
+  transform: translateY(-16px) scale(0.98);
+  opacity: 0;
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1), opacity 240ms ease;
+}
+.cari-panel.on .cari-kaca { transform: translateY(0) scale(1); opacity: 1; }
+
+.cari-baris { display: flex; gap: 8px; align-items: center; }
+#cariInput {
+  flex: 1;
+  min-width: 0;
+  min-height: 48px;
+  padding: 0 16px;
+  border-radius: 14px;
+  border: 1.5px solid var(--lk-garis);
+  background: rgba(255, 255, 255, 0.92);
+  font: inherit;
+  font-size: 16px;
+  color: var(--lk-teks);
+}
+#cariInput:focus {
+  outline: none;
+  border-color: #5F6FEE;
+  box-shadow: 0 0 0 4px rgba(95, 111, 238, 0.16);
+}
+.cari-tutup {
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 14px;
+  border: 1px solid var(--lk-garis);
+  background: #fff;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.cari-hasil { overflow-y: auto; display: grid; gap: 8px; }
+.cari-info { margin: 8px 0; text-align: center; color: var(--lk-muted); font-size: 14px; }
+
+.cari-item {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 8px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid var(--lk-garis);
+  color: var(--lk-teks);
+  animation: munculNaik 260ms ease both;
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+.cari-item:hover { transform: translateX(3px); box-shadow: var(--lk-bayangan); }
+.cari-item img,
+.cari-ph {
+  width: 96px;
+  height: 56px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--lk-grad-brand);
+}
+.cari-teks { min-width: 0; }
+.cari-teks b {
+  display: block;
+  font-size: 14px;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.cari-teks small { font-size: 12px; color: var(--lk-muted); }
+
+.cari-kerangka { display: grid; gap: 8px; }
+.cari-kerangka span {
+  height: 64px;
+  border-radius: 16px;
+  background: linear-gradient(90deg, #ece8ff 25%, #f8f6ff 50%, #ece8ff 75%);
+  background-size: 200% 100%;
+  animation: cariKilau 1.3s infinite linear;
+}
+@keyframes cariKilau {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@media (min-width: 768px) {
+  .cari-panel { padding-top: 10vh; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cari-panel, .cari-kaca, .cari-item, .cari-btn { transition: none; animation: none; }
+  .cari-kerangka span { animation: none; }
+}

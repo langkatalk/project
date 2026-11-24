@@ -257,6 +257,7 @@
       if (gen !== st.gen) return;
 
       el.feed.insertAdjacentHTML('beforeend', data.map(function (a) { return kartu(a, peta); }).join(''));
+            sisipIklanFeed();
       tulisStatus(st.selesai ? 'Sudah semua berita ditampilkan.' : '');
     } catch (e) {
       if (gen === st.gen) tulisStatus('Gagal memuat berita. Coba lagi sebentar lagi.');
@@ -662,6 +663,110 @@
     elBreaking.addEventListener('touchend', function () { setTimeout(jalankan, 4000); }, { passive: true });
 
     jalankan();
+  }
+    /* ---------- Iklan di beranda ---------- */
+
+  var IKLAN_POSISI = { feed_1: 4, feed_google: 8, feed_2: 12 };
+  var iklanBeranda = {};
+  var iklanSiap = false;
+
+  function pasangScriptAdsense(client) {
+    if (document.getElementById('adsense-js')) return;
+    var sc = document.createElement('script');
+    sc.id = 'adsense-js';
+    sc.async = true;
+    sc.crossOrigin = 'anonymous';
+    sc.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + encodeURIComponent(client);
+    document.head.appendChild(sc);
+  }
+
+  function bungkusIklan(id) {
+    var s = iklanBeranda[id];
+    if (!s) return '';
+    var luar = id === 'banner_atas' || id === 'banner_bawah' || id === 'google_atas';
+    var kelasLuar = luar ? ' ad-luar' : '';
+
+    if (s.ad_type === 'adsense') {
+      if (!s.adsense_client || !s.adsense_slot_id) return '';
+      return '<div class="ad-slot ad-google' + kelasLuar + '" data-ad-slot="' + id + '">' +
+        '<span class="ad-badge">Iklan</span>' +
+        '<ins class="adsbygoogle" style="display:block" data-ad-client="' + esc(s.adsense_client) +
+        '" data-ad-slot="' + esc(s.adsense_slot_id) + '" data-ad-format="auto" data-full-width-responsive="true"></ins>' +
+      '</div>';
+    }
+
+    if (!s.image_url) return '';
+    var kelasRasio = id.indexOf('banner') === 0 ? 'ad-4-1' : 'ad-2-1';
+    var tinggi = kelasRasio === 'ad-4-1' ? 300 : 600;
+    var gambar = '<img src="' + esc(s.image_url) + '" alt="' + esc(s.title || 'Iklan Langkatalk') +
+      '" width="1200" height="' + tinggi + '" loading="lazy" decoding="async">';
+    var aman = s.link_url && /^https:\/\//i.test(s.link_url);
+    var isi = aman
+      ? '<a class="ad-manual" href="' + esc(s.link_url) + '" target="_blank" rel="noopener sponsored">' + gambar + '</a>'
+      : '<div class="ad-manual">' + gambar + '</div>';
+    return '<div class="ad-slot ' + kelasRasio + kelasLuar + '" data-ad-slot="' + id + '">' +
+      '<span class="ad-badge">Iklan</span>' + isi + '</div>';
+  }
+
+  function aktifkanAdsense() {
+    document.querySelectorAll('ins.adsbygoogle').forEach(function (ins) {
+      if (ins.dataset.dipasang) return;
+      ins.dataset.dipasang = '1';
+      try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) {}
+    });
+    // Ruang Google yang tidak terisi iklan dihapus, supaya tidak meninggalkan kotak kosong
+    setTimeout(function () {
+      document.querySelectorAll('.ad-google').forEach(function (wadah) {
+        var ins = wadah.querySelector('ins');
+        var status = ins ? ins.getAttribute('data-ad-status') : null;
+        if (!ins || status === 'unfilled' || (status !== 'filled' && ins.offsetHeight < 10)) {
+          wadah.remove();
+        }
+      });
+    }, 4000);
+  }
+
+  async function muatIklanBeranda() {
+    if (!sb) return;
+    var r = await sb.from('ads')
+      .select('slot,ad_type,title,image_url,link_url,adsense_client,adsense_slot_id')
+      .eq('is_active', true);
+
+    if (!r.error && r.data) {
+      r.data.forEach(function (x) { iklanBeranda[x.slot] = x; });
+      var google = r.data.find(function (x) {
+        return x.ad_type === 'adsense' && x.adsense_client && x.adsense_slot_id;
+      });
+      if (google) pasangScriptAdsense(google.adsense_client);
+    }
+    iklanSiap = true;
+
+    // Ruang di atas feed (setelah breaking news)
+    ['banner_atas', 'google_atas'].forEach(function (id) {
+      var html = bungkusIklan(id);
+      if (html) el.feed.insertAdjacentHTML('beforebegin', html);
+    });
+
+    // Ruang di atas footer
+    var footer = document.querySelector('.lk-footer');
+    var bawah = bungkusIklan('banner_bawah');
+    if (footer && bawah) footer.insertAdjacentHTML('beforebegin', bawah);
+
+    sisipIklanFeed();
+  }
+
+  // Menyisipkan iklan di antara kartu: setelah kartu ke-4, ke-8, dan ke-12
+  function sisipIklanFeed() {
+    if (!iklanSiap || st.filter === '__simpan') return;
+    var kartu = el.feed.querySelectorAll('.ig-kartu');
+    Object.keys(IKLAN_POSISI).forEach(function (id) {
+      var p = IKLAN_POSISI[id];
+      if (kartu.length < p) return;
+      if (el.feed.querySelector('[data-ad-slot="' + id + '"]')) return;
+      var html = bungkusIklan(id);
+      if (html) kartu[p - 1].insertAdjacentHTML('afterend', html);
+    });
+    aktifkanAdsense();
   }
   async function mulai() {
     buatSheet();

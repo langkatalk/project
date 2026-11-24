@@ -6,6 +6,44 @@
   'use strict';
 
   var HALAMAN = {
+        tentang: {
+      judul: 'Tentang Kami',
+      teks: [
+        '## Tentang Langkatalk',
+        'Langkatalk adalah portal berita investigasi, cerita lokal, dan jurnalisme sosial dari Langkat, Sumatera Utara.',
+        '',
+        '## Misi',
+        'Menjadi ruang temu digital yang mengangkat, mendokumentasikan, dan menyebarkan cerita Langkat kepada dunia.',
+        '',
+        '## Makna nama dan logo',
+        'Langkatalk berarti “Langkat yang berbicara”: tentang manusianya, alamnya, peristiwanya, dan harapannya.',
+        '',
+        '- Huruf L: Kabupaten Langkat',
+        '- Aliran sungai: Sungai Wampu',
+        '- Siluet perbukitan: Bukit Barisan',
+        '- Tombol play: media dan dunia digital',
+        '',
+        '## Kontak',
+        'Email: langkatalk@gmail.com',
+        'WhatsApp: 082261275447',
+        'Alamat: sedang dalam proses pengurusan'
+      ].join('\n')
+    },
+    masthead: {
+      judul: 'Susunan Redaksi',
+      teks: [
+        '## Susunan Redaksi',
+        '- Direktur: M Fakhri',
+        '- Pemimpin Redaksi: [isi di dashboard]',
+        '- Redaktur: [isi di dashboard]',
+        '- Editor: [isi di dashboard]',
+        '- Reporter: [isi di dashboard]',
+        '',
+        '## Kontak redaksi',
+        'Email: langkatalk@gmail.com',
+        'WhatsApp: 082261275447'
+      ].join('\n')
+    },
     privasi: {
       judul: 'Kebijakan Privasi',
       teks: [

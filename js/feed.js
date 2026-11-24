@@ -813,5 +813,122 @@
     muatBerikutnya();
   }
 
+  /* ---------- Pencarian: ikon kaca, panel dari atas ---------- */
+  function pasangCari() {
+    var header = document.querySelector('.lk-header');
+    if (!header || document.getElementById('cariBtn')) return;
+
+    var tombol = document.createElement('button');
+    tombol.type = 'button';
+    tombol.id = 'cariBtn';
+    tombol.className = 'cari-btn';
+    tombol.setAttribute('aria-label', 'Cari berita');
+    tombol.innerHTML =
+      '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" ' +
+      'stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      '<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>';
+    header.insertBefore(tombol, header.lastElementChild);
+
+    var panel = document.createElement('div');
+    panel.id = 'cariPanel';
+    panel.className = 'cari-panel';
+    panel.setAttribute('role', 'dialog');
+    panel.setAttribute('aria-modal', 'true');
+    panel.setAttribute('aria-label', 'Cari berita');
+    panel.innerHTML =
+      '<div class="cari-kaca">' +
+        '<div class="cari-baris">' +
+          '<input id="cariInput" type="search" autocomplete="off" ' +
+          'placeholder="Cari judul, isi, atau kata kunci…" aria-label="Kata kunci">' +
+          '<button type="button" class="cari-tutup" id="cariTutup" aria-label="Tutup">✕</button>' +
+        '</div>' +
+        '<div id="cariHasil" class="cari-hasil" aria-live="polite"></div>' +
+      '</div>';
+    document.body.appendChild(panel);
+
+    var input = document.getElementById('cariInput');
+    var hasil = document.getElementById('cariHasil');
+    var timer = null;
+    var nomor = 0;
+
+    function buka() {
+      panel.classList.add('on');
+      setTimeout(function () { input.focus(); }, 180);
+    }
+
+    function tutup() {
+      panel.classList.remove('on');
+      input.blur();
+    }
+
+    // Membuang karakter yang bisa merusak filter pencarian
+    function bersihkanKata(s) {
+      return String(s || '').replace(/[(),*%_\\]/g, ' ').replace(/\s+/g, ' ').trim();
+    }
+
+    async function cari(kata) {
+      var k = bersihkanKata(kata);
+      var id = ++nomor;
+
+      if (k.length < 2) {
+        hasil.innerHTML = '<p class="cari-info">Ketik minimal 2 huruf untuk mencari.</p>';
+        return;
+      }
+      hasil.innerHTML = '<div class="cari-kerangka"><span></span><span></span><span></span></div>';
+      if (!sb) return;
+
+      var r = await sb.from('articles')
+        .select('id,title,slug,category,cover_url,published_at')
+        .eq('status', 'terbit')
+        .is('deleted_at', null)
+        .or('scheduled_at.is.null,scheduled_at.lte.' + new Date().toISOString())
+        .or('title.ilike.*' + k + '*,description.ilike.*' + k + '*')
+        .order('published_at', { ascending: false })
+        .limit(12);
+
+      if (id !== nomor) return; // sudah digantikan pencarian yang lebih baru
+
+      if (r.error) {
+        hasil.innerHTML = '<p class="cari-info">Pencarian belum bisa dilakukan. Coba lagi.</p>';
+        return;
+      }
+      var data = r.data || [];
+      if (!data.length) {
+        hasil.innerHTML = '<p class="cari-info">Tidak ada berita untuk “' + esc(k) + '”.</p>';
+        return;
+      }
+
+      hasil.innerHTML = data.map(function (a) {
+        var tujuan = 'baca.html?s=' + encodeURIComponent(a.slug || a.id);
+        return '<a class="cari-item" href="' + tujuan + '">' +
+          (a.cover_url
+            ? '<img src="' + esc(a.cover_url) + '" alt="" loading="lazy" decoding="async">'
+            : '<span class="cari-ph"></span>') +
+          '<span class="cari-teks"><b>' + esc(a.title) + '</b>' +
+          '<small>' + esc(a.category || 'Umum') + ' • ' + tgl(a.published_at) + '</small></span>' +
+        '</a>';
+      }).join('');
+    }
+
+    tombol.addEventListener('click', buka);
+    document.getElementById('cariTutup').addEventListener('click', tutup);
+    panel.addEventListener('click', function (e) { if (e.target === panel) tutup(); });
+    hasil.addEventListener('click', tutup);
+
+    input.addEventListener('input', function () {
+      clearTimeout(timer);
+      timer = setTimeout(function () { cari(input.value); }, 280);
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && panel.classList.contains('on')) tutup();
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        buka();
+      }
+    });
+  }
+
+  pasangCari();
   mulai();
 })();

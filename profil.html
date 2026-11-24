@@ -69,6 +69,65 @@
     function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
     function kabar(t){var e=document.getElementById('toast');if(!e)return;e.textContent=t;e.classList.add('show');setTimeout(function(){e.classList.remove('show')},2500)}
     function tglIndo(t){if(!t)return '-';try{return new Date(t).toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}catch(e){return t}}
+    var FOTO_SISI = 480;
+    var FOTO_MAX_MB = 2;
+
+    function muatGambar(url){
+      return new Promise(function(resolve, reject){
+        var img = new Image();
+        img.onload = function(){ resolve(img); };
+        img.onerror = function(){ reject(new Error('File gambar tidak bisa dibaca.')); };
+        img.src = url;
+      });
+    }
+
+    function keBlob(canvas, tipe, kualitas){
+      return new Promise(function(resolve){ canvas.toBlob(resolve, tipe, kualitas); });
+    }
+
+    async function prosesFoto(file){
+      var url = URL.createObjectURL(file);
+      try{
+        var img = await muatGambar(url);
+        var sw = img.naturalWidth, sh = img.naturalHeight;
+        var sisi = Math.min(sw, sh);
+        var sx = (sw - sisi) / 2, sy = (sh - sisi) / 2;
+
+        var canvas = document.createElement('canvas');
+        canvas.width = FOTO_SISI;
+        canvas.height = FOTO_SISI;
+        canvas.getContext('2d').drawImage(img, sx, sy, sisi, sisi, 0, 0, FOTO_SISI, FOTO_SISI);
+
+        var blob = await keBlob(canvas, 'image/webp', 0.85);
+        var ext = 'webp';
+        if(!blob || blob.type !== 'image/webp'){
+          blob = await keBlob(canvas, 'image/jpeg', 0.85);
+          ext = 'jpg';
+        }
+        if(!blob) throw new Error('Gagal memproses foto.');
+        return { blob: blob, ext: ext };
+      } finally {
+        URL.revokeObjectURL(url);
+      }
+    }
+
+    async function unggahFotoProfil(sb, file, userId){
+      if(!/^image\/(jpeg|png|webp)$/.test(file.type)){
+        throw new Error('Pilih gambar JPG, PNG, atau WebP.');
+      }
+      if(file.size > FOTO_MAX_MB * 1024 * 1024){
+        throw new Error('Ukuran foto maksimal ' + FOTO_MAX_MB + ' MB.');
+      }
+      var hasil = await prosesFoto(file);
+      var path = 'avatars/' + userId + '/' + Date.now() + '.' + hasil.ext;
+      var up = await sb.storage.from('articles').upload(path, hasil.blob, {
+        contentType: hasil.blob.type,
+        cacheControl: '31536000',
+        upsert: false
+      });
+      if(up.error) throw new Error('Unggah foto gagal: ' + up.error.message);
+      return sb.storage.from('articles').getPublicUrl(path).data.publicUrl;
+    }
 
     function kotakSandi(id, label, placeholder){
       return '<label class="lk-label" for="'+id+'">'+label+'</label>'+
@@ -127,7 +186,7 @@
       document.getElementById('isiProfil').innerHTML=
         '<section class="lk-kartu"><div class="lk-profil-atas"><div class="lk-foto-besar">'+foto+'</div><div><p class="lk-nama">'+esc(pr.full_name||pr.username||'Tanpa Nama')+'</p><p class="lk-username">@'+esc(pr.username||'-')+'</p><span class="lk-chip">'+esc(jabatan)+'</span></div></div>'+
         '<div class="lk-stat"><div><b>'+terbit+'</b><span>Berita Terbit</span></div><div><b>'+draf+'</b><span>Draf / Proses</span></div><div><b>'+hariAktif+' hari</b><span>Aktif Sejak '+tglIndo(gabung)+'</span></div></div>'+
-        '<div class="lk-bar"><a class="btn btn-utama btn-kecil" href="tulis.html">+ Tulis Berita</a><a class="btn btn-kecil" style="background:#fff;border:1.5px solid #e5e7eb;color:#161133" href="redaksi.html">Ubah Foto di Redaksi</a></div></section>'+
+        '<div class="lk-bar"><a class="btn btn-utama btn-kecil" href="tulis.html">+ Tulis Berita</a><label class="btn btn-kecil" style="background:#fff;border:1.5px solid #e5e7eb;color:#161133;cursor:pointer">Ubah Foto Profil<input type="file" id="inputFotoProfil" accept="image/jpeg,image/png,image/webp" hidden></label></div></section>'+
         '<section class="lk-kartu"><h2 style="font-size:17px">Data Profil</h2>'+
         '<form id="formProfil"><label class="lk-label">Nama Lengkap</label><input class="lk-input" id="fNama" value="'+esc(pr.full_name||'')+'">'+
         '<label class="lk-label">Deskripsi Singkat</label><input class="lk-input" id="fDesk" placeholder="Peran atau deskripsi singkat" value="'+esc(pr.desk||'')+'">'+
@@ -144,6 +203,29 @@
       pasangTombolMata();
 
       document.getElementById('formProfil').addEventListener('submit', async function(ev){
+        document.getElementById('inputFotoProfil').addEventListener('change', async function(ev){
+        var file = ev.target.files && ev.target.files[0];
+        if(!file) return;
+        try{
+          kabar('Mengunggah foto…');
+          var url = await unggahFotoProfil(sb, file, user.id);
+          var r = await sb.rpc('perbarui_profil_sendiri', { p_full_name: null, p_username: null, p_avatar_url: url });
+          if(r.error) throw new Error(r.error.message);
+
+          pr.avatar_url = url;
+          var fotoBesar = document.querySelector('.lk-foto-besar');
+          if(fotoBesar) fotoBesar.innerHTML = '<img src="'+esc(url)+'" alt="">';
+          var boxHeader = document.getElementById('headerAkun');
+          if(boxHeader){
+            boxHeader.innerHTML = '<a class="btn btn-utama btn-kecil" href="redaksi.html">Ruang Redaksi</a><a class="lk-avatar" href="profil.html" title="Akun saya"><img src="'+esc(url)+'" alt=""></a>';
+          }
+          kabar('Foto profil diperbarui');
+        } catch(e){
+          kabar('Gagal: ' + (e.message || e));
+        } finally {
+          ev.target.value = '';
+        }
+      });
         ev.preventDefault();
         var nama=document.getElementById('fNama').value.trim();
         var desk=document.getElementById('fDesk').value.trim()||null;

@@ -539,7 +539,7 @@
   }
 
   function bagi() {
-    var url = location.origin + '/baca.html?s=' + encodeURIComponent(artikel.slug || artikel.id);
+    var url = location.origin + '/api/berita?s=' + encodeURIComponent(artikel.slug || artikel.id);
     if (navigator.share) {
       navigator.share({ title: artikel.title, url: url }).catch(function () {});
       return;

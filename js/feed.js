@@ -258,6 +258,7 @@
         var ids = Array.from(st.disimpan);
         st.selesai = true;
         if (!ids.length) {
+          hapusSkeleton();
           tulisStatus('Belum ada berita yang kamu simpan.');
           return;
         }

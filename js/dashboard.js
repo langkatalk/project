@@ -164,7 +164,6 @@
       m.push({ id: 'pengaturan', nama: 'Pengaturan Situs' });
       m.push({ id: 'builder', nama: 'Builder Level 1' });
       m.push({ id: 'log', nama: 'Log Aktivitas' });
-      m.push({ id: 'halaman', nama: 'Halaman Legal' });
     }
     if (r === 'direktur' || r === 'pemred') {
       m.push({ id: 'galeri', nama: 'Galeri' });
@@ -172,6 +171,7 @@
       m.push({ id: 'breaking', nama: 'Breaking News' });
       m.push({ id: 'web', nama: 'Manajemen Web' });
     }
+    if (r === 'direktur' || r === 'pemred') m.push({ id: 'halaman', nama: 'Halaman Legal' });
     return m;
   }
 
@@ -1428,18 +1428,24 @@ el.profil.addEventListener('change', async function (ev) {
     wadah.innerHTML = '<img class="ik-gambar" alt="Pratinjau">';
     wadah.firstChild.src = URL.createObjectURL(f);
   });
-  /* ---------- Halaman legal (privasi dan pedoman) ---------- */
+  /* ---------- Halaman legal (privasi, pedoman, tentang, masthead) ---------- */
 
   var HALAMAN_LEGAL = [
-    { kunci: 'privasi', judul: 'Kebijakan Privasi', alamat: 'privasi.html' },
-    { kunci: 'pedoman', judul: 'Pedoman Pemberitaan', alamat: 'pedoman.html' }
+    { kunci: 'privasi', judul: 'Kebijakan Privasi', alamat: 'privasi.html', pemred: false },
+    { kunci: 'pedoman', judul: 'Pedoman Pemberitaan', alamat: 'pedoman.html', pemred: false },
+    { kunci: 'tentang', judul: 'Tentang Kami', alamat: 'tentang.html', pemred: true },
+    { kunci: 'masthead', judul: 'Susunan Redaksi', alamat: 'masthead.html', pemred: true }
   ];
+
+  function bolehEditHalaman(h) {
+    return state.profil.role === 'direktur' || (state.profil.role === 'pemred' && h.pemred);
+  }
 
   async function muatHalamanLegal() {
     pesan('Memuat halaman…');
     var r = await sb.from('site_settings')
       .select('key,value')
-      .in('key', ['halaman_privasi', 'halaman_pedoman']);
+      .in('key', ['halaman_privasi', 'halaman_pedoman', 'halaman_tentang', 'halaman_masthead']);
     if (r.error) return pesan('Gagal memuat halaman: ' + r.error.message, 'rd-err');
 
     state.halamanLegal = {};
@@ -1451,10 +1457,13 @@ el.profil.addEventListener('change', async function (ev) {
     var def = window.LK && window.LK.HALAMAN;
     if (!def) return pesan('Berkas js/halaman.js belum termuat. Periksa redaksi.html.', 'rd-err');
 
+    var daftar = HALAMAN_LEGAL.filter(bolehEditHalaman);
+    if (!daftar.length) return pesan('Kamu tidak punya akses ke halaman legal.');
+
     isi(
       '<section class="rd-kotak"><h2>Halaman Legal</h2>' +
-        '<p class="rd-catatan">Teks di sini tampil langsung di halaman publik setelah disimpan. Format: baris berawalan “## ” menjadi judul, baris berawalan “- ” menjadi daftar, dan baris kosong memisahkan paragraf.</p>' +
-        HALAMAN_LEGAL.map(function (h) {
+        '<p class="rd-catatan">Teks di sini tampil langsung di halaman publik setelah disimpan. Baris berawalan “## ” menjadi judul, “- ” menjadi daftar, dan baris kosong memisahkan paragraf.</p>' +
+        daftar.map(function (h) {
           var teks = (state.halamanLegal && state.halamanLegal['halaman_' + h.kunci]) || def[h.kunci].teks;
           return '<article class="rd-baris hl-kartu" data-hl="' + h.kunci + '">' +
             '<div class="hl-atas">' +
@@ -1474,7 +1483,14 @@ el.profil.addEventListener('change', async function (ev) {
     );
   }
 
+  function cariHalamanLegal(kunci) {
+    return HALAMAN_LEGAL.find(function (x) { return x.kunci === kunci; }) || null;
+  }
+
   async function simpanHalamanLegal(kunci, teks, tombol) {
+    var h = cariHalamanLegal(kunci);
+    if (!h || !bolehEditHalaman(h)) return kabarkan('Kamu tidak punya akses ke halaman ini');
+
     var key = 'halaman_' + kunci;
     teks = String(teks || '').trim();
     if (teks.length < 50) return kabarkan('Isi halaman terlalu pendek');
@@ -1502,6 +1518,8 @@ el.profil.addEventListener('change', async function (ev) {
     var rs = ev.target.closest ? ev.target.closest('[data-hl-reset]') : null;
     if (rs) {
       var k2 = rs.dataset.hlReset;
+      var h2 = cariHalamanLegal(k2);
+      if (!h2 || !bolehEditHalaman(h2)) return kabarkan('Kamu tidak punya akses ke halaman ini');
       if (!confirm('Kembalikan ke teks awal? Teks yang tersimpan sekarang akan dihapus.')) return;
       rs.disabled = true;
       var d = await sb.from('site_settings').delete().eq('key', 'halaman_' + k2);

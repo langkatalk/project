@@ -15,7 +15,7 @@
     ditinjau: 'Ditinjau', revisi: 'Revisi', terbit: 'Terbit', arsip: 'Arsip'
   };
   var STAF = ['direktur', 'pemred', 'redaktur', 'editor'];
-  var SUDAH_DIBUAT = ['naskah', 'komentar', 'log', 'pengguna', 'breaking', 'iklan'];
+  var SUDAH_DIBUAT = ['naskah', 'komentar', 'log', 'pengguna', 'breaking', 'iklan', 'halaman'];
   var FOTO_SISI = 480;
   var FOTO_MAX_MB = 2;
   var FILTER_NASKAH = [

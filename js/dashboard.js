@@ -158,9 +158,11 @@
   function menuUntuk(r) {
     var m = [{ id: 'naskah', nama: 'Naskah' }];
     if (STAF.indexOf(r) !== -1) m.push({ id: 'komentar', nama: 'Komentar' });
-    if (r === 'direktur' || r === 'pemred') m.push({ id: 'iklan', nama: 'Iklan' });
-    if (r === 'direktur') {
+        if (r === 'direktur' || r === 'pemred') m.push({ id: 'iklan', nama: 'Iklan' });
+    if (r === 'direktur' || r === 'pemred') {
       m.push({ id: 'pengguna', nama: 'Pengguna & Jabatan' });
+    }
+    if (r === 'direktur') {
       m.push({ id: 'pengaturan', nama: 'Pengaturan Situs' });
       m.push({ id: 'builder', nama: 'Builder Level 1' });
       m.push({ id: 'log', nama: 'Log Aktivitas' });
@@ -172,7 +174,7 @@
       m.push({ id: 'web', nama: 'Manajemen Web' });
     }
     return m;
-  }
+  
 
   function namaMenu(id) {
     var m = menuUntuk(state.profil.role).find(function (x) { return x.id === id; });

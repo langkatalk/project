@@ -773,6 +773,7 @@
     await muatKategori();
     pasangPengamat();
         muatBreaking();
+        muatIklanBeranda();
     muatBerikutnya();
   }
 

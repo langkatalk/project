@@ -196,7 +196,8 @@
     if (state.tab === 'komentar') return muatKomentar();
     if (state.tab === 'log') return muatLog();
     if (state.tab === 'pengguna') return muatPengguna();
-        if (state.tab === 'breaking') return muatBreaking();
+      if (state.tab === 'breaking') return muatBreaking();
+      if (state.tab === 'iklan') return muatIklan();
     pesan('Menu "' + namaMenu(state.tab) + '" dibuat di tahap berikutnya.');
   }
 
@@ -1235,5 +1236,195 @@
     if (t) ubahBreaking(t.dataset.id, t.value, t);
   });
 
+  /* ---------- Iklan ---------- */
+
+  var SLOT_IKLAN = [
+    { id: 'banner_atas', nama: 'Banner atas', tipe: 'manual', w: 1200, h: 300, catatan: 'Di bawah breaking news, lebar penuh (4:1)' },
+    { id: 'feed_1', nama: 'Sisipan feed 1', tipe: 'manual', w: 1200, h: 600, catatan: 'Setelah kartu ke-4 (2:1)' },
+    { id: 'feed_2', nama: 'Sisipan feed 2', tipe: 'manual', w: 1200, h: 600, catatan: 'Setelah kartu ke-12 (2:1)' },
+    { id: 'banner_bawah', nama: 'Banner bawah', tipe: 'manual', w: 1200, h: 300, catatan: 'Di atas footer (4:1)' },
+    { id: 'google_atas', nama: 'Google Ads atas', tipe: 'adsense', catatan: 'Di bawah breaking news. Tersembunyi jika tidak aktif' },
+    { id: 'feed_google', nama: 'Google Ads feed', tipe: 'adsense', catatan: 'Setelah kartu ke-8. Tersembunyi jika tidak aktif' }
+  ];
+
+  async function muatIklan() {
+    pesan('Memuat iklan…');
+    var r = await sb.from('ads').select('*').order('created_at', { ascending: true });
+    if (r.error) return pesan('Gagal memuat iklan: ' + r.error.message, 'rd-err');
+    state.iklan = r.data || [];
+    tampilIklan();
+  }
+
+  function tampilIklan() {
+    var direktur = state.profil.role === 'direktur';
+    isi(
+      '<section class="rd-kotak"><h2>Iklan</h2>' +
+        '<p class="rd-catatan">' + (direktur
+          ? 'Foto iklan otomatis dipotong dan dikompres sesuai ukuran ruang. Ruang yang tidak aktif tidak menyisakan tempat di beranda.'
+          : 'Kamu hanya bisa melihat iklan. Pengelolaan iklan dilakukan oleh direktur.') + '</p>' +
+        SLOT_IKLAN.map(kartuSlot).join('') +
+      '</section>'
+    );
+  }
+
+  function kartuSlot(s) {
+    var b = (state.iklan || []).find(function (x) { return x.slot === s.id; }) || null;
+    var aktif = !!(b && b.is_active);
+    var direktur = state.profil.role === 'direktur';
+
+    var pratinjau = '';
+    if (s.tipe === 'manual') {
+      var kelasRasio = (s.w / s.h) === 4 ? 'ik-4-1' : 'ik-2-1';
+      pratinjau = '<div class="ik-pratinjau ' + kelasRasio + '">' +
+        (b && b.image_url
+          ? '<img class="ik-gambar" src="' + esc(b.image_url) + '" alt="' + esc(b.title || s.nama) + '">'
+          : '<div class="ik-kosong">Belum ada foto</div>') +
+      '</div>';
+    }
+
+    var form = '';
+    if (direktur) {
+      form = (s.tipe === 'manual' ? formManual(s, b) : formGoogle(b)) +
+        '<div class="ik-aksi">' +
+          '<label class="rd-cek"><input type="checkbox" data-ik="aktif"' + (aktif ? ' checked' : '') + '> Aktifkan</label>' +
+          '<button type="button" class="btn-xs utama" data-ik="simpan">Simpan</button>' +
+        '</div>';
+    }
+
+    return '<article class="rd-baris ik-kartu" data-slot="' + s.id + '">' +
+      '<div class="ik-atas">' +
+        '<div><p class="rd-baris-judul">' + esc(s.nama) + '</p>' +
+        '<p class="rd-baris-meta">' + esc(s.catatan) + '</p></div>' +
+        '<span class="rd-status ' + (aktif ? 'terbit' : 'arsip') + '">' + (aktif ? 'Aktif' : 'Nonaktif') + '</span>' +
+      '</div>' +
+      pratinjau +
+      form +
+    '</article>';
+  }
+
+  function formManual(s, b) {
+    return '<div class="ik-form">' +
+      '<label class="rd-label">Judul iklan' +
+        '<input data-ik="judul" type="text" value="' + esc((b && b.title) || '') + '"></label>' +
+      '<label class="rd-label">Tautan tujuan (mulai dengan https://)' +
+        '<input data-ik="link" type="url" placeholder="https://..." value="' + esc((b && b.link_url) || '') + '"></label>' +
+      '<label class="rd-label">Foto iklan (akan dipotong ' + s.w + ' × ' + s.h + ' px)' +
+        '<input data-ik="file" type="file" accept="image/jpeg,image/png,image/webp"></label>' +
+    '</div>';
+  }
+
+  function formGoogle(b) {
+    return '<div class="ik-form">' +
+      '<label class="rd-label">ID Publisher AdSense (ca-pub-...)' +
+        '<input data-ik="pub" type="text" placeholder="ca-pub-1234567890123456" value="' + esc((b && b.adsense_client) || '') + '"></label>' +
+      '<label class="rd-label">ID slot iklan (angka)' +
+        '<input data-ik="slotid" type="text" placeholder="1234567890" value="' + esc((b && b.adsense_slot_id) || '') + '"></label>' +
+    '</div>';
+  }
+
+  // Foto iklan: potong sesuai rasio ruang, kompres WebP (cadangan JPG)
+  async function unggahIklan(file, w, h) {
+    if (!/^image\/(jpeg|png|webp)$/.test(file.type)) {
+      throw new Error('Pilih gambar JPG, PNG, atau WebP.');
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      throw new Error('Ukuran foto maksimal 2 MB sebelum dikompres.');
+    }
+    var url = URL.createObjectURL(file);
+    try {
+      var img = await muatGambar(url);
+      var sw = img.naturalWidth, sh = img.naturalHeight;
+      var rasio = w / h;
+      var cw = sw, ch = sh, sx = 0, sy = 0;
+      if (sw / sh > rasio) { cw = sh * rasio; sx = (sw - cw) / 2; }
+      else { ch = sw / rasio; sy = (sh - ch) / 2; }
+
+      var canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext('2d').drawImage(img, sx, sy, cw, ch, 0, 0, w, h);
+
+      var blob = await keBlob(canvas, 'image/webp', 0.82);
+      var ext = 'webp';
+      if (!blob || blob.type !== 'image/webp') {
+        blob = await keBlob(canvas, 'image/jpeg', 0.82);
+        ext = 'jpg';
+      }
+      if (!blob) throw new Error('Gagal memproses gambar.');
+
+      var path = 'ads/' + state.profil.id + '/' + Date.now() + '.' + ext;
+      var up = await sb.storage.from('articles').upload(path, blob, {
+        contentType: blob.type,
+        cacheControl: '31536000',
+        upsert: false
+      });
+      if (up.error) throw new Error('Unggah gambar gagal: ' + up.error.message);
+      return sb.storage.from('articles').getPublicUrl(path).data.publicUrl;
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+  }
+
+  async function simpanSlot(kartuEl, tombol) {
+    var s = SLOT_IKLAN.find(function (x) { return x.id === kartuEl.dataset.slot; });
+    if (!s) return;
+    var b = (state.iklan || []).find(function (x) { return x.slot === s.id; }) || null;
+    var aktif = kartuEl.querySelector('[data-ik="aktif"]').checked;
+    var data = { slot: s.id, ad_type: s.tipe, is_active: aktif };
+
+    try {
+      if (s.tipe === 'manual') {
+        var judul = kartuEl.querySelector('[data-ik="judul"]').value.trim();
+        var link = kartuEl.querySelector('[data-ik="link"]').value.trim();
+        var file = kartuEl.querySelector('[data-ik="file"]').files[0];
+
+        if (link && !/^https:\/\//i.test(link)) throw new Error('Tautan tujuan harus mulai dengan https://');
+
+        data.title = judul || null;
+        data.link_url = link || null;
+        data.image_url = file
+          ? await unggahIklan(file, s.w, s.h)
+          : (b ? b.image_url : null);
+
+        if (aktif && !data.image_url) throw new Error('Pasang foto iklan dulu sebelum diaktifkan.');
+      } else {
+        var pub = kartuEl.querySelector('[data-ik="pub"]').value.trim();
+        var sid = kartuEl.querySelector('[data-ik="slotid"]').value.trim();
+
+        if (aktif && !(/^ca-pub-\d+$/.test(pub) && /^\d+$/.test(sid))) {
+          throw new Error('Isi ID Publisher (ca-pub-...) dan ID slot dengan benar sebelum diaktifkan.');
+        }
+        data.adsense_client = pub || null;
+        data.adsense_slot_id = sid || null;
+      }
+    } catch (e) {
+      return kabarkan(e.message || 'Periksa isian iklan');
+    }
+
+    tombol.disabled = true;
+    var r = b
+      ? await sb.from('ads').update(data).eq('id', b.id)
+      : await sb.from('ads').insert(data);
+    tombol.disabled = false;
+
+    if (r.error) return kabarkan('Gagal menyimpan: ' + r.error.message);
+    kabarkan(aktif ? 'Iklan disimpan dan aktif' : 'Iklan disimpan (nonaktif)');
+    muatIklan();
+  }
+
+  el.isi.addEventListener('click', function (ev) {
+    var t = ev.target.closest ? ev.target.closest('[data-ik="simpan"]') : null;
+    if (t) simpanSlot(t.closest('.ik-kartu'), t);
+  });
+
+  el.isi.addEventListener('change', function (ev) {
+    if (!ev.target.dataset || ev.target.dataset.ik !== 'file') return;
+    var kartuEl = ev.target.closest('.ik-kartu');
+    var wadah = kartuEl ? kartuEl.querySelector('.ik-pratinjau') : null;
+    var f = ev.target.files && ev.target.files[0];
+    if (!f || !wadah) return;
+    wadah.innerHTML = '<img class="ik-gambar" alt="Pratinjau">';
+    wadah.firstChild.src = URL.createObjectURL(f);
+  });
   cekSesi();
 })();

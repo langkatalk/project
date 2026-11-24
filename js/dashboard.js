@@ -836,12 +836,6 @@
   });
 
     /* ---------- Daftar penulis baru ---------- */
-  function tampilMasuk() {
-    el.masuk.hidden = false;
-    el.daftar.hidden = true;
-    el.app.hidden = true;
-    el.aksi.hidden = true;
-  }
 
   function tampilDaftar() {
     el.masuk.hidden = true;

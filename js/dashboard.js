@@ -233,7 +233,6 @@ function tampilRedaksi(p) {
 
     bukaTab(state.tab);
   }
-  }
 
   async function ambilProfil(userId) {
     var r = await sb.from('profiles')

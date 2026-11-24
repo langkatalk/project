@@ -16,11 +16,11 @@
     .lk-profil-atas{display:flex;gap:16px;align-items:center}
     .lk-foto-besar{width:84px;height:84px;border-radius:999px;overflow:hidden;flex-shrink:0;border:3px solid #fff;box-shadow:0 6px 18px rgba(124,58,237,.25);background:linear-gradient(135deg,#7c3aed,#2563eb,#06b6d4,#f59e0b);color:#fff;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800}
     .lk-foto-besar img{width:100%;height:100%;object-fit:cover;display:block}
-        .lk-avatar{ width:36px;height:36px;border-radius:999px;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;border:2px solid #fff;box-shadow:0 4px 14px rgba(124,58,237,.25);flex-shrink:0;background:linear-gradient(135deg,#7c3aed,#2563eb,#06b6d4,#f59e0b);color:#fff;font-weight:800;font-size:16px;text-decoration:none; }
+    .lk-avatar{width:36px;height:36px;border-radius:999px;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;border:2px solid #fff;box-shadow:0 4px 14px rgba(124,58,237,.25);flex-shrink:0;background:linear-gradient(135deg,#7c3aed,#2563eb,#06b6d4,#f59e0b);color:#fff;font-weight:800;font-size:16px;text-decoration:none}
     .lk-avatar img{width:100%;height:100%;object-fit:cover;display:block}
-    .lk-avatar-kosong{ background:#E9E4FF; border-color:#E9E4FF; }
-    #headerAkun{ display:inline-flex; align-items:center; gap:8px; flex-shrink:0; }
-    .lk-header{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding-right:14px; }
+    .lk-avatar-kosong{background:#E9E4FF;border-color:#E9E4FF}
+    #headerAkun{display:inline-flex;align-items:center;gap:8px;flex-shrink:0}
+    .lk-header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-right:14px}
     .lk-nama{font-family:Sora,sans-serif;font-size:22px;font-weight:800;margin:0}
     .lk-username{color:#6b7280;margin:2px 0 6px}
     .lk-chip{display:inline-block;background:#E9E4FF;color:#5b21b6;font-weight:700;font-size:12.5px;padding:4px 10px;border-radius:999px}
@@ -31,11 +31,14 @@
     .lk-label{display:block;font-size:13px;font-weight:700;margin:12px 0 4px}
     .lk-label small{font-weight:400;color:#6b7280}
     .lk-input{width:100%;height:44px;border:1.5px solid #e5e7eb;border-radius:12px;padding:0 12px;font:inherit;background:#fff;box-sizing:border-box}
+    .lk-sandi-wrap{position:relative;display:flex;align-items:center}
+    .lk-sandi-wrap .lk-input{padding-right:44px}
+    .lk-mata{position:absolute;right:6px;width:34px;height:34px;border:0;border-radius:8px;background:transparent;color:#4b5563;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+    .lk-mata:hover{background:#f3f4f6;color:#161133}
     .lk-bar{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .lk-note{font-size:13px;color:#6b7280}
     .lk-berkas{border:1.5px dashed #c7d2fe;border-radius:12px;padding:12px;margin-top:8px}
-    .lk-berkas a{font-weight:700}
-        .lk-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);background:#161133;color:#fff;padding:12px 18px;border-radius:12px;opacity:0;pointer-events:none;transition:.2s;z-index:9999;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+    .lk-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);background:#161133;color:#fff;padding:12px 18px;border-radius:12px;opacity:0;pointer-events:none;transition:.2s;z-index:9999;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.25)}
     .lk-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
   </style>
 </head>
@@ -60,9 +63,34 @@
   <script src="js/supabase.js"></script>
   <script>
   (function(){
+    var IKON_MATA_TUTUP = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+    var IKON_MATA_BUKA = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+
     function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
     function kabar(t){var e=document.getElementById('toast');if(!e)return;e.textContent=t;e.classList.add('show');setTimeout(function(){e.classList.remove('show')},2500)}
     function tglIndo(t){if(!t)return '-';try{return new Date(t).toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}catch(e){return t}}
+
+    function kotakSandi(id, label, placeholder){
+      return '<label class="lk-label" for="'+id+'">'+label+'</label>'+
+        '<div class="lk-sandi-wrap">'+
+          '<input class="lk-input" id="'+id+'" type="password" autocomplete="new-password" placeholder="'+placeholder+'">'+
+          '<button type="button" class="lk-mata" data-mata="'+id+'" aria-label="Tampilkan kata sandi" aria-pressed="false">'+IKON_MATA_TUTUP+'</button>'+
+        '</div>';
+    }
+
+    function pasangTombolMata(){
+      document.querySelectorAll('[data-mata]').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          var inp=document.getElementById(btn.getAttribute('data-mata'));
+          if(!inp)return;
+          var tampil=inp.type==='password';
+          inp.type=tampil?'text':'password';
+          btn.innerHTML=tampil?IKON_MATA_BUKA:IKON_MATA_TUTUP;
+          btn.setAttribute('aria-pressed',tampil?'true':'false');
+          btn.setAttribute('aria-label',tampil?'Sembunyikan kata sandi':'Tampilkan kata sandi');
+        });
+      });
+    }
 
     async function muat(){
       var sb=window.LK&&window.LK.sb; if(!sb)return;
@@ -70,28 +98,25 @@
       var user=sesi&&sesi.data&&sesi.data.session&&sesi.data.session.user;
       if(!user){location.href='redaksi.html';return;}
 
-    // Ambil profil (hanya kolom yang diizinkan untuk authenticated)
-     var pr={};
-     try{
-     var ph=await sb.from('profiles').select('id,username,full_name,role,is_active,avatar_url,desk,email,created_at,status_akun').eq('id',user.id).maybeSingle();
-     if(ph&&!ph.error&&ph.data){ pr=ph.data; }
-     }catch(e){}
-     if(pr&&pr.is_active===false){ await sb.auth.signOut(); location.href='redaksi.html'; return; }
-     // Header avatar kecil
-     try{
-     var box=document.getElementById('headerAkun');
-     if(box){ box.innerHTML='<a class="btn btn-utama btn-kecil" href="redaksi.html">Ruang Redaksi</a><a class="lk-avatar" href="profil.html" title="Akun saya">'+(pr.avatar_url?'<img src="'+esc(pr.avatar_url)+'" alt="">':esc(((pr.full_name||pr.username||'?').trim().charAt(0)||'?').toUpperCase()))+'</a>'; }
-     }catch(e){}
-
-      // Hitung berita
-      var terbit=0, draf=0, total=0;
+      var pr={};
       try{
-        var a=await sb.from('articles').select('id,status').eq('author_id',user.id).limit(1000);
-        var list=(a.data||[]); total=list.length;
-        list.forEach(function(x){ if(x.status==='terbit'||x.status==='published') terbit++; else draf++; });
+        var ph=await sb.from('profiles').select('id,username,full_name,role,is_active,avatar_url,desk,email,created_at,status_akun').eq('id',user.id).maybeSingle();
+        if(ph&&!ph.error&&ph.data){ pr=ph.data; }
+      }catch(e){}
+      if(pr&&pr.is_active===false){ await sb.auth.signOut(); location.href='redaksi.html'; return; }
+
+      try{
+        var box=document.getElementById('headerAkun');
+        if(box){ box.innerHTML='<a class="btn btn-utama btn-kecil" href="redaksi.html">Ruang Redaksi</a><a class="lk-avatar" href="profil.html" title="Akun saya">'+(pr.avatar_url?'<img src="'+esc(pr.avatar_url)+'" alt="">':esc(((pr.full_name||pr.username||'?').trim().charAt(0)||'?').toUpperCase()))+'</a>'; }
       }catch(e){}
 
-      var gabung = pr.created_at || pr.join_date || user.created_at;
+      var terbit=0, draf=0;
+      try{
+        var a=await sb.from('articles').select('id,status').eq('author_id',user.id).limit(1000);
+        (a.data||[]).forEach(function(x){ if(x.status==='terbit') terbit++; else draf++; });
+      }catch(e){}
+
+      var gabung = pr.created_at || user.created_at;
       var hariAktif = gabung ? Math.max(1, Math.floor((Date.now()-new Date(gabung).getTime())/86400000)+1) : 1;
 
       var inisial=((pr.full_name||pr.username||'?').trim().charAt(0)||'?').toUpperCase();
@@ -100,23 +125,49 @@
       var jabatan=roleMap[pr.role]||pr.role||'Kontributor';
 
       document.getElementById('isiProfil').innerHTML=
-      '<section class="lk-kartu"><div class="lk-profil-atas"><div class="lk-foto-besar">'+foto+'</div><div><p class="lk-nama">'+esc(pr.full_name||pr.username||'Tanpa Nama')+'</p><p class="lk-username">@'+esc(pr.username||'-')+'</p><span class="lk-chip">'+esc(jabatan)+'</span></div></div>'+
-      '<div class="lk-stat"><div><b>'+terbit+'</b><span>Berita Terbit</span></div><div><b>'+draf+'</b><span>Draf / Proses</span></div><div><b>'+hariAktif+' hari</b><span>Aktif Sejak '+tglIndo(gabung)+'</span></div></div>'+
-      '<div class="lk-bar"><a class="btn btn-utama btn-kecil" href="tulis.html">+ Tulis Berita</a><a class="btn btn-kecil" style="background:#fff;border:1.5px solid #e5e7eb;color:#161133" href="redaksi.html">Ubah Foto di Redaksi</a></div></section>'+
-      '<section class="lk-kartu"><h2 style="font-size:17px">Data Pribadi</h2><p class="lk-note">No HP & tanggal lahir hanya dilihat kamu sendiri, tidak tampil di publik.</p>'+
-      '<form id="formProfil"><label class="lk-label">Nama Lengkap</label><input class="lk-input" id="fNama" value="'+esc(pr.full_name||'')+'">'+
-      '<label class="lk-label">No HP / WhatsApp</label><input class="lk-input" id="fPhone" placeholder="08xxxxxxxxxx" value="'+esc(pr.phone||'')+'">'+
-      '<label class="lk-label">Tanggal Lahir</label><input class="lk-input" id="fBirth" type="date" value="'+esc(pr.birth_date||'')+'">'+
-      '<label class="lk-label">Alamat</label><input class="lk-input" id="fAddr" placeholder="Kecamatan, Kabupaten" value="'+esc(pr.address||'')+'">'+
-      '<label class="lk-label">Email <small>(tidak bisa diubah di sini)</small></label><input class="lk-input" value="'+esc(user.email||'')+'" disabled>'+
-      '<div class="lk-bar"><button type="submit" class="btn btn-utama btn-kecil">Simpan Perubahan</button></div></form></section>'+
-      '<section class="lk-kartu"><h2 style="font-size:17px">Berkas Karyawan</h2><p class="lk-note">Untuk KTP / SK / kontrak, kirim ke Direktur lewat WhatsApp redaksi dulu. Nanti link berkasnya ditampilkan di sini.</p><div class="lk-berkas">Belum ada berkas yang diunggah.</div></section>';
+        '<section class="lk-kartu"><div class="lk-profil-atas"><div class="lk-foto-besar">'+foto+'</div><div><p class="lk-nama">'+esc(pr.full_name||pr.username||'Tanpa Nama')+'</p><p class="lk-username">@'+esc(pr.username||'-')+'</p><span class="lk-chip">'+esc(jabatan)+'</span></div></div>'+
+        '<div class="lk-stat"><div><b>'+terbit+'</b><span>Berita Terbit</span></div><div><b>'+draf+'</b><span>Draf / Proses</span></div><div><b>'+hariAktif+' hari</b><span>Aktif Sejak '+tglIndo(gabung)+'</span></div></div>'+
+        '<div class="lk-bar"><a class="btn btn-utama btn-kecil" href="tulis.html">+ Tulis Berita</a><a class="btn btn-kecil" style="background:#fff;border:1.5px solid #e5e7eb;color:#161133" href="redaksi.html">Ubah Foto di Redaksi</a></div></section>'+
+        '<section class="lk-kartu"><h2 style="font-size:17px">Data Profil</h2>'+
+        '<form id="formProfil"><label class="lk-label">Nama Lengkap</label><input class="lk-input" id="fNama" value="'+esc(pr.full_name||'')+'">'+
+        '<label class="lk-label">Deskripsi Singkat</label><input class="lk-input" id="fDesk" placeholder="Peran atau deskripsi singkat" value="'+esc(pr.desk||'')+'">'+
+        '<label class="lk-label">Email <small>(tidak bisa diubah di sini)</small></label><input class="lk-input" value="'+esc(user.email||'')+'" disabled>'+
+        '<div class="lk-bar"><button type="submit" class="btn btn-utama btn-kecil">Simpan Profil</button></div></form></section>'+
+        '<section class="lk-kartu"><h2 style="font-size:17px">Ubah Kata Sandi</h2><p class="lk-note">Minimal 8 karakter. Klik ikon mata bila ingin melihat kata sandi yang diketik.</p>'+
+        '<form id="formSandi">'+
+          kotakSandi('sBaru', 'Kata Sandi Baru', 'Minimal 8 karakter')+
+          kotakSandi('sUlang', 'Ulangi Kata Sandi Baru', 'Ketik ulang kata sandi baru')+
+          '<div class="lk-bar"><button type="submit" class="btn btn-utama btn-kecil" id="btnSimpanSandi">Perbarui Kata Sandi</button></div>'+
+        '</form></section>'+
+        '<section class="lk-kartu"><h2 style="font-size:17px">Berkas Karyawan</h2><p class="lk-note">Untuk KTP / SK / kontrak, kirim ke Direktur lewat WhatsApp redaksi dulu. Nanti link berkasnya ditampilkan di sini.</p><div class="lk-berkas">Belum ada berkas yang diunggah.</div></section>';
+
+      pasangTombolMata();
 
       document.getElementById('formProfil').addEventListener('submit', async function(ev){
         ev.preventDefault();
-        var upd={full_name:document.getElementById('fNama').value.trim(), phone:document.getElementById('fPhone').value.trim()||null, birth_date:document.getElementById('fBirth').value||null, address:document.getElementById('fAddr').value.trim()||null};
-        var r=await sb.from('profiles').update(upd).eq('id',user.id);
-        if(r.error){ kabar('Gagal simpan: '+r.error.message); } else { kabar('Profil tersimpan!'); }
+        var nama=document.getElementById('fNama').value.trim();
+        var desk=document.getElementById('fDesk').value.trim()||null;
+        if(nama.length<2){ kabar('Nama minimal 2 huruf'); return; }
+        var r=await sb.from('profiles').update({full_name:nama,desk:desk}).eq('id',user.id);
+        if(r.error){ kabar('Gagal simpan: '+r.error.message); } else { kabar('Profil tersimpan'); }
+      });
+
+      document.getElementById('formSandi').addEventListener('submit', async function(ev){
+        ev.preventDefault();
+        var baru=document.getElementById('sBaru').value;
+        var ulang=document.getElementById('sUlang').value;
+        if(baru.length<8){ kabar('Kata sandi minimal 8 karakter'); return; }
+        if(baru!==ulang){ kabar('Ulangan kata sandi tidak sama'); return; }
+        var btn=document.getElementById('btnSimpanSandi');
+        btn.disabled=true;
+        var r=await sb.auth.updateUser({password:baru});
+        btn.disabled=false;
+        if(r.error){ kabar('Gagal ubah sandi: '+r.error.message); return; }
+        document.getElementById('sBaru').value='';
+        document.getElementById('sUlang').value='';
+        document.getElementById('sBaru').type='password';
+        document.getElementById('sUlang').type='password';
+        kabar('Kata sandi berhasil diperbarui');
       });
     }
     if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',muat)}else{muat()}

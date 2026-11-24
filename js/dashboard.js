@@ -1234,5 +1234,54 @@
     var t = ev.target.closest ? ev.target.closest('[data-bk="pilih"]') : null;
     if (t) ubahBreaking(t.dataset.id, t.value, t);
   });
+  /* ---------- Menu tab: geser dengan mouse dan roda ---------- */
+  (function pasangGeserMenu() {
+    var tabs = el.tabs;
+    if (!tabs) return;
+
+    var sedangTarik = false;
+    var titikAwal = 0;
+    var geserAwal = 0;
+    var pernahGeser = false;
+
+    tabs.addEventListener('mousedown', function (e) {
+      if (e.button !== 0) return;
+      sedangTarik = true;
+      pernahGeser = false;
+      titikAwal = e.pageX;
+      geserAwal = tabs.scrollLeft;
+      tabs.classList.add('geser-aktif');
+    });
+
+    window.addEventListener('mousemove', function (e) {
+      if (!sedangTarik) return;
+      var selisih = e.pageX - titikAwal;
+      if (Math.abs(selisih) > 4) pernahGeser = true;
+      tabs.scrollLeft = geserAwal - selisih;
+    });
+
+    window.addEventListener('mouseup', function () {
+      if (!sedangTarik) return;
+      sedangTarik = false;
+      tabs.classList.remove('geser-aktif');
+    });
+
+    // Setelah menarik, klik tombol tidak dianggap klik
+    tabs.addEventListener('click', function (e) {
+      if (pernahGeser) {
+        pernahGeser = false;
+        e.stopPropagation();
+        e.preventDefault();
+      }
+    }, true);
+
+    // Roda mouse vertikal digeser ke samping
+    tabs.addEventListener('wheel', function (e) {
+      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+        tabs.scrollLeft += e.deltaY;
+        e.preventDefault();
+      }
+    }, { passive: false });
+  })();
   cekSesi();
 })();

@@ -566,3 +566,18 @@
   gap: 10px;
   flex-wrap: wrap;
 }
+/* Halaman legal */
+.hl-kartu { display: grid; gap: 10px; }
+.hl-atas {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.hl-textarea {
+  min-height: 320px;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 14px;
+  line-height: 1.6;
+}

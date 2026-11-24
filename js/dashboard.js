@@ -2,7 +2,7 @@
 // Ruang Redaksi: masuk, menu sesuai peran, Naskah (dengan submenu status), Komentar, dan Log.
 // Perubahan status naskah lewat fungsi resmi di database.
 (function () {
-  'use strict';
+  'use strict'; 
 
   var sb = window.LK && window.LK.sb;
   var REGEX_EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;

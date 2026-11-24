@@ -567,10 +567,107 @@
     pengamat.observe(el.sentinel);
   }
 
+  /* ---------- Breaking news: slideshow di atas feed ---------- */
+  var elBreaking = document.getElementById('breaking');
+  var bkIndeks = 0;
+  var bkTimer = null;
+  var bkJumlah = 0;
+
+  function bkSlide(a) {
+    var tujuan = 'baca.html?s=' + encodeURIComponent(a.slug || a.id);
+    return '<a class="lk-bk-slide" href="' + tujuan + '">' +
+      (a.cover_url
+        ? '<img src="' + esc(a.cover_url) + '" alt="' + esc(a.title) + '" width="1200" height="600" decoding="async">'
+        : '') +
+      '<div class="lk-bk-isi">' +
+        '<span class="lk-bk-kat">' + esc(a.category || 'Berita') + '</span>' +
+        '<h2>' + esc(a.title) + '</h2>' +
+        (a.description ? '<p>' + esc(a.description) + '</p>' : '') +
+      '</div>' +
+    '</a>';
+  }
+
+  async function muatBreaking() {
+    if (!elBreaking || !sb) return;
+    var r = await sb.from('articles')
+      .select('id,title,slug,description,cover_url,category,breaking_urutan,published_at')
+      .eq('status', 'terbit')
+      .is('deleted_at', null)
+      .not('breaking_urutan', 'is', null)
+      .or('scheduled_at.is.null,scheduled_at.lte.' + new Date().toISOString())
+      .order('breaking_urutan', { ascending: true })
+      .limit(3);
+
+    var data = (!r.error && r.data) ? r.data : [];
+    if (!data.length) {
+      elBreaking.hidden = true;
+      elBreaking.innerHTML = '';
+      return;
+    }
+
+    bkJumlah = data.length;
+    elBreaking.hidden = false;
+    elBreaking.innerHTML =
+      '<span class="lk-bk-label">BREAKING NEWS</span>' +
+      '<div class="lk-bk-track" id="bkTrack">' + data.map(bkSlide).join('') + '</div>' +
+      (data.length > 1
+        ? '<div class="lk-bk-nav">' + data.map(function (_, i) {
+            return '<button type="button" class="lk-bk-dot' + (i === 0 ? ' on' : '') +
+              '" data-bk-dot="' + i + '" aria-label="Berita ' + (i + 1) + '"></button>';
+          }).join('') + '</div>'
+        : '');
+
+    pasangSlider();
+  }
+
+  function pasangSlider() {
+    var track = document.getElementById('bkTrack');
+    if (!track) return;
+    var dots = elBreaking.querySelectorAll('[data-bk-dot]');
+
+    function aktifkan(i) {
+      bkIndeks = i;
+      dots.forEach(function (d, k) { d.classList.toggle('on', k === i); });
+    }
+
+    function kePosisi(i) {
+      track.scrollTo({ left: i * track.clientWidth, behavior: 'smooth' });
+      aktifkan(i);
+    }
+
+    track.addEventListener('scroll', function () {
+      var i = Math.round(track.scrollLeft / Math.max(1, track.clientWidth));
+      i = Math.min(Math.max(i, 0), bkJumlah - 1);
+      if (i !== bkIndeks) aktifkan(i);
+    }, { passive: true });
+
+    elBreaking.addEventListener('click', function (ev) {
+      var d = ev.target.closest('[data-bk-dot]');
+      if (d) kePosisi(Number(d.dataset.bkDot));
+    });
+
+    function hentikan() { clearInterval(bkTimer); }
+
+    function jalankan() {
+      hentikan();
+      if (bkJumlah < 2) return;
+      bkTimer = setInterval(function () {
+        kePosisi((bkIndeks + 1) % bkJumlah);
+      }, 6000);
+    }
+
+    elBreaking.addEventListener('pointerenter', hentikan);
+    elBreaking.addEventListener('pointerleave', jalankan);
+    elBreaking.addEventListener('touchstart', hentikan, { passive: true });
+    elBreaking.addEventListener('touchend', function () { setTimeout(jalankan, 4000); }, { passive: true });
+
+    jalankan();
+  }
   async function mulai() {
     buatSheet();
     await muatKategori();
     pasangPengamat();
+        muatBreaking();
     muatBerikutnya();
   }
 

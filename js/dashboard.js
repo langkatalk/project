@@ -593,13 +593,57 @@
     '</article>';
   }
 
+    function peranBolehDiundang() {
+    if (state.profil.role === 'direktur') return ['direktur','pemred','redaktur','editor','reporter','kontributor'];
+    if (state.profil.role === 'pemred') return ['redaktur','editor','reporter','kontributor'];
+    return [];
+  }
+
+  function bukaFormUndang() {
+    var box = document.getElementById('formUndang');
+    if (!box) return;
+    box.hidden = false;
+    var opsi = peranBolehDiundang().map(function(k){ return '<option value="'+k+'">'+esc(NAMA_PERAN[k])+'</option>'; }).join('');
+    box.innerHTML =
+      '<label class="rd-label">Nama lengkap<input id="uNama" placeholder="Nama orangnya"></label>' +
+      '<label class="rd-label">Email yang diundang<input id="uEmail" type="email" placeholder="nama@email.com"></label>' +
+      '<label class="rd-label">Jabatan yang diberikan<select id="uRole">'+opsi+'</select></label>' +
+      '<p class="rd-catatan">Orang itu daftar sendiri lewat link undangan. Jabatannya langsung sesuai yang kamu pilih.</p>' +
+      '<div style="display:flex;gap:8px"><button type="button" class="btn btn-utama btn-kecil" id="btnBuatUndang">Buat Link Undangan</button>' +
+      '<button type="button" class="btn btn-kecil" id="btnTutupUndang">Batal</button></div>' +
+      '<div id="hasilUndang" style="margin-top:10px"></div>';
+    document.getElementById('btnTutupUndang').onclick = function(){ box.hidden = true; box.innerHTML = ''; };
+    document.getElementById('btnBuatUndang').onclick = buatUndangan;
+  }
+
+  async function buatUndangan() {
+    var nama = document.getElementById('uNama').value.trim();
+    var email = document.getElementById('uEmail').value.trim().toLowerCase();
+    var role = document.getElementById('uRole').value;
+    if (nama.length < 3) return kabarkan('Nama minimal 3 karakter');
+    if (!REGEX_EMAIL.test(email)) return kabarkan('Email belum benar');
+    if (peranBolehDiundang().indexOf(role) === -1) return kabarkan('Jabatan ini tidak boleh kamu undang');
+    var kode = Math.random().toString(36).slice(2,10).toUpperCase() + Date.now().toString(36).toUpperCase();
+    var r = await sb.from('undangan').insert({ email: email, role: role, kode: kode, dibuat_oleh: state.profil.id });
+    if (r.error) return kabarkan('Gagal buat undangan: ' + r.error.message);
+    var link = location.origin + '/redaksi.html#daftar?undang=' + kode;
+    var hasil = document.getElementById('hasilUndang');
+    hasil.innerHTML = '<p class="rd-catatan">Undangan untuk <b>'+esc(nama)+'</b> dibuat. Kirim link ini lewat WA / Email:</p>' +
+      '<input readonly value="'+esc(link)+'" onclick="this.select()" style="width:100%">' +
+      '<button type="button" class="btn btn-utama btn-kecil" style="margin-top:8px" onclick="navigator.clipboard.writeText(\''+link+'\').then(()=>kabarkan(\'Link tersalin\'))">Salin Link</button>';
+    kabarkan('Undangan dibuat');
+  }
+
   function tampilPengguna() {
     isi(
-      '<section class="rd-kotak"><h2>Pengguna &amp; Jabatan</h2>' +
-        '<p class="rd-catatan">Akun baru dibuat lewat formulir "Daftar Penulis" di layar masuk (jabatan awal: Kontributor). Di sini kamu menaikkan jabatan, menonaktifkan akun, atau memasang foto penulis yang tampil di beranda.</p>' +
+      '<section class="rd-kotak"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2>Pengguna &amp; Jabatan</h2>' +
+        '<button type="button" class="btn btn-utama btn-kecil" id="btnUndang">+ Undang Orang</button></div>' +
+        '<div id="formUndang" hidden style="margin:12px 0;padding:14px;border:1.5px dashed #c7d2fe;border-radius:12px"></div>' +
+        '<p class="rd-catatan">Akun baru dibuat lewat link undangan. Di sini kamu menaikkan jabatan, menonaktifkan akun, atau memasang foto penulis yang tampil di beranda.</p>' +
         (state.pengguna.length ? state.pengguna.map(barisPengguna).join('') : '<p class="rd-kotak-kosong">Belum ada pengguna.</p>') +
       '</section>'
     );
+  }
   }
 
   async function simpanPengguna(baris) {
@@ -699,8 +743,8 @@
     if (t) bukaTab(t.dataset.tab);
   });
 
-  el.isi.addEventListener('click', function (ev) {
-     // FIX GANTI FOTO: langsung upload begitu pilih foto, jangan nunggu Simpan.
+    el.isi.addEventListener('click', function (ev) {
+    if (ev.target.closest('#btnUndang')) { bukaFormUndang(); return; }
   // Ini yang bikin tadi gak ada notif & gak ada yang berubah.
   el.isi.addEventListener('change', async function (ev) {
     if (!ev.target.classList.contains('pg-foto')) return;

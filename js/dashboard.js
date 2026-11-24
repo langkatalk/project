@@ -228,8 +228,7 @@
         '<div><b>' + esc(p.full_name || p.username) + '</b>' +
         '<small>@' + esc(p.username) + '</small></div>' +
       '</div>' +
-      '<span class="rd-lencana-peran">' + esc(peran) + '</span>' +
-      '<label class="rd-tautan" style="cursor:pointer">Ubah foto saya<input type="file" id="fotoSaya" accept="image/jpeg,image/png,image/webp" hidden></label>';
+      '<span class="rd-lencana-peran">' + esc(peran) + '</span>';
 
     bukaTab(state.tab);
   }
@@ -1139,22 +1138,22 @@
   });
 
   // Tombol "Ubah foto saya" ada di header profil (#profil), dibuat ulang tiap masuk.
-  el.profil.addEventListener('change', async function (ev) {
-    if (ev.target.id !== 'fotoSaya') return;
-    var file = ev.target.files && ev.target.files[0];
-    if (!file) return;
-    try {
-      kabarkan('Mengunggah foto…');
-      var url = await unggahFoto(file, state.profil.id);
-      var r = await sb.rpc('perbarui_profil_sendiri', { p_full_name: null, p_username: null, p_avatar_url: url });
-      if (r.error) throw new Error(r.error.message);
-      state.profil.avatar_url = url;
-      kabarkan('Foto profil diperbarui');
-      tampilRedaksi(state.profil);
-    } catch (e) {
-      kabarkan('Gagal: ' + (e.message || e));
-    }
-  });
+el.profil.addEventListener('change', async function (ev) {
+  if (ev.target.id !== 'fotoSaya') return;
+  var file = ev.target.files && ev.target.files[0];
+  if (!file) return;
+  try {
+    kabarkan('Mengunggah foto…');
+    var url = await unggahFoto(file, state.profil.id);
+    var r = await sb.rpc('perbarui_profil_sendiri', { p_full_name: null, p_username: null, p_avatar_url: url });
+    if (r.error) throw new Error(r.error.message);
+    state.profil.avatar_url = url;
+    kabarkan('Foto profil diperbarui');
+    tampilRedaksi(state.profil);
+  } catch (e) {
+    kabarkan('Gagal: ' + (e.message || e));
+  }
+});
 
     /* ---------- Breaking News ---------- */
 

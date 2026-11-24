@@ -569,3 +569,51 @@
   .ig-kartu, .ig-gambar, .ig-ikon, .chip-kat { transition: none; }
   .ig-kartu:hover { transform: none; }
 }
+/* ===== Iklan beranda ===== */
+.ad-slot {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  background: var(--lk-kaca);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  border: 1px solid var(--lk-kaca-garis);
+  box-shadow: var(--lk-bayangan);
+  animation: munculNaik 300ms ease both;
+}
+.lk-feed > .ad-slot { grid-column: 1 / -1; }
+.ad-luar {
+  width: min(1240px, calc(100% - 24px));
+  margin: 14px auto;
+}
+.ad-4-1 { aspect-ratio: 4 / 1; }
+.ad-2-1 { aspect-ratio: 2 / 1; }
+.ad-manual,
+.ad-manual img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.ad-manual img {
+  object-fit: cover;
+  transition: transform 600ms ease;
+}
+.ad-slot:hover .ad-manual img { transform: scale(1.02); }
+.ad-google .adsbygoogle { display: block; }
+.ad-badge {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  z-index: 2;
+  background: rgba(13, 10, 44, 0.72);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ad-slot { animation: none; }
+  .ad-manual img { transition: none; }
+}

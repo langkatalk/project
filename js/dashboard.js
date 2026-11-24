@@ -196,8 +196,8 @@
     if (state.tab === 'komentar') return muatKomentar();
     if (state.tab === 'log') return muatLog();
     if (state.tab === 'pengguna') return muatPengguna();
-      if (state.tab === 'breaking') return muatBreaking();
-      if (state.tab === 'iklan') return muatIklan();
+    if (state.tab === 'breaking') return muatBreaking();
+    if (state.tab === 'iklan') return muatIklan();
     pesan('Menu "' + namaMenu(state.tab) + '" dibuat di tahap berikutnya.');
   }
 

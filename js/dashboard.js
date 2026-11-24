@@ -15,7 +15,7 @@
     ditinjau: 'Ditinjau', revisi: 'Revisi', terbit: 'Terbit', arsip: 'Arsip'
   };
   var STAF = ['direktur', 'pemred', 'redaktur', 'editor'];
-  var SUDAH_DIBUAT = ['naskah', 'komentar', 'log', 'pengguna'];
+  var SUDAH_DIBUAT = ['naskah', 'komentar', 'log', 'pengguna', 'breaking'];
   var FOTO_SISI = 480;
   var FOTO_MAX_MB = 2;
   var FILTER_NASKAH = [
@@ -196,6 +196,7 @@
     if (state.tab === 'komentar') return muatKomentar();
     if (state.tab === 'log') return muatLog();
     if (state.tab === 'pengguna') return muatPengguna();
+        if (state.tab === 'breaking') return muatBreaking();
     pesan('Menu "' + namaMenu(state.tab) + '" dibuat di tahap berikutnya.');
   }
 
@@ -1154,5 +1155,84 @@
     }
   });
 
+    /* ---------- Breaking News ---------- */
+
+  async function muatBreaking() {
+    pesan('Memuat breaking news…');
+    var r = await sb.from('articles')
+      .select('id,title,category,status,breaking_urutan,is_breaking,published_at,cover_url,deleted_at')
+      .eq('status', 'terbit')
+      .is('deleted_at', null)
+      .order('published_at', { ascending: false })
+      .limit(100);
+    if (r.error) return pesan('Gagal memuat naskah terbit: ' + r.error.message, 'rd-err');
+    state.breaking = r.data || [];
+    tampilBreaking();
+  }
+
+  function tampilBreaking() {
+    var aktif = (state.breaking || []).filter(function (a) { return a.breaking_urutan; });
+
+    var slot = [1, 2, 3].map(function (n) {
+      var a = aktif.find(function (x) { return x.breaking_urutan === n; });
+      return '<div class="rd-bk-slot">' +
+        '<span class="rd-bk-nomor">' + n + '</span>' +
+        (a ? '<span class="rd-bk-judul">' + esc(a.title) + '</span>'
+           : '<span class="rd-bk-kosong">Belum dipilih</span>') +
+      '</div>';
+    }).join('');
+
+    var daftar = (state.breaking || []).map(barisBreaking).join('');
+
+    isi(
+      '<section class="rd-kotak">' +
+        '<h2>Breaking News</h2>' +
+        '<p class="rd-catatan">Pilih hingga tiga berita. Urutan 1 tampil paling besar di beranda, urutan 2 dan 3 tampil sebagai geser. Berita breaking tetap tampil di feed.</p>' +
+        '<div class="rd-bk-slots">' + slot + '</div>' +
+      '</section>' +
+      '<section class="rd-kotak">' +
+        '<h2>Naskah terbit</h2>' +
+        (daftar || '<p class="rd-kotak-kosong">Belum ada naskah terbit.</p>') +
+      '</section>'
+    );
+  }
+
+  function barisBreaking(a) {
+    var awal = a.breaking_urutan || '';
+    var pilihan = '<option value="">Lepas</option>' + [1, 2, 3].map(function (n) {
+      return '<option value="' + n + '"' + (a.breaking_urutan === n ? ' selected' : '') + '>Urutan ' + n + '</option>';
+    }).join('');
+
+    return '<article class="rd-baris">' +
+      '<p class="rd-baris-judul">' + esc(a.title || '(Tanpa judul)') + '</p>' +
+      '<p class="rd-baris-meta">' + esc(a.category || 'Umum') + ' • ' + tgl(a.published_at) + '</p>' +
+      '<div class="rd-baris-aksi">' +
+        '<select class="rd-pilih" data-bk="pilih" data-id="' + esc(a.id) + '" data-awal="' + awal +
+          '" aria-label="Urutan breaking news">' + pilihan + '</select>' +
+      '</div>' +
+    '</article>';
+  }
+
+  async function ubahBreaking(id, nilai, pilihEl) {
+    var urutan = nilai ? Number(nilai) : null;
+    var awal = pilihEl.dataset.awal || '';
+
+    pilihEl.disabled = true;
+    var r = await sb.rpc('set_breaking', { p_id: Number(id), p_urutan: urutan });
+    pilihEl.disabled = false;
+
+    if (r.error) {
+      kabarkan('Gagal: ' + r.error.message);
+      pilihEl.value = awal;
+      return;
+    }
+    kabarkan(urutan ? 'Breaking news urutan ' + urutan + ' diperbarui' : 'Berita dilepas dari breaking news');
+    muatBreaking();
+  }
+
+  el.isi.addEventListener('change', function (ev) {
+    var t = ev.target.closest ? ev.target.closest('[data-bk="pilih"]') : null;
+    if (t) ubahBreaking(t.dataset.id, t.value, t);
+  });
   cekSesi();
 })();

@@ -70,13 +70,18 @@
       var user=sesi&&sesi.data&&sesi.data.session&&sesi.data.session.user;
       if(!user){location.href='redaksi.html';return;}
 
-      // Header avatar kecil
-      try{
-        var ph=await sb.from('profiles').select('*').eq('id',user.id).maybeSingle();
-        var pr=ph.data||{};
-        var box=document.getElementById('headerAkun');
-        if(box){ box.innerHTML='<a class="btn btn-utama btn-kecil" href="redaksi.html">Ruang Redaksi</a><a class="lk-avatar" href="profil.html" title="Akun saya">'+(pr.avatar_url?'<img src="'+esc(pr.avatar_url)+'" alt="">':esc(((pr.full_name||pr.username||'?').trim().charAt(0)||'?').toUpperCase()))+'</a>'; }
-      }catch(e){}
+    // Ambil profil (hanya kolom yang diizinkan untuk authenticated)
+     var pr={};
+     try{
+     var ph=await sb.from('profiles').select('id,username,full_name,role,is_active,avatar_url,desk,email,created_at,status_akun').eq('id',user.id).maybeSingle();
+     if(ph&&!ph.error&&ph.data){ pr=ph.data; }
+     }catch(e){}
+     if(pr&&pr.is_active===false){ await sb.auth.signOut(); location.href='redaksi.html'; return; }
+     // Header avatar kecil
+     try{
+     var box=document.getElementById('headerAkun');
+     if(box){ box.innerHTML='<a class="btn btn-utama btn-kecil" href="redaksi.html">Ruang Redaksi</a><a class="lk-avatar" href="profil.html" title="Akun saya">'+(pr.avatar_url?'<img src="'+esc(pr.avatar_url)+'" alt="">':esc(((pr.full_name||pr.username||'?').trim().charAt(0)||'?').toUpperCase()))+'</a>'; }
+     }catch(e){}
 
       // Hitung berita
       var terbit=0, draf=0, total=0;

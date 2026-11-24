@@ -521,3 +521,51 @@
   .lk-bk-track { scroll-behavior: auto; }
   .lk-bk-slide img { transition: none; }
 }
+/* ===== Feed kaca (glassmorphism) dan animasi halus ===== */
+.ig-kartu {
+  background: var(--lk-kaca);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  border: 1px solid var(--lk-kaca-garis);
+  box-shadow: var(--lk-bayangan);
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 320ms ease;
+  will-change: transform;
+}
+.ig-kartu:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 22px 44px rgba(95, 63, 200, 0.18);
+}
+.ig-kepala,
+.ig-aksi,
+.ig-isi { background: transparent; }
+
+.ig-media { border-radius: 0; }
+.ig-kartu:hover .ig-gambar { transform: scale(1.025); }
+.ig-gambar {
+  transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ig-ikon {
+  transition: transform 180ms cubic-bezier(0.34, 1.56, 0.64, 1),
+              color 220ms ease,
+              background 220ms ease;
+}
+.ig-ikon:hover { background: rgba(124, 63, 224, 0.08); border-radius: 12px; }
+
+.chip-kat { transition: transform 200ms ease, background 240ms ease, box-shadow 240ms ease; }
+.chip-kat:hover { transform: translateY(-1px); }
+
+.lk-header,
+.lk-chips {
+  transition: background 300ms ease, box-shadow 300ms ease;
+}
+
+@media (hover: none) {
+  .ig-kartu:hover { transform: none; box-shadow: var(--lk-bayangan); }
+  .ig-kartu:hover .ig-gambar { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ig-kartu, .ig-gambar, .ig-ikon, .chip-kat { transition: none; }
+  .ig-kartu:hover { transform: none; }
+}

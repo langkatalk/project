@@ -26,7 +26,7 @@
   </header>
 
   <!-- Masuk -->
- <main class="rd-masuk" id="layarMasuk" hidden>
+  <main class="rd-masuk" id="layarMasuk">
     <section class="rd-kartu">
       <h1 class="rd-judul">Masuk Redaksi</h1>
       <p class="rd-catatan">Masuk dengan akun tim Langkatalk.</p>
@@ -41,42 +41,6 @@
         <button type="submit" class="btn btn-utama rd-tombol-lebar" id="mKirim">Masuk</button>
       </form>
       <button type="button" class="rd-tautan" id="btnLupaSandi">Lupa kata sandi?</button>
-      <button type="button" class="rd-tautan" id="btnKeDaftar">Belum punya akun? Daftar jadi penulis</button>
-    </section>
-  </main>
-
-  <!-- Daftar penulis baru (mandiri, jabatan awal: Kontributor) -->
-  <main class="rd-masuk" id="layarDaftar" hidden>
-    <section class="rd-kartu">
-      <h1 class="rd-judul">Daftar Penulis</h1>
-      <p class="rd-catatan">Buat akun untuk mulai menulis di Langkatalk. Jabatan awal: Kontributor. Direktur bisa menaikkan jabatanmu nanti lewat menu Pengguna &amp; Jabatan.</p>
-      <form id="formDaftar" novalidate>
-        <label class="rd-label">Nama lengkap
-          <input id="dNama" type="text" placeholder="Nama kamu" autocomplete="name" required>
-        </label>
-        <label class="rd-label">Nama pengguna
-          <input id="dUsername" type="text" placeholder="huruf kecil, contoh: budi123" autocomplete="username" required>
-        </label>
-        <label class="rd-label">Email
-          <input id="dEmail" type="email" placeholder="nama@email.com" autocomplete="email" required>
-        </label>
-        <label class="rd-label">Kata sandi
-          <input id="dSandi" type="password" placeholder="Minimal 8 karakter" autocomplete="new-password" required>
-        </label>
-        <label class="rd-label">Ulangi kata sandi
-          <input id="dSandi2" type="password" autocomplete="new-password" required>
-        </label>
-        <label class="rd-label">Foto profil (opsional, tampil di beranda)
-          <input id="dFoto" type="file" accept="image/jpeg,image/png,image/webp">
-        </label>
-        <div id="dFotoPreview" hidden style="margin:-4px 0 14px">
-          <img id="dFotoImg" alt="Pratinjau foto" style="width:72px;height:72px;border-radius:999px;object-fit:cover;display:block">
-        </div>
-        <p class="rd-err" id="dErr"></p>
-        <p class="rd-err" id="dOk" style="color:#166534"></p>
-        <button type="submit" class="btn btn-utama rd-tombol-lebar" id="dKirim">Daftar</button>
-      </form>
-      <button type="button" class="rd-tautan" id="btnKeMasuk">Sudah punya akun? Masuk</button>
     </section>
   </main>
 
@@ -110,9 +74,8 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="config.js"></script>
-    <script src="js/supabase.js"></script>
-  <script src="js/sesi.js"></script>
-  <script src="js/sandi.js"></script>
+  <script src="js/supabase.js"></script>
   <script src="js/dashboard.js"></script>
+  <script src="js/sandi.js"></script>
 </body>
 </html>

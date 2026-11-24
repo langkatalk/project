@@ -211,16 +211,17 @@
     el.aksi.hidden = true;
   }
 
-  function tampilRedaksi(p) {
+function tampilRedaksi(p) {
     state.profil = p;
     el.masuk.hidden = true;
     el.app.hidden = false;
     el.aksi.hidden = false;
 
     var peran = NAMA_PERAN[p.role] || p.role || 'Belum ada peran';
-    var foto = p.avatar_url
-      ? '<img class="rd-av-foto rd-av-sedang" src="' + esc(p.avatar_url) + '" alt="">'
+    var isiFoto = p.avatar_url
+      ? '<img class="rd-av-foto rd-av-sedang" src="' + esc(p.avatar_url) + '" alt="Profil ' + esc(p.full_name || p.username || 'pengguna') + '">'
       : '<span class="rd-av rd-av-sedang">' + esc((p.full_name || p.username || '?').trim().charAt(0).toUpperCase()) + '</span>';
+    var foto = '<a href="profil.html" title="Buka profil saya" style="display:inline-flex;align-items:center;text-decoration:none;flex-shrink:0">' + isiFoto + '</a>';
 
     el.profil.innerHTML =
       '<div style="display:flex;align-items:center;gap:10px">' +
@@ -231,6 +232,7 @@
       '<span class="rd-lencana-peran">' + esc(peran) + '</span>';
 
     bukaTab(state.tab);
+  }
   }
 
   async function ambilProfil(userId) {

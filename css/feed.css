@@ -617,3 +617,42 @@
   .ad-slot { animation: none; }
   .ad-manual img { transition: none; }
 }
+/* Animasi pop untuk tombol suka dan pantul untuk tombol simpan */
+@keyframes lkPopSuka {
+  0% { transform: scale(1); }
+  45% { transform: scale(1.28); }
+  75% { transform: scale(0.92); }
+  100% { transform: scale(1); }
+}
+
+@keyframes lkPantulSimpan {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.22) translateY(-2px); }
+  75% { transform: scale(0.94); }
+  100% { transform: scale(1) translateY(0); }
+}
+
+.ig-ikon {
+  transition: transform 0.16s ease, color 0.16s ease, opacity 0.16s ease;
+}
+
+.ig-ikon:active {
+  transform: scale(0.88);
+}
+
+.ig-ikon.suka.aktif svg {
+  animation: lkPopSuka 0.36s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ig-simpan.aktif svg {
+  animation: lkPantulSimpan 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ig-ikon,
+  .ig-ikon.suka.aktif svg,
+  .ig-simpan.aktif svg {
+    transition: none;
+    animation: none;
+  }
+}

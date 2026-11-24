@@ -73,7 +73,7 @@
         var ph=await sb.from('profiles').select('*').eq('id',user.id).maybeSingle();
         var pr=ph.data||{};
         var box=document.getElementById('headerAkun');
-        if(box){ box.innerHTML='<a class="lk-avatar" href="profil.html" title="Akun saya">'+(pr.avatar_url?'<img src="'+esc(pr.avatar_url)+'" alt="">':esc(((pr.full_name||pr.username||'?').trim().charAt(0)||'?').toUpperCase()))+'</a>'; }
+        if(box){ box.innerHTML='<a class="btn btn-utama btn-kecil" href="redaksi.html">Ruang Redaksi</a><a class="lk-avatar" href="profil.html" title="Akun saya">'+(pr.avatar_url?'<img src="'+esc(pr.avatar_url)+'" alt="">':esc(((pr.full_name||pr.username||'?').trim().charAt(0)||'?').toUpperCase()))+'</a>'; }
       }catch(e){}
 
       // Hitung berita

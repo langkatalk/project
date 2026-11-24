@@ -160,7 +160,7 @@
     if (STAF.indexOf(r) !== -1) m.push({ id: 'komentar', nama: 'Komentar' });
     if (r === 'direktur' || r === 'pemred') m.push({ id: 'iklan', nama: 'Iklan' });
     if (r === 'direktur') {
-      m.push({ id: 'pengguna', nama: 'Pengguna & Jabatan' });
+      m.push({ id: 'pengguna', nama: 'Manajemen Akses' });
       m.push({ id: 'pengaturan', nama: 'Pengaturan Situs' });
       m.push({ id: 'builder', nama: 'Builder Level 1' });
       m.push({ id: 'log', nama: 'Log Aktivitas' });
@@ -549,56 +549,421 @@
     );
   }
 
-  /* ---------- Pengguna & Jabatan ---------- */
+  /* ---------- Manajemen Akses ---------- */
+
+  var JABATAN_LIST = ['direktur', 'pemred', 'redaktur', 'editor', 'reporter', 'kontributor'];
+  var MEJA_LIST = ['Investigasi', 'Ruang Gelap', 'Politik', 'Panggung', 'Ekonomi Gelap', 'Opini'];
+  var STATUS_LABEL = { aktif: 'Aktif', nonaktif: 'Nonaktif', menunggu: 'Menunggu Konfirmasi', ditangguhkan: 'Ditangguhkan' };
+  var BADGE_JABATAN = {
+    direktur: 'ba-direktur', pemred: 'ba-pemred', redaktur: 'ba-redaktur',
+    editor: 'ba-editor', reporter: 'ba-reporter', kontributor: 'ba-kontributor'
+  };
+  var filterAkses = { cari: '', peran: '', status: '' };
+
+  function statusDari(u) {
+    return u.status_akun || (u.is_active === false ? 'nonaktif' : 'aktif');
+  }
+
+  function cariUser(id) {
+    return state.pengguna.find(function (x) { return String(x.id) === String(id); }) || null;
+  }
+
+  function nilaiIsian(id) {
+    var e = document.getElementById(id);
+    return e ? String(e.value || '').trim() : '';
+  }
+
+  function mdGagal(teks) {
+    var e = document.getElementById('mdErr');
+    if (e) e.textContent = teks;
+  }
+
+  function tokenSaya() {
+    return sb.auth.getSession().then(function (s) {
+      return s.data && s.data.session ? s.data.session.access_token : null;
+    });
+  }
+
+  function opsiJabatan(mode) {
+    var daftar = mode === 'pemred' ? ['kontributor', 'reporter'] : JABATAN_LIST;
+    return daftar.map(function (k) {
+      return '<option value="' + k + '">' + esc(NAMA_PERAN[k]) + '</option>';
+    }).join('');
+  }
+
+  function opsiMeja() {
+    return '<option value="">(tidak ada)</option>' + MEJA_LIST.map(function (m) {
+      return '<option value="' + esc(m) + '">' + esc(m) + '</option>';
+    }).join('');
+  }
+
+  /* ---------- Modal umum ---------- */
+
+  function tutupModal() {
+    var m = document.getElementById('rdModal');
+    if (m) m.remove();
+  }
+
+  function bukaModal(judul, isiHtml, onSimpan, onBatal) {
+    tutupModal();
+    var bg = document.createElement('div');
+    bg.className = 'rd-modal-bg';
+    bg.id = 'rdModal';
+    bg.innerHTML =
+      '<div class="rd-modal" role="dialog" aria-modal="true">' +
+        '<h2>' + esc(judul) + '</h2>' +
+        isiHtml +
+        '<p class="rd-err" id="mdErr"></p>' +
+        '<div class="rd-tombol-baris" style="justify-content:flex-end">' +
+          '<button type="button" class="btn-xs" id="mdBatal">' + (onSimpan ? 'Batal' : 'Tutup') + '</button>' +
+          (onSimpan ? '<button type="button" class="btn-xs utama" id="mdSimpan">Simpan</button>' : '') +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(bg);
+
+    function batal() {
+      tutupModal();
+      if (onBatal) onBatal();
+    }
+    document.getElementById('mdBatal').onclick = batal;
+    bg.addEventListener('click', function (e) { if (e.target === bg) batal(); });
+    if (onSimpan) document.getElementById('mdSimpan').onclick = onSimpan;
+  }
+
+  /* ---------- Muat dan tampilkan ---------- */
 
   async function muatPengguna() {
     pesan('Memuat pengguna…');
     var r = await sb.from('profiles')
-      .select('id,username,full_name,role,is_active,avatar_url,desk,email')
+      .select('id,username,full_name,role,is_active,status_akun,avatar_url,desk,email,created_at')
       .order('created_at', { ascending: true });
-
     if (r.error) return pesan('Gagal memuat pengguna: ' + r.error.message, 'rd-err');
     state.pengguna = r.data || [];
+
+    var u = await sb.from('usulan_akses')
+      .select('id,dibuat_at,dibuat_oleh,data,alasan,status,catatan_putusan')
+      .order('dibuat_at', { ascending: false })
+      .limit(50);
+    state.usulan = u.error ? [] : (u.data || []);
+
     tampilPengguna();
   }
 
-  function barisPengguna(u) {
+  function cocokAkses(u) {
+    var q = filterAkses.cari.toLowerCase();
+    if (q && [u.full_name, u.username, u.email].join(' ').toLowerCase().indexOf(q) === -1) return false;
+    if (filterAkses.peran && u.role !== filterAkses.peran) return false;
+    if (filterAkses.status && statusDari(u) !== filterAkses.status) return false;
+    return true;
+  }
+
+  function barisAkses(u) {
+    var saya = u.id === state.profil.id;
+    var direktur = state.profil.role === 'direktur';
+    var status = statusDari(u);
     var inisial = (u.full_name || u.username || '?').trim().charAt(0).toUpperCase();
     var foto = u.avatar_url
       ? '<img class="rd-av-foto" src="' + esc(u.avatar_url) + '" alt="">'
       : '<span class="rd-av">' + esc(inisial) + '</span>';
 
-    var opsiPeran = Object.keys(NAMA_PERAN).map(function (k) {
-      return '<option value="' + k + '"' + (k === u.role ? ' selected' : '') + '>' + esc(NAMA_PERAN[k]) + '</option>';
-    }).join('');
+    var pilihJabatan = (direktur && !saya)
+      ? '<select class="rd-pilih" data-mk="jabatan" aria-label="Ubah jabatan">' + JABATAN_LIST.map(function (k) {
+          return '<option value="' + k + '"' + (k === u.role ? ' selected' : '') + '>' + esc(NAMA_PERAN[k]) + '</option>';
+        }).join('') + '</select>'
+      : '';
 
-    var sayaSendiri = u.id === state.profil.id;
+    var tombol = '';
+    if (direktur && !saya) {
+      tombol =
+        '<button type="button" class="btn-xs" data-mk="detail">Detail</button>' +
+        '<button type="button" class="btn-xs" data-mk="status">' + (status === 'aktif' ? 'Nonaktifkan' : 'Aktifkan') + '</button>' +
+        '<button type="button" class="btn-xs" data-mk="reset">Reset sandi</button>';
+    }
 
-    return '<article class="rd-baris rd-pengguna" data-uid="' + u.id + '">' +
-      '<div class="rd-pengguna-atas">' + foto +
-        '<div><p class="rd-baris-judul">' + esc(u.full_name || '(Tanpa nama)') +
-          (sayaSendiri ? ' <span class="rd-baris-meta">(Kamu)</span>' : '') + '</p>' +
-        '<p class="rd-baris-meta">@' + esc(u.username || '-') + (u.email ? ' • ' + esc(u.email) : '') + '</p></div>' +
+    return '<article class="rd-baris rd-akses" data-uid="' + esc(u.id) + '">' +
+      '<div class="rd-akses-atas">' + foto +
+        '<div class="rd-akses-info">' +
+          '<p class="rd-baris-judul">' + esc(u.full_name || '(Tanpa nama)') + (saya ? ' <span class="rd-baris-meta">(Kamu)</span>' : '') + '</p>' +
+          '<p class="rd-baris-meta">@' + esc(u.username || '-') + ' • ' + esc(u.email || '-') + '</p>' +
+        '</div>' +
+        '<span class="rd-badge ' + (BADGE_JABATAN[u.role] || '') + '">' + esc(NAMA_PERAN[u.role] || u.role) + '</span>' +
       '</div>' +
-      '<div class="rd-pengguna-form">' +
-        '<label class="rd-label">Jabatan<select class="pg-role"' + (sayaSendiri ? ' disabled' : '') + '>' + opsiPeran + '</select></label>' +
-        '<label class="rd-cek"><input type="checkbox" class="pg-aktif"' + (u.is_active !== false ? ' checked' : '') +
-          (sayaSendiri ? ' disabled' : '') + '> Akun aktif</label>' +
-        '<label class="btn-xs pg-label-foto" style="display:inline-flex;align-items:center;cursor:pointer">Ganti foto' +
-          '<input type="file" accept="image/jpeg,image/png,image/webp" class="pg-foto" hidden></label>' +
-        '<button type="button" class="btn-xs utama pg-simpan"' + (sayaSendiri ? ' disabled title="Ubah jabatanmu sendiri lewat direktur lain"' : '') + '>Simpan</button>' +
+      '<div class="rd-akses-meta">' +
+        '<span class="rd-status ' + esc(status) + '">' + esc(STATUS_LABEL[status] || status) + '</span>' +
+        '<span class="rd-baris-meta">Bergabung ' + esc(tgl(u.created_at)) + '</span>' +
       '</div>' +
+      ((pilihJabatan || tombol) ? '<div class="rd-baris-aksi">' + pilihJabatan + tombol + '</div>' : '') +
     '</article>';
   }
 
-  function tampilPengguna() {
-    isi(
-      '<section class="rd-kotak"><h2>Pengguna &amp; Jabatan</h2>' +
-        '<p class="rd-catatan">Akun baru dibuat lewat formulir "Daftar Penulis" di layar masuk (jabatan awal: Kontributor). Di sini kamu menaikkan jabatan, menonaktifkan akun, atau memasang foto penulis yang tampil di beranda.</p>' +
-        (state.pengguna.length ? state.pengguna.map(barisPengguna).join('') : '<p class="rd-kotak-kosong">Belum ada pengguna.</p>') +
-      '</section>'
-    );
+  function barisUsulan(x) {
+    var d = x.data || {};
+    var pengaju = cariUser(x.dibuat_oleh);
+    var namaPengaju = pengaju ? (pengaju.full_name || pengaju.username) : 'Tidak diketahui';
+    var kelasStatus = x.status === 'menunggu' ? 'menunggu' : (x.status === 'disetujui' ? 'aktif' : 'ditangguhkan');
+    var aksi = (state.profil.role === 'direktur' && x.status === 'menunggu')
+      ? '<button type="button" class="btn-xs setuju" data-mk="setujui-usulan" data-id="' + x.id + '">Setujui & buat akun</button>' +
+        '<button type="button" class="btn-xs tolak" data-mk="tolak-usulan" data-id="' + x.id + '">Tolak</button>'
+      : '';
+
+    return '<article class="rd-baris">' +
+      '<p class="rd-baris-judul">' + esc(d.nama || '-') + ' <span class="rd-baris-meta">@' + esc(d.username || '-') + '</span></p>' +
+      '<p class="rd-baris-meta">Jabatan: ' + esc(NAMA_PERAN[d.role] || d.role || '-') + ' • Meja: ' + esc(d.desk || '-') + '</p>' +
+      '<p class="rd-baris-meta">Diusulkan oleh ' + esc(namaPengaju) + ' • ' + esc(tgl(x.dibuat_at)) + '</p>' +
+      '<p class="rd-baris-meta">Alasan: ' + esc(x.alasan || '-') + '</p>' +
+      '<div><span class="rd-status ' + kelasStatus + '">' + esc(x.status) + '</span></div>' +
+      (x.catatan_putusan ? '<p class="rd-baris-meta">Catatan direktur: ' + esc(x.catatan_putusan) + '</p>' : '') +
+      (aksi ? '<div class="rd-baris-aksi">' + aksi + '</div>' : '') +
+    '</article>';
   }
+
+  function renderDaftarAkses() {
+    var box = document.getElementById('akDaftar');
+    if (!box) return;
+    var hasil = state.pengguna.filter(cocokAkses);
+    box.innerHTML = hasil.length
+      ? hasil.map(barisAkses).join('')
+      : '<p class="rd-kotak-kosong">Tidak ada pengguna yang cocok.</p>';
+  }
+
+  function tampilPengguna() {
+    var direktur = state.profil.role === 'direktur';
+    var tombolBuat = direktur
+      ? '<button type="button" class="btn btn-utama btn-kecil" data-mk="buat-akun">+ Buat Akun</button>'
+      : '<button type="button" class="btn btn-utama btn-kecil" data-mk="usul-akun">+ Usulkan Akun</button>';
+
+    var usulanHtml = state.usulan.length
+      ? '<section class="rd-kotak"><h2>Usulan akun</h2>' + state.usulan.map(barisUsulan).join('') + '</section>'
+      : '';
+
+    isi(
+      '<section class="rd-kotak">' +
+        '<div class="rd-akses-judul"><h2>Manajemen Akses</h2>' + tombolBuat + '</div>' +
+        '<div class="rd-filter-baris">' +
+          '<input id="akCari" type="search" placeholder="Cari nama, email, atau username" value="' + esc(filterAkses.cari) + '">' +
+          '<select id="akPeran"><option value="">Semua jabatan</option>' +
+            JABATAN_LIST.map(function (k) {
+              return '<option value="' + k + '"' + (filterAkses.peran === k ? ' selected' : '') + '>' + esc(NAMA_PERAN[k]) + '</option>';
+            }).join('') +
+          '</select>' +
+          '<select id="akStatus"><option value="">Semua status</option>' +
+            Object.keys(STATUS_LABEL).map(function (k) {
+              return '<option value="' + k + '"' + (filterAkses.status === k ? ' selected' : '') + '>' + esc(STATUS_LABEL[k]) + '</option>';
+            }).join('') +
+          '</select>' +
+        '</div>' +
+        '<div id="akDaftar"></div>' +
+      '</section>' +
+      usulanHtml
+    );
+    renderDaftarAkses();
+  }
+
+  /* ---------- Buat akun dan usulan ---------- */
+
+  function modalBuatAkun(mode) {
+    var direktur = mode === 'direktur';
+    var html =
+      '<label class="rd-label">Nama lengkap<input id="baNama" type="text"></label>' +
+      '<label class="rd-label">Nama pengguna (huruf kecil, angka, titik, garis bawah)<input id="baUser" type="text"></label>' +
+      '<label class="rd-label">Email<input id="baEmail" type="email"></label>' +
+      (direktur
+        ? '<label class="rd-label">Kata sandi awal (minimal 8 karakter)<input id="baSandi" type="password" autocomplete="new-password"></label>'
+        : '') +
+      '<label class="rd-label">Jabatan<select id="baRole">' + opsiJabatan(mode) + '</select></label>' +
+      '<label class="rd-label">Meja<select id="baDesk">' + opsiMeja() + '</select></label>' +
+      '<label class="rd-label">Alasan (wajib, minimal 10 karakter)<textarea id="baAlasan"></textarea></label>';
+
+    bukaModal(direktur ? 'Buat Akun Baru' : 'Usulkan Akun Baru', html, async function () {
+      var nama = nilaiIsian('baNama');
+      var username = nilaiIsian('baUser').toLowerCase();
+      var email = nilaiIsian('baEmail').toLowerCase();
+      var role = nilaiIsian('baRole');
+      var desk = nilaiIsian('baDesk') || null;
+      var alasan = nilaiIsian('baAlasan');
+
+      if (nama.length < 3) return mdGagal('Nama minimal 3 karakter.');
+      if (!/^[a-z0-9_.]{3,24}$/.test(username)) return mdGagal('Nama pengguna 3-24 karakter: huruf kecil, angka, titik, garis bawah.');
+      if (!REGEX_EMAIL.test(email)) return mdGagal('Email belum benar.');
+      if (alasan.length < 10) return mdGagal('Alasan minimal 10 karakter.');
+
+      if (direktur) {
+        var sandi = nilaiIsian('baSandi');
+        if (sandi.length < 8) return mdGagal('Kata sandi awal minimal 8 karakter.');
+        var token = await tokenSaya();
+        if (!token) return mdGagal('Sesi berakhir. Masuk ulang.');
+        var r = await fetch('/api/buat-akun', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+          body: JSON.stringify({ full_name: nama, username: username, email: email, password: sandi, role: role, desk: desk, alasan: alasan })
+        });
+        var hasil = await r.json().catch(function () { return {}; });
+        if (!r.ok) return mdGagal(hasil.pesan || 'Gagal membuat akun.');
+        tutupModal();
+        kabarkan(hasil.pesan || 'Akun dibuat');
+        return muatPengguna();
+      }
+
+      var u = await sb.rpc('ajukan_buat_akun', {
+        p_nama: nama, p_username: username, p_email: email,
+        p_role: role, p_desk: desk, p_alasan: alasan
+      });
+      if (u.error) return mdGagal(u.error.message);
+      tutupModal();
+      kabarkan('Usulan dikirim ke direktur');
+      return muatPengguna();
+    });
+  }
+
+  function modalSetujuiUsulan(id) {
+    var x = state.usulan.find(function (z) { return String(z.id) === String(id); });
+    if (!x) return kabarkan('Usulan tidak ditemukan');
+    var d = x.data || {};
+
+    var html =
+      '<p class="rd-baris-meta">' + esc(d.nama) + ' (@' + esc(d.username) + ') • ' + esc(d.email) +
+        ' • ' + esc(NAMA_PERAN[d.role] || d.role) + '</p>' +
+      '<label class="rd-label">Kata sandi awal (minimal 8 karakter)<input id="baSandi" type="password" autocomplete="new-password"></label>';
+
+    bukaModal('Setujui usulan akun', html, async function () {
+      var sandi = nilaiIsian('baSandi');
+      if (sandi.length < 8) return mdGagal('Kata sandi awal minimal 8 karakter.');
+
+      var token = await tokenSaya();
+      if (!token) return mdGagal('Sesi berakhir. Masuk ulang.');
+
+      var r = await fetch('/api/buat-akun', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+        body: JSON.stringify({
+          full_name: d.nama, username: d.username, email: d.email, password: sandi,
+          role: d.role, desk: d.desk || null, alasan: x.alasan
+        })
+      });
+      var hasil = await r.json().catch(function () { return {}; });
+      if (!r.ok) return mdGagal(hasil.pesan || 'Gagal membuat akun.');
+
+      var p = await sb.rpc('putuskan_usulan', { p_id: x.id, p_setuju: true, p_catatan: 'Akun sudah dibuat' });
+      tutupModal();
+      kabarkan(p.error
+        ? 'Akun dibuat, tapi status usulan gagal diperbarui: ' + p.error.message
+        : (hasil.pesan || 'Akun dibuat'));
+      return muatPengguna();
+    });
+  }
+
+  function modalTolakUsulan(id) {
+    var html = '<label class="rd-label">Alasan penolakan (wajib, minimal 10 karakter)<textarea id="baAlasan"></textarea></label>';
+    bukaModal('Tolak usulan akun', html, async function () {
+      var catatan = nilaiIsian('baAlasan');
+      if (catatan.length < 10) return mdGagal('Alasan minimal 10 karakter.');
+      var p = await sb.rpc('putuskan_usulan', { p_id: Number(id), p_setuju: false, p_catatan: catatan });
+      if (p.error) return mdGagal(p.error.message);
+      tutupModal();
+      kabarkan('Usulan ditolak');
+      return muatPengguna();
+    });
+  }
+
+  /* ---------- Ubah jabatan, status, detail, reset ---------- */
+
+  function modalJabatan(u, roleBaru, selectEl) {
+    var html =
+      '<label class="rd-label">Nama<input value="' + esc(u.full_name || u.username) + '" disabled></label>' +
+      '<label class="rd-label">Jabatan lama<input value="' + esc(NAMA_PERAN[u.role] || u.role) + '" disabled></label>' +
+      '<label class="rd-label">Jabatan baru<input value="' + esc(NAMA_PERAN[roleBaru] || roleBaru) + '" disabled></label>' +
+      '<label class="rd-label">Alasan (wajib, minimal 10 karakter)<textarea id="baAlasan"></textarea></label>';
+
+    bukaModal('Ubah jabatan', html, async function () {
+      var alasan = nilaiIsian('baAlasan');
+      if (alasan.length < 10) return mdGagal('Alasan minimal 10 karakter.');
+      var r = await sb.rpc('atur_jabatan', { p_target: u.id, p_role: roleBaru, p_alasan: alasan });
+      if (r.error) return mdGagal(r.error.message);
+      tutupModal();
+      kabarkan('Jabatan diubah');
+      return muatPengguna();
+    }, function () {
+      selectEl.value = u.role;
+    });
+  }
+
+  function modalStatus(u) {
+    var aktifSekarang = statusDari(u) === 'aktif';
+    var html =
+      '<p class="rd-baris-meta">' + esc(u.full_name || u.username) + '</p>' +
+      '<label class="rd-label">Alasan (wajib, minimal 10 karakter)<textarea id="baAlasan"></textarea></label>';
+
+    bukaModal((aktifSekarang ? 'Nonaktifkan' : 'Aktifkan') + ' akun', html, async function () {
+      var alasan = nilaiIsian('baAlasan');
+      if (alasan.length < 10) return mdGagal('Alasan minimal 10 karakter.');
+      var r = await sb.rpc('atur_status_akun', { p_target: u.id, p_aktif: !aktifSekarang, p_alasan: alasan });
+      if (r.error) return mdGagal(r.error.message);
+      tutupModal();
+      kabarkan('Status akun diperbarui');
+      return muatPengguna();
+    });
+  }
+
+  async function modalDetail(u) {
+    var r = await sb.rpc('data_pribadi_pengguna', { p_id: u.id });
+    var d = (!r.error && r.data && r.data[0]) || null;
+
+    var html =
+      '<p class="rd-baris-meta">Email: ' + esc(u.email || '-') + '</p>' +
+      '<p class="rd-baris-meta">Meja: ' + esc(u.desk || '-') + '</p>' +
+      '<p class="rd-baris-meta">Bergabung: ' + esc(tgl(u.created_at)) + '</p>' +
+      (d
+        ? '<p class="rd-baris-meta">No. HP: ' + esc(d.phone || '-') + '</p>' +
+          '<p class="rd-baris-meta">Tanggal lahir: ' + esc(d.birth_date || '-') + '</p>' +
+          '<p class="rd-baris-meta">Alamat: ' + esc(d.address || '-') + '</p>'
+        : '<p class="rd-err">Data pribadi belum bisa dibaca' + (r.error ? ': ' + esc(r.error.message) : '') + '</p>');
+
+    bukaModal('Detail: ' + (u.full_name || u.username), html, null);
+  }
+
+  async function kirimResetSandi(u) {
+    if (!u.email) return kabarkan('Email pengguna kosong');
+    if (!confirm('Kirim link reset kata sandi ke ' + u.email + '?')) return;
+    var r = await sb.auth.resetPasswordForEmail(u.email, { redirectTo: location.origin + '/redaksi.html' });
+    kabarkan(r.error ? 'Gagal: ' + r.error.message : 'Link reset dikirim ke email pengguna');
+  }
+
+  /* ---------- Kejadian Manajemen Akses ---------- */
+
+  el.isi.addEventListener('input', function (ev) {
+    if (ev.target.id === 'akCari') {
+      filterAkses.cari = ev.target.value;
+      renderDaftarAkses();
+    }
+  });
+
+  el.isi.addEventListener('change', function (ev) {
+    if (ev.target.id === 'akPeran') { filterAkses.peran = ev.target.value; return renderDaftarAkses(); }
+    if (ev.target.id === 'akStatus') { filterAkses.status = ev.target.value; return renderDaftarAkses(); }
+    if (ev.target.dataset && ev.target.dataset.mk === 'jabatan') {
+      var baris = ev.target.closest('.rd-akses');
+      var u = baris ? cariUser(baris.dataset.uid) : null;
+      if (u) modalJabatan(u, ev.target.value, ev.target);
+    }
+  });
+
+  el.isi.addEventListener('click', function (ev) {
+    var t = ev.target.closest('[data-mk]');
+    if (!t) return;
+    var aksi = t.dataset.mk;
+
+    if (aksi === 'buat-akun') return modalBuatAkun('direktur');
+    if (aksi === 'usul-akun') return modalBuatAkun('pemred');
+    if (aksi === 'setujui-usulan') return modalSetujuiUsulan(t.dataset.id);
+    if (aksi === 'tolak-usulan') return modalTolakUsulan(t.dataset.id);
+
+    var baris = t.closest('.rd-akses');
+    var u = baris ? cariUser(baris.dataset.uid) : null;
+    if (!u) return;
+    if (aksi === 'detail') return modalDetail(u);
+    if (aksi === 'status') return modalStatus(u);
+    if (aksi === 'reset') return kirimResetSandi(u);
+  });
 
   async function simpanPengguna(baris) {
     var uid = baris.dataset.uid;
@@ -788,94 +1153,6 @@
       kabarkan('Gagal: ' + (e.message || e));
     }
   });
-
-  /* ---------- Daftar penulis baru ---------- */
-
-  function tampilDaftar() {
-    el.masuk.hidden = true;
-    el.daftar.hidden = false;
-    el.app.hidden = true;
-    el.aksi.hidden = true;
-  }
-
-  if (el.btnKeDaftar) el.btnKeDaftar.addEventListener('click', tampilDaftar);
-  if (el.btnKeMasuk) el.btnKeMasuk.addEventListener('click', tampilMasuk);
-
-  if (el.dFoto) {
-    el.dFoto.addEventListener('change', function () {
-      var f = el.dFoto.files && el.dFoto.files[0];
-      if (!f) { el.dFotoPreview.hidden = true; return; }
-      el.dFotoImg.src = URL.createObjectURL(f);
-      el.dFotoPreview.hidden = false;
-    });
-  }
-
-  if (el.formDaftar) {
-    el.formDaftar.addEventListener('submit', async function (ev) {
-      ev.preventDefault();
-      el.dErr.textContent = '';
-      el.dOk.textContent = '';
-
-      if (!sb) { el.dErr.textContent = 'Koneksi ke database belum siap.'; return; }
-
-      var nama = el.dNama.value.trim();
-      var username = el.dUsername.value.trim().toLowerCase();
-      var email = el.dEmail.value.trim().toLowerCase();
-      var sandi = el.dSandi.value;
-      var sandi2 = el.dSandi2.value;
-      var file = el.dFoto.files && el.dFoto.files[0];
-
-      if (nama.length < 3) { el.dErr.textContent = 'Nama minimal 3 karakter.'; return; }
-      if (!/^[a-z0-9_.]{3,24}$/.test(username)) {
-        el.dErr.textContent = 'Nama pengguna 3–24 karakter: huruf kecil, angka, titik, atau garis bawah.';
-        return;
-      }
-      if (!REGEX_EMAIL.test(email)) { el.dErr.textContent = 'Email belum benar.'; return; }
-      if (sandi.length < 8) { el.dErr.textContent = 'Kata sandi minimal 8 karakter.'; return; }
-      if (sandi !== sandi2) { el.dErr.textContent = 'Konfirmasi kata sandi belum sama.'; return; }
-
-      el.dKirim.disabled = true;
-      var daftar = await sb.auth.signUp({
-        email: email,
-        password: sandi,
-        options: { data: { username: username, full_name: nama } }
-      });
-      el.dKirim.disabled = false;
-
-      if (daftar.error) {
-        el.dErr.textContent = /registered|already/i.test(daftar.error.message)
-          ? 'Email ini sudah terdaftar. Coba masuk, atau pakai "Lupa kata sandi".'
-          : daftar.error.message;
-        return;
-      }
-
-      var sesi = daftar.data && daftar.data.session;
-      var userId = daftar.data && daftar.data.user && daftar.data.user.id;
-
-      if (sesi && userId) {
-        // Konfirmasi email nonaktif: sesi langsung ada, profil bisa langsung dibuat lengkap dengan foto.
-        try {
-          var avatarUrl = null;
-          if (file) avatarUrl = await unggahFoto(file, userId);
-          var buat = await sb.rpc('daftar_penulis', { p_username: username, p_full_name: nama, p_avatar_url: avatarUrl });
-          if (buat.error) throw new Error(buat.error.message);
-
-          el.formDaftar.reset();
-          el.dFotoPreview.hidden = true;
-          kabarkan('Pendaftaran berhasil. Selamat menulis!');
-          await cekSesi();
-        } catch (e) {
-          el.dErr.textContent = 'Akun dibuat, tapi profil gagal disiapkan: ' + (e.message || e) + '. Coba masuk ulang.';
-        }
-      } else {
-        // Konfirmasi email aktif: profil baru dibuat otomatis saat pengguna berhasil masuk (lihat cekSesi).
-        el.formDaftar.reset();
-        el.dFotoPreview.hidden = true;
-        el.dOk.textContent = 'Pendaftaran berhasil. Cek email untuk konfirmasi, lalu masuk. Foto profil bisa dipasang sesudahnya lewat tombol "Ubah foto saya".';
-        el.dEmail.value = email;
-      }
-    });
-  }
 
   cekSesi();
 })();

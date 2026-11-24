@@ -514,3 +514,19 @@
 @media (prefers-reduced-motion: reduce) {
   .rd-tab, .rd-tab button { scroll-behavior: auto; transition: none; }
 }
+/* Menu tab: tampil turun ke bawah, semua tombol terlihat */
+.rd-tab {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  overflow: visible;
+  padding: 0;
+  margin: 0 0 14px;
+  -webkit-mask-image: none;
+          mask-image: none;
+  scroll-snap-type: none;
+  cursor: default;
+}
+.rd-tab button {
+  flex: 0 0 auto;
+}

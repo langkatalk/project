@@ -946,3 +946,19 @@ header.lk-header {
   .lk-logo small { display: none; }
   .lk-logo b { font-size: 15px; }
 }
+/* ===== HP: halaman tidak bisa digeser ke samping ===== */
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+@media (max-width: 1023px) {
+  body {
+    background-attachment: scroll;
+  }
+  body::before {
+    left: 0;
+    right: 0;
+    width: 100%;
+  }
+}

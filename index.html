@@ -12,6 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/feed.css">
+  <link rel="stylesheet" href="css/filter.css">
   <style>
     .lk-sosmed {
       width: 100%;
@@ -64,6 +65,7 @@
   </header>
 
   <nav class="lk-chips" id="chips" aria-label="Kategori berita"></nav>
+  <div class="filter-bar"><button type="button" id="filterBtn" class="filter-btn" aria-label="Filter berita" aria-haspopup="dialog"></button></div>
 
     <section class="lk-breaking" id="breaking" hidden></section>
   <main class="lk-feed" id="feed"></main>
@@ -91,6 +93,7 @@
   <script src="config.js"></script>
   <script src="js/supabase.js"></script>
   <script src="js/feed.js"></script>
+  <script src="js/filter.js"></script>
 
   <script>
   (function () {

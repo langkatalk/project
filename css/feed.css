@@ -858,3 +858,27 @@ body::before {
   .cari-panel, .cari-kaca, .cari-item, .cari-btn { transition: none; animation: none; }
   .cari-kerangka span { animation: none; }
 }
+/* ===== Breaking PC: 1 besar kiri, 2 kecil kanan, tampil sekaligus ===== */
+@media (min-width: 1024px) {
+  .lk-bk-track {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 14px;
+    height: 420px;
+    overflow: visible;
+    scroll-snap-type: none;
+  }
+  .lk-bk-slide {
+    flex: none;
+    height: 100%;
+    aspect-ratio: auto;
+  }
+  .lk-bk-slide:nth-child(1) { grid-column: 1; grid-row: 1 / span 2; }
+  .lk-bk-slide:nth-child(2) { grid-column: 2; grid-row: 1; }
+  .lk-bk-slide:nth-child(3) { grid-column: 2; grid-row: 2; }
+  .lk-bk-slide:not(:first-child) .lk-bk-isi { padding: 14px; }
+  .lk-bk-slide:not(:first-child) .lk-bk-isi h2 { font-size: 16px; }
+  .lk-bk-slide:not(:first-child) .lk-bk-isi p { display: none; }
+  .lk-bk-nav { display: none; }
+}

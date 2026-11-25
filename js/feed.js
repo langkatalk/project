@@ -626,16 +626,44 @@
 
   async function muatBreaking() {
     if (!elBreaking || !sb) return;
-    var r = await sb.from('articles')
-      .select('id,title,slug,description,cover_url,category,breaking_urutan,published_at')
+    var iso = new Date().toISOString();
+    var batas12Jam = new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString();
+    var kolom = 'id,title,slug,description,cover_url,category,breaking_urutan,published_at';
+
+    // 1. Breaking: ditandai is_breaking, terbit dalam 12 jam terakhir, urutan 1 sampai 3
+    var rb = await sb.from('articles')
+      .select(kolom)
       .eq('status', 'terbit')
+      .eq('is_breaking', true)
       .is('deleted_at', null)
+      .gte('published_at', batas12Jam)
       .not('breaking_urutan', 'is', null)
-      .or('scheduled_at.is.null,scheduled_at.lte.' + new Date().toISOString())
+      .or('scheduled_at.is.null,scheduled_at.lte.' + iso)
       .order('breaking_urutan', { ascending: true })
       .limit(3);
 
-    var data = (!r.error && r.data) ? r.data : [];
+    var data = (!rb.error && rb.data) ? rb.data.slice(0, 3) : [];
+
+    // 2. Kalau kurang dari 3, isi dengan berita terbaru yang belum tampil
+    if (data.length < 3) {
+      var rt = await sb.from('articles')
+        .select(kolom)
+        .eq('status', 'terbit')
+        .is('deleted_at', null)
+        .or('scheduled_at.is.null,scheduled_at.lte.' + iso)
+        .order('published_at', { ascending: false })
+        .limit(8);
+
+      if (!rt.error && rt.data) {
+        var sudahAda = new Set(data.map(function (a) { return a.id; }));
+        rt.data.forEach(function (a) {
+          if (data.length < 3 && !sudahAda.has(a.id)) {
+            data.push(a);
+            sudahAda.add(a.id);
+          }
+        });
+      }
+    }
     if (!data.length) {
       elBreaking.hidden = true;
       elBreaking.innerHTML = '';

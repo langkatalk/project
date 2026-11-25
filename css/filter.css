@@ -1,0 +1,138 @@
+/* ===== Filter ikon kecil di bawah kategori ===== */
+.filter-bar {
+  display: flex;
+  justify-content: flex-start;
+  padding: 0 16px 6px;
+}
+.filter-btn {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid var(--lk-kaca-garis);
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  color: var(--lk-teks);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(95, 63, 200, 0.12);
+}
+.filter-btn.aktif::after {
+  content: "";
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #E11D48;
+}
+
+.filter-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 14px;
+  background: rgba(13, 10, 44, 0.35);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 240ms ease;
+}
+.filter-panel.on { opacity: 1; pointer-events: auto; }
+
+.filter-kaca {
+  width: 100%;
+  max-width: 560px;
+  max-height: 82vh;
+  overflow-y: auto;
+  margin-top: 10vh;
+  padding: 18px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(22px) saturate(150%);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+  border: 1px solid var(--lk-kaca-garis);
+  box-shadow: 0 24px 60px rgba(22, 17, 51, 0.22);
+}
+.fk-baris { display: flex; justify-content: space-between; align-items: center; }
+.fk-judul {
+  font-family: 'Sora', 'Plus Jakarta Sans', sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--lk-teks);
+  margin: 0;
+}
+.fk-tutup {
+  min-width: 40px;
+  min-height: 40px;
+  border-radius: 12px;
+  border: 1px solid var(--lk-garis);
+  background: #fff;
+  cursor: pointer;
+}
+.fk-blok { margin-top: 14px; }
+.fk-label { font-size: 13px; font-weight: 700; color: var(--lk-teks); margin: 0 0 8px; }
+.fk-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.fk-chip {
+  min-height: 36px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.85);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--lk-body);
+  cursor: pointer;
+}
+.fk-chip.on {
+  background: var(--lk-grad-tombol);
+  color: #fff;
+  border-color: transparent;
+}
+.fk-tgl { display: grid; grid-template-columns: 1fr 1.4fr 1fr; gap: 8px; }
+.fk-tgl select {
+  min-height: 44px;
+  padding: 0 8px;
+  border-radius: 12px;
+  border: 1.5px solid var(--lk-garis);
+  background: #fff;
+  font: inherit;
+  font-size: 15px;
+  color: var(--lk-teks);
+}
+.fk-err { min-height: 18px; color: #B91C1C; font-size: 13px; font-weight: 600; margin: 10px 0 0; }
+.fk-tombol { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
+.fk-btn-reset {
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 14px;
+  border: 1.5px solid var(--lk-garis);
+  background: #fff;
+  font: inherit;
+  font-weight: 700;
+  color: var(--lk-teks);
+  cursor: pointer;
+}
+.fk-btn-terapkan {
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 14px;
+  border: 0;
+  background: var(--lk-grad-tombol);
+  color: #fff;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+@media (min-width: 1024px) {
+  .filter-bar { padding: 0 32px 6px; }
+}

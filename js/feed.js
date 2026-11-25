@@ -688,9 +688,11 @@
     function jalankan() {
       hentikan();
       if (bkJumlah < 2) return;
+      // PC: ketiga berita tampil sekaligus, tidak berputar
+      if (window.matchMedia('(min-width: 1024px)').matches) return;
       bkTimer = setInterval(function () {
         kePosisi((bkIndeks + 1) % bkJumlah);
-      }, 6000);
+      }, 5000);
     }
 
     elBreaking.addEventListener('pointerenter', hentikan);

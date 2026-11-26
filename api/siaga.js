@@ -119,7 +119,7 @@ function statusDari(keparahan) {
 
 const URUTAN = { biru: 1, kuning: 2, merah: 3 };
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   try {
     const sekarang = Date.now();
     let rssOk = true;

@@ -466,7 +466,7 @@
   /* ---------- Kumpulkan data dan simpan ---------- */
 
   function kumpulkan() {
-    return {
+    var d = {
       title: val('tTitle'),
       category: $('tCategory').value,
       description: val('tDesc') || null,
@@ -483,6 +483,13 @@
       meta_title: val('tMetaTitle') || null,
       meta_description: val('tMetaDesc') || null
     };
+    // Hanya direktur yang punya kotak PIN, jadi kolom PIN hanya dikirim dari sana
+    if (kotakPin) {
+      var aktif = $('tPinAktif').checked;
+      d.is_pin = aktif;
+      d.pin_kunci = aktif ? ($('tPinJenis').value || null) : null;
+    }
+    return d;
   }
 
   function simpanLokal() {
@@ -507,6 +514,7 @@
   async function simpanNaskah() {
     var data = kumpulkan();
     if (!data.title) throw new Error('Judul wajib diisi.');
+    if (data.is_pin && !data.pin_kunci) throw new Error('Pilih jenis PIN dulu (Pantau Pembangunan atau Laporan Rakyat).');
 
     if (!st.artikelId) {
       var slug = buatSlug(data.title);
@@ -611,6 +619,11 @@
     $('tCoverCaption').value = d.cover_caption || '';
     $('tAllowComment').checked = d.allow_comment !== false;
     $('tShowHome').checked = d.show_on_home !== false;
+        if (kotakPin) {
+      $('tPinAktif').checked = d.is_pin === true;
+      $('tPinJenis').value = d.pin_kunci || '';
+      sinkronPin();
+    }
 
     st.tags = Array.isArray(d.tags) ? d.tags.slice() : [];
     st.related = Array.isArray(d.related_ids) ? d.related_ids.map(String) : [];
@@ -834,6 +847,7 @@
       $('btnKeluar').hidden = false;
       $('layarTanpa').hidden = true;
       $('layarTulis').hidden = false;
+      if (p.data.role === 'direktur') buatKotakPin();
       $('tlBawah').hidden = false;
       $('tAuthor').value = p.data.full_name || p.data.username || '';
 

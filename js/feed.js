@@ -234,12 +234,21 @@
     var q = sb.from('articles')
       .select(KOLOM)
       .eq('status', 'terbit')
+      .eq('is_pin', false)
       .is('deleted_at', null)
       .or('scheduled_at.is.null,scheduled_at.lte.' + new Date().toISOString());
 
     if (st.rentang) {
       q = q.gte('published_at', st.rentang.dari).lt('published_at', st.rentang.sampai);
     }
+
+    var u = st.urutan || 'terbaru';
+    if (u === 'terlama') return q.order('published_at', { ascending: true });
+    if (u === 'az') return q.order('title', { ascending: true });
+    if (u === 'za') return q.order('title', { ascending: false });
+    if (u === 'populer') return q.order('like_count', { ascending: false }).order('published_at', { ascending: false });
+    return q.order('published_at', { ascending: false });
+  }
 
     var u = st.urutan || 'terbaru';
     if (u === 'terlama') return q.order('published_at', { ascending: true });

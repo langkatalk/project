@@ -227,6 +227,7 @@
     $('apPanel').hidden = false;
     $('apFile').addEventListener('change', saatFileDipilih);
     $('apJenis').addEventListener('change', saatFileDipilih);
+    $('apTempel').addEventListener('input', saatFileDipilih);
     $('apSimpan').addEventListener('click', simpan);
   }
 

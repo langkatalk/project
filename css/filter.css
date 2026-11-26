@@ -136,3 +136,14 @@
 @media (min-width: 1024px) {
   .filter-bar { padding: 0 32px 6px; }
 }
+.fk-input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: 12px;
+  border: 1.5px solid var(--lk-garis);
+  background: #fff;
+  font: inherit;
+  font-size: 15px;
+  color: var(--lk-teks);
+}

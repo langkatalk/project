@@ -231,12 +231,23 @@
   /* ---------- Muat berita ---------- */
 
   function dasarQuery() {
-    return sb.from('articles')
+    var q = sb.from('articles')
       .select(KOLOM)
       .eq('status', 'terbit')
       .is('deleted_at', null)
-      .or('scheduled_at.is.null,scheduled_at.lte.' + new Date().toISOString())
-      .order('published_at', { ascending: false });
+      .or('scheduled_at.is.null,scheduled_at.lte.' + new Date().toISOString());
+
+    if (st.rentang) {
+      q = q.gte('published_at', st.rentang.dari).lt('published_at', st.rentang.sampai);
+    }
+
+    var u = st.urutan || 'terbaru';
+    if (u === 'terlama') return q.order('published_at', { ascending: true });
+    if (u === 'az') return q.order('title', { ascending: true });
+    if (u === 'za') return q.order('title', { ascending: false });
+    // Sementara memakai jumlah suka, sampai pencatatan pembacaan dibuat
+    if (u === 'populer') return q.order('like_count', { ascending: false }).order('published_at', { ascending: false });
+    return q.order('published_at', { ascending: false });
   }
 
   async function muatBerikutnya() {
@@ -576,13 +587,10 @@
     else if (aksi === 'simpan') simpanBerita(id, t, kartuEl);
   });
 
-  el.chips.addEventListener('click', function (ev) {
-    var b = ev.target.closest('[data-filter]');
-    if (!b) return;
-
+  // Mengosongkan daftar dan memuat ulang dari awal, dengan filter yang sekarang aktif
+  function muatUlang() {
     st.gen++;
     st.sedangMuat = false;
-    st.filter = b.dataset.filter;
     st.dari = 0;
     st.selesai = false;
 
@@ -590,10 +598,30 @@
     tulisStatus('');
     tampilSkeleton(window.innerWidth < 768 ? 3 : 4);
     el.chips.querySelectorAll('.chip-kat').forEach(function (c) {
-      c.classList.toggle('on', c === b);
+      c.classList.toggle('on', (c.dataset.filter || '') === (st.filter || ''));
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
     muatBerikutnya();
+  }
+
+  // Klik chip kategori
+  el.chips.addEventListener('click', function (ev) {
+    var b = ev.target.closest('[data-filter]');
+    if (!b) return;
+    st.filter = b.dataset.filter;
+    document.dispatchEvent(new CustomEvent('lk:kategori', {
+      detail: st.filter === '__simpan' ? '' : st.filter
+    }));
+    muatUlang();
+  });
+
+  // Terapkan atau reset dari pop-up filter (js/filter.js)
+  document.addEventListener('lk:filter', function (ev) {
+    var d = ev.detail || {};
+    st.filter = d.kategori || '';
+    st.urutan = d.urutan || 'terbaru';
+    st.rentang = d.rentang || null;
+    muatUlang();
   });
 
   function pasangPengamat() {

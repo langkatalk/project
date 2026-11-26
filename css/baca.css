@@ -231,3 +231,18 @@
   .bc-judul#judul { font-size: 24px; }
   .bc-tubuh#isi { font-size: 16px; }
 }
+/* ===== Revisi: header HP, ukuran font, tag di luar kartu ===== */
+@media (max-width: 700px) {
+  .bt-header { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+  .bt-kiri { order: 1; }
+  .bt-kanan { order: 2; margin-left: auto; }
+  .bt-logo { order: 3; flex-basis: 100%; display: flex; justify-content: center; }
+  .bt-logo img { height: 46px; }
+}
+
+/* Ukuran judul dan isi berita dibuat seperti media besar */
+.bc-judul { font-size: 28px; line-height: 1.25; }
+@media (max-width: 700px) { .bc-judul { font-size: 22px; } }
+.bc-tubuh, .bc-tubuh p, .bc-tubuh li { font-size: 16px; line-height: 1.7; }
+
+.bt-tag { margin: 16px auto 0; max-width: 760px; padding: 0 4px; }

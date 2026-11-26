@@ -18,6 +18,33 @@
     return 'Rp ' + n.toLocaleString('id-ID');
   }
 
+  // Format untuk animasi angka
+  var FMT = {
+    rp: rp,
+    angka: function (n) { return Math.round(n).toLocaleString('id-ID'); },
+    paket: function (n) { return Math.round(n).toLocaleString('id-ID') + ' paket'; }
+  };
+
+  // Angka naik dari 0 ke nilai sebenarnya dalam sekitar 0,9 detik
+  function animasi(el, target, fmt) {
+    var dur = 900, mulai = null;
+    function frame(t) {
+      if (mulai === null) mulai = t;
+      var p = Math.min((t - mulai) / dur, 1);
+      var e = 1 - Math.pow(1 - p, 3);
+      el.textContent = fmt(target * e);
+      if (p < 1) requestAnimationFrame(frame);
+      else el.textContent = fmt(target);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function animasiSemua() {
+    document.querySelectorAll('[data-nilai]').forEach(function (el) {
+      animasi(el, Number(el.dataset.nilai), FMT[el.dataset.fmt] || FMT.rp);
+    });
+  }
+
   function persen(a, b) { return b ? Math.round(a / b * 1000) / 10 + '%' : '0%'; }
 
   function esc(s) {
@@ -81,7 +108,10 @@
       return x ? Number(x.total) : 0;
     });
     $('pbApbd').innerHTML = urut.map(function (j, i) {
-      return '<div class="pb-kartu"><p>' + nama[j] + '</p><b>' + (nilai[i] ? rp(nilai[i]) : 'Belum ada data') + '</b></div>';
+      var ada = nilai[i] > 0;
+      return '<div class="pb-kartu"><p>' + nama[j] + '</p><b' +
+        (ada ? ' data-nilai="' + nilai[i] + '" data-fmt="rp"' : '') + '>' +
+        (ada ? 'Rp 0' : 'Belum ada data') + '</b></div>';
     }).join('');
     gambar('pbGrafApbd', {
       type: 'bar',
@@ -91,8 +121,10 @@
 
     // 2. Rencana (SIRUP)
     var totalRup = rup.reduce(function (s, r) { return s + (Number(r.pagu) || 0); }, 0);
-    $('pbRencanaTotal').textContent = rp(totalRup);
-    $('pbRencanaJumlah').textContent = rup.length.toLocaleString('id-ID');
+    $('pbRencanaTotal').dataset.nilai = totalRup;
+    $('pbRencanaTotal').dataset.fmt = 'rp';
+    $('pbRencanaJumlah').dataset.nilai = rup.length;
+    $('pbRencanaJumlah').dataset.fmt = 'angka';
 
     var perInstansi = {};
     rup.forEach(function (r) {
@@ -123,9 +155,12 @@
     var tender = lelang.filter(function (r) { return r.jenis === 'tender'; }).length;
     var nontender = lelang.filter(function (r) { return r.jenis === 'nontender'; }).length;
     var nilaiKontrak = lelang.reduce(function (s, r) { return s + (Number(r.nilai_kontrak) || 0); }, 0);
-    $('pbTender').textContent = tender.toLocaleString('id-ID') + ' paket';
-    $('pbNontender').textContent = nontender.toLocaleString('id-ID') + ' paket';
-    $('pbNilaiKontrak').textContent = rp(nilaiKontrak);
+    $('pbTender').dataset.nilai = tender;
+    $('pbTender').dataset.fmt = 'paket';
+    $('pbNontender').dataset.nilai = nontender;
+    $('pbNontender').dataset.fmt = 'paket';
+    $('pbNilaiKontrak').dataset.nilai = nilaiKontrak;
+    $('pbNilaiKontrak').dataset.fmt = 'rp';
 
     var terbaru = lelang.slice()
       .sort(function (a, b) { return String(b.tanggal_kontrak || '').localeCompare(String(a.tanggal_kontrak || '')); })
@@ -152,6 +187,8 @@
     });
 
     $('pbDiperbarui').textContent = 'Terakhir diperbarui: ' + terakhirDiperbarui();
+
+    animasiSemua();
   }
 
   async function muat() {

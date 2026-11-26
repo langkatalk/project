@@ -103,3 +103,32 @@ body.pc-halaman {
 @media (min-width: 1024px) {
   .lk-zona-pin { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
+/* ===== Kartu PIN artikel (Pantau Pembangunan, Laporan Rakyat) ===== */
+.pc-pin {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  padding: 14px;
+}
+.pin-gambar img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 1;
+  object-fit: cover;
+  border-radius: 14px;
+}
+.pin-teks { min-width: 0; }
+.pin-badge {
+  display: inline-block;
+  font: 700 10px/1 'Plus Jakarta Sans', sans-serif;
+  letter-spacing: 0.08em;
+  color: #fff;
+  background: linear-gradient(135deg, #5A2FCF, #2D5CF0);
+  padding: 5px 9px;
+  border-radius: 999px;
+}
+.pin-judul {
+  font: 800 18px/1.25 'Sora', sans-serif;
+  color: var(--lk-teks, #1d1640);
+  margin: 8px 0 4px;
+}

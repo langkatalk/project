@@ -1,6 +1,7 @@
 // js/zona-pin.js
-// Kartu PANTAU PEMBANGUNAN dan LAPORAN RAKYAT di zona PIN, dari artikel yang ditandai is_pin.
-// Klik membuka halaman artikelnya (baca.html), yang sudah punya suka, komentar, dan bagikan.
+// Kartu PANTAU PEMBANGUNAN dan LAPORAN RAKYAT di zona PIN, dari artikel is_pin.
+// Gambar mengikuti pengaturan Direktur (tabel pin_kartu). Kalau belum diatur, pakai sampul artikel.
+// Kartu PANTAU CUACA juga bisa diberi gambar sendiri; kalau kosong, ilustrasi cuaca tetap dipakai.
 (function () {
   'use strict';
 
@@ -13,6 +14,7 @@
     { kunci: 'pembangunan', judul: 'PANTAU PEMBANGUNAN' },
     { kunci: 'laporan', judul: 'LAPORAN RAKYAT' }
   ];
+  var gambarKartu = {};
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
@@ -25,9 +27,16 @@
     return !c || c.dataset.filter === '';
   }
 
-  // Zona hanya tampil kalau ada isinya dan chip yang aktif Semua
   function sinkron() {
     zona.hidden = !aktifSemua() || zona.children.length === 0;
+  }
+
+  async function ambilGambarKartu() {
+    var r = await sb.from('pin_kartu').select('kunci,gambar_url');
+    if (!r.error && r.data) {
+      gambarKartu = {};
+      r.data.forEach(function (x) { gambarKartu[x.kunci] = x.gambar_url; });
+    }
   }
 
   async function ambilPin() {
@@ -47,8 +56,9 @@
     var tujuan = jenis.kunci === 'pembangunan'
       ? 'pantau-pembangunan.html'
       : 'baca.html?s=' + encodeURIComponent(a.slug || a.id);
-    var gambar = a.cover_url
-      ? '<img src="' + esc(a.cover_url) + '" alt="' + esc(a.title) + '" loading="lazy" decoding="async">'
+    var sumber = gambarKartu[jenis.kunci] || a.cover_url;
+    var gambar = sumber
+      ? '<img src="' + esc(sumber) + '" alt="' + esc(a.title) + '" loading="lazy" decoding="async">'
       : '<span class="pin-kosong" aria-hidden="true">' + esc(jenis.judul.charAt(0)) + '</span>';
     return '<a class="pc-card pc-pin" data-pin="' + jenis.kunci + '" href="' + tujuan + '">' +
       '<div class="pin-gambar">' + gambar + '<span class="pin-badge">PIN OLEH REDAKSI</span></div>' +
@@ -60,24 +70,43 @@
     '</a>';
   }
 
+  // Gambar kartu cuaca: dipakai hanya kalau sudah diatur Direktur
+  function pasangCuaca() {
+    var card = document.getElementById('pantauCuacaKartu');
+    var url = gambarKartu.cuaca;
+    if (!card || !url) return;
+    var g = card.querySelector('.pin-gambar');
+    if (!g) return;
+    var img = g.querySelector('img');
+    if (img && img.getAttribute('src') === url) return;
+    g.innerHTML = '<img src="' + esc(url) + '" alt="" loading="lazy" decoding="async">' +
+      '<span class="pin-badge">PIN OLEH REDAKSI</span>';
+  }
+
   async function render() {
     zona.querySelectorAll('[data-pin]').forEach(function (n) { n.remove(); });
-    if (!aktifSemua()) return sinkron();
+    if (!aktifSemua()) { sinkron(); return; }
 
+    await ambilGambarKartu();
     var data = await ambilPin();
     JENIS.forEach(function (j) {
       var a = data.find(function (x) { return x.pin_kunci === j.kunci; });
       if (a) zona.insertAdjacentHTML('beforeend', kartu(a, j));
     });
     sinkron();
+    pasangCuaca();
   }
 
-  // Zona ikut diperbarui setiap kali isinya berubah (termasuk kartu cuaca dari siaga.js)
-  new MutationObserver(sinkron).observe(zona, { childList: true });
+  // Dipantau sampai ke dalam kartu, karena siaga.js menulis ulang kartu cuaca secara berkala
+  new MutationObserver(function () {
+    sinkron();
+    pasangCuaca();
+  }).observe(zona, { childList: true, subtree: true });
 
   document.addEventListener('lk:kategori', render);
   document.addEventListener('lk:filter', render);
   setInterval(render, 5 * 60 * 1000);
 
+  ambilGambarKartu().then(pasangCuaca);
   render();
 })();

@@ -44,7 +44,9 @@
   }
 
   function kartu(a, jenis) {
-    var tujuan = 'baca.html?s=' + encodeURIComponent(a.slug || a.id);
+    var tujuan = jenis.kunci === 'pembangunan'
+      ? 'pantau-pembangunan.html'
+      : 'baca.html?s=' + encodeURIComponent(a.slug || a.id);
     var gambar = a.cover_url
       ? '<img src="' + esc(a.cover_url) + '" alt="' + esc(a.title) + '" loading="lazy" decoding="async">'
       : '<span class="pin-kosong" aria-hidden="true">' + esc(jenis.judul.charAt(0)) + '</span>';

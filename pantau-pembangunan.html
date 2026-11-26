@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pantau Pembangunan Langkat | Langkatalk</title>
+<meta name="description" content="Uang daerah Kabupaten Langkat dipakai untuk apa? Ringkasan anggaran, rencana belanja, dan lelang pembangunan, dalam bahasa sederhana.">
+<meta property="og:title" content="Pantau Pembangunan Langkat | Langkatalk">
+<meta property="og:description" content="Uang daerah Kabupaten Langkat dipakai untuk apa? Ringkasan anggaran, rencana belanja, dan lelang pembangunan.">
+<meta property="og:type" content="website">
+<link rel="icon" href="favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@700;800&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/siaga.css">
+<style>
+  .pb-judul { font: 800 28px/1.2 'Sora', sans-serif; margin: 0 0 6px; }
+  .pb-h { font: 800 20px/1.3 'Sora', sans-serif; margin: 0 0 8px; }
+  .pb-sub { font: 800 15px/1.3 'Sora', sans-serif; margin: 18px 0 8px; }
+  .pb-penjelasan { font-size: 14px; line-height: 1.7; color: #443d63; margin: 0 0 14px; }
+  .pb-filter { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; margin-top: 14px; }
+  .pb-filter label { font-weight: 700; font-size: 13px; display: flex; flex-direction: column; gap: 6px; }
+  .pb-filter select { min-height: 44px; min-width: 150px; padding: 0 12px; border-radius: 12px; border: 1.5px solid #E4DEFF; background: #fff; font: inherit; }
+  .pb-diperbarui { font-size: 12px; color: #5b5478; margin: 12px 0 0; }
+  .pb-kartu-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 14px; }
+  @media (min-width: 640px) { .pb-kartu-grid { grid-template-columns: repeat(3, 1fr); } }
+  .pb-kartu { background: rgba(255,255,255,.85); border: 1px solid rgba(255,255,255,.95); border-radius: 16px; padding: 14px 16px; box-shadow: 0 6px 18px rgba(45,30,110,.06); }
+  .pb-kartu p { margin: 0 0 6px; font-size: 12px; font-weight: 700; color: #5b5478; }
+  .pb-kartu b { font: 800 18px/1.25 'Sora', sans-serif; color: #1d1640; }
+  .pb-tabel-wrap { overflow-x: auto; margin-top: 12px; }
+  .pb-tabel { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .pb-tabel th, .pb-tabel td { border-bottom: 1px solid #ECE8FF; padding: 8px; text-align: left; vertical-align: top; }
+  .pb-tabel th { color: #5b5478; font-weight: 700; }
+  .pb-disklaimer p { font-size: 12px; line-height: 1.6; color: #5b5478; margin: 0 0 8px; }
+  .pb-disklaimer p:last-child { margin: 0; }
+  .pb-bagi { margin-top: 0; }
+</style>
+</head>
+<body class="pc-halaman">
+<header class="pc-header"><a class="pc-kembali" href="index.html">← Langkatalk</a></header>
+
+<main class="pc-wrap">
+  <section class="pc-kaca">
+    <p class="pc-label">PANTAU PEMBANGUNAN</p>
+    <h1 class="pb-judul">Uang daerah kita dipakai untuk apa?</h1>
+    <p class="pc-sub">Ringkasan belanja pembangunan Kabupaten Langkat, dari anggaran sampai pemenang lelang.</p>
+    <div class="pb-filter">
+      <label>Tahun <select id="pbTahun"></select></label>
+      <label>Bulan <select id="pbBulan"></select></label>
+      <button class="pc-bagi pb-bagi" id="pbBagi" type="button">Bagikan</button>
+    </div>
+    <p class="pb-diperbarui" id="pbDiperbarui"></p>
+  </section>
+
+  <section class="pc-kaca" id="pbKosong" hidden>
+    <p>Belum ada data untuk pilihan ini.</p>
+  </section>
+
+  <section class="pc-kaca">
+    <h2 class="pb-h">1. Anggaran daerah</h2>
+    <p class="pb-penjelasan">Anggaran daerah dibuat dalam tiga tahap. Rancangan (R-APBD) adalah usulan yang sedang dibahas. APBD adalah yang sudah disahkan. Perubahan (P-APBD) adalah penyesuaian di tengah tahun.</p>
+    <div class="pb-kartu-grid" id="pbApbd"></div>
+    <canvas id="pbGrafApbd" height="140"></canvas>
+  </section>
+
+  <section class="pc-kaca">
+    <h2 class="pb-h">2. Rencana belanja (SIRUP)</h2>
+    <p class="pb-penjelasan">Ini daftar pekerjaan dan barang yang <b>direncanakan</b> akan dibeli pemerintah. Totalnya <b id="pbRencanaTotal">–</b> dari <b id="pbRencanaJumlah">–</b> paket.</p>
+    <h3 class="pb-sub">Instansi dengan rencana terbesar</h3>
+    <canvas id="pbGrafInstansi" height="260"></canvas>
+    <h3 class="pb-sub">Dari mana uangnya?</h3>
+    <canvas id="pbGrafSumber" height="200"></canvas>
+  </section>
+
+  <section class="pc-kaca">
+    <h2 class="pb-h">3. Yang sudah masuk lelang (LPSE)</h2>
+    <p class="pb-penjelasan">Tender adalah lelang terbuka. Nontender adalah pengadaan langsung. Tabel di bawah menampilkan 15 kontrak terbaru.</p>
+    <div class="pb-kartu-grid">
+      <div class="pb-kartu"><p>Tender</p><b id="pbTender">–</b></div>
+      <div class="pb-kartu"><p>Nontender</p><b id="pbNontender">–</b></div>
+      <div class="pb-kartu"><p>Nilai kontrak</p><b id="pbNilaiKontrak">–</b></div>
+    </div>
+    <div class="pb-tabel-wrap"><table class="pb-tabel" id="pbTabelLelang"></table></div>
+  </section>
+
+  <section class="pc-kaca">
+    <h2 class="pb-h">4. Seberapa jauh sudah berjalan?</h2>
+    <p class="pb-penjelasan" id="pbRealisasi"></p>
+    <canvas id="pbGrafRealisasi" height="160"></canvas>
+  </section>
+
+  <section class="pc-kaca pb-disklaimer">
+    <p><b>Sumber data:</b> SIRUP dan LPSE Kabupaten Langkat (INAPROC), serta dokumen APBD. Data diinput dan diverifikasi oleh Redaksi Langkatalk. Ini bukan data real-time dari sistem pemerintah.</p>
+    <p>Langkatalk tidak bertanggung jawab atas keakuratan data sumbernya. Untuk memastikan, cek langsung di sirup.inaproc.id dan spse.inaproc.id.</p>
+  </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script src="js/supabase.js"></script>
+<script src="js/pantau-pembangunan.js"></script>
+</body>
+</html>

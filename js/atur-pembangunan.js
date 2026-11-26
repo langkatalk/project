@@ -1,5 +1,5 @@
 // js/atur-pembangunan.js
-// Halaman Direktur: unggah CSV RUP, lelang, dan APBD.
+// Halaman Direktur: unggah CSV RUP, lelang, dan APBD, atau tempel dari Console.
 // Aturan: hanya baris BARU yang disimpan. Baris yang sudah ada dilewati, tidak diubah.
 (function () {
   'use strict';
@@ -157,7 +157,8 @@
       (salah.length ? '<p class="ap-err">' + salah.slice(0, 5).join(' ') + (salah.length > 5 ? ' …' : '') + '</p>' : '');
   }
 
-  async function saatFileDipilih() {
+  // Dari file atau dari kotak tempel. Kalau keduanya diisi, file yang dipakai.
+  async function saatInputBerubah() {
     var f = $('apFile').files[0];
     var tempel = $('apTempel').value.trim();
     $('apErr').textContent = ''; $('apOk').textContent = '';
@@ -200,6 +201,7 @@
       }
       $('apOk').textContent = total + ' baris baru tersimpan. Data lama tidak diubah.';
       $('apFile').value = '';
+      $('apTempel').value = '';
       hasil = [];
       $('apPratinjau').innerHTML = '';
     } catch (e) {
@@ -225,9 +227,9 @@
 
     $('apAkses').hidden = true;
     $('apPanel').hidden = false;
-    $('apFile').addEventListener('change', saatFileDipilih);
-    $('apJenis').addEventListener('change', saatFileDipilih);
-    $('apTempel').addEventListener('input', saatFileDipilih);
+    $('apFile').addEventListener('change', saatInputBerubah);
+    $('apTempel').addEventListener('input', saatInputBerubah);
+    $('apJenis').addEventListener('change', saatInputBerubah);
     $('apSimpan').addEventListener('click', simpan);
   }
 

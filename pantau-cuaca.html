@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pantau Cuaca Langkat | Langkatalk</title>
+<meta name="description" content="Prakiraan cuaca dan peringatan dini per kecamatan di Kabupaten Langkat, bersumber dari BMKG.">
+<meta property="og:title" content="Pantau Cuaca Langkat | Langkatalk">
+<meta property="og:description" content="Prakiraan cuaca dan peringatan dini per kecamatan di Kabupaten Langkat, bersumber dari BMKG.">
+<meta property="og:type" content="website">
+<link rel="icon" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/siaga.css">
+</head>
+<body class="pc-halaman">
+<header class="pc-header"><a class="pc-kembali" href="index.html">← Langkatalk</a></header>
+
+<main class="pc-wrap">
+  <section class="pc-kaca pc-hero" id="pcHero" aria-live="polite">
+    <p>Memuat data BMKG…</p>
+  </section>
+
+  <div class="pc-grid" id="pcGrid"></div>
+
+  <section class="pc-kaca pc-disklaimer">
+    <p><strong>Sumber data:</strong> Badan Meteorologi, Klimatologi, dan Geofisika (BMKG). Prakiraan cuaca dan peringatan dini ditampilkan sebagaimana diterbitkan BMKG, diperbarui mengikuti jadwal sumbernya.</p>
+    <p><strong>Batasan tanggung jawab:</strong> Langkatalk bukan penyedia data cuaca dan tidak menjamin ketepatan, kelengkapan, atau ketepatan waktu informasi ini. Langkatalk tidak bertanggung jawab atas kerugian atau dampak yang timbul dari penggunaan informasi di halaman ini.</p>
+    <p><strong>Untuk keselamatan:</strong> rujuk langsung ke BMKG (bmkg.go.id) dan BPBD setempat untuk keputusan yang menyangkut keselamatan.</p>
+    <button type="button" class="pc-bagi" id="pcBagi">Bagikan halaman ini</button>
+  </section>
+</main>
+
+<script src="js/siaga.js"></script>
+<script>
+(function () {
+  var S = window.LKSiaga;
+  var hero = document.getElementById('pcHero');
+  var grid = document.getElementById('pcGrid');
+  var jamEl = null;
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function jam() {
+    return new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'Asia/Jakarta' }) + ' WIB';
+  }
+
+  function tanggal() {
+    return new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' });
+  }
+
+  function render(d) {
+    var t = S.tertinggi(d.kecamatan);
+    var k = S.kondisi(d);
+    var terdampak = d.kecamatan.filter(function (x) { return x.status !== 'biru'; }).length;
+    var sub = terdampak
+      ? terdampak + ' kecamatan terdampak peringatan dini'
+      : 'Tidak ada peringatan dini untuk Kabupaten Langkat';
+
+    hero.innerHTML =
+      '<div class="pc-hero-ikon">' + S.ilustrasi(k) + '</div>' +
+      '<div><p class="pc-label">PANTAU CUACA LANGKAT</p>' +
+      '<h1>' + S.LABEL[t] + '</h1>' +
+      '<p class="pc-sub">' + sub + '</p></div>' +
+      '<div class="pc-jam"><p id="pcJam">' + jam() + '</p><p class="pc-tgl">' + tanggal() + '</p></div>';
+
+    grid.innerHTML = d.kecamatan.map(function (x) {
+      var c = x.cuaca;
+      var suhu = c && c.suhu != null ? c.suhu + '°C' : '–';
+      var desk = c && c.cuaca ? esc(c.cuaca) : 'Data belum tersedia';
+      var ikon = c && c.ikon ? '<img src="' + esc(c.ikon) + '" alt="" width="40" height="40" loading="lazy">' : '';
+      var p = x.peringatan && x.peringatan.length
+        ? '<p class="pc-kec-peringatan">' + esc(x.peringatan[0].judul) + '</p>' : '';
+      return '<article class="pc-kec pc-' + x.status + '">' +
+        '<div class="pc-kec-atas"><h3>' + esc(x.nama) + '</h3>' +
+        '<span class="pc-pil">' + S.LABEL[x.status] + '</span></div>' +
+        '<div class="pc-kec-cuaca">' + ikon + '<div><p class="pc-suhu">' + suhu + '</p>' +
+        '<p class="pc-desk">' + desk + '</p></div></div>' + p + '</article>';
+    }).join('');
+
+    jamEl = document.getElementById('pcJam');
+  }
+
+  function muat() {
+    S.ambil().then(render).catch(function () {
+      hero.innerHTML = '<p>Data BMKG belum bisa dimuat. Coba lagi sebentar lagi.</p>';
+    });
+  }
+
+  setInterval(function () { if (jamEl) jamEl.textContent = jam(); }, 1000);
+  setInterval(muat, 5 * 60 * 1000);
+
+  document.getElementById('pcBagi').addEventListener('click', function () {
+    var url = location.href;
+    if (navigator.share) {
+      navigator.share({ title: 'Pantau Cuaca Langkat', url: url }).catch(function () {});
+    } else if (navigator.clipboard) {
+      navigator.clipboard.writeText(url).then(function () { alert('Tautan disalin'); });
+    }
+  });
+
+  muat();
+})();
+</script>
+</body>
+</html>

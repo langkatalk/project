@@ -159,15 +159,24 @@
 
   async function saatFileDipilih() {
     var f = $('apFile').files[0];
+    var tempel = $('apTempel').value.trim();
     $('apErr').textContent = ''; $('apOk').textContent = '';
     hasil = [];
     $('apSimpan').disabled = true;
     $('apPratinjau').innerHTML = '';
-    if (!f) return;
-    if (!/\.csv$/i.test(f.name)) { $('apErr').textContent = 'Pilih file berformat .csv'; return; }
 
-    var rows = bacaCsv(await f.text());
-    if (rows.length < 2) { $('apErr').textContent = 'File kosong atau hanya berisi judul kolom.'; return; }
+    var teks = '';
+    if (f) {
+      if (!/\.csv$/i.test(f.name)) { $('apErr').textContent = 'Pilih file berformat .csv'; return; }
+      teks = await f.text();
+    } else if (tempel) {
+      teks = tempel;
+    } else {
+      return;
+    }
+
+    var rows = bacaCsv(teks);
+    if (rows.length < 2) { $('apErr').textContent = 'Isi kosong atau hanya berisi judul kolom.'; return; }
 
     var jenis = $('apJenis').value;
     var v = validasi(jenis, rows);

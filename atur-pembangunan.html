@@ -18,10 +18,13 @@
   .ap-tabel th, .ap-tabel td { border-bottom: 1px solid #ECE8FF; padding: 6px 8px; text-align: left; }
   .ap-err { color: #B91C1C; font-weight: 700; min-height: 20px; }
   .ap-ok { color: #047857; font-weight: 700; }
-  .ap-panduan summary { font-weight: 800; cursor: pointer; }
-  .ap-panduan ol { margin: 10px 0 0; padding-left: 20px; line-height: 1.7; }
+  .ap-panduan summary { font-weight: 800; cursor: pointer; font-size: 16px; }
+  .ap-panduan ol { margin: 10px 0 0; padding-left: 22px; line-height: 1.8; }
+  .ap-panduan h3 { font: 800 15px 'Sora', sans-serif; margin: 18px 0 6px; }
+  .ap-skrip { white-space: pre; overflow-x: auto; max-height: 260px; background: #0F0B2E; color: #DCD7FF; padding: 12px; border-radius: 14px; font-size: 12px; line-height: 1.5; }
   .ap-tombol { margin-top: 14px; min-height: 46px; padding: 0 20px; border: 0; border-radius: 14px; background: linear-gradient(135deg,#5A2FCF,#2D5CF0); color: #fff; font: 800 15px 'Sora', sans-serif; cursor: pointer; }
   .ap-tombol:disabled { opacity: .5; cursor: default; }
+  .ap-tombol-kecil { min-height: 38px; padding: 0 14px; font-size: 13px; margin: 8px 0; }
 </style>
 </head>
 <body style="margin:0;background:#F3F0FF">
@@ -30,22 +33,46 @@
 
   <section class="ap-kaca" id="apPanel" hidden>
     <h1 class="ap-judul">Atur Pantau Pembangunan</h1>
-    <p>Unggah file CSV dari SIRUP dan LPSE, atau tempel hasil dari Console. Yang sudah ada tidak akan diubah.</p>
+    <p>Halaman ini hanya untuk direktur. Data yang sudah ada tidak akan diubah, hanya baris baru yang ditambahkan.</p>
 
-    <details class="ap-kaca ap-panduan">
-      <summary>Cara ambil data (baca dulu)</summary>
+    <details class="ap-kaca ap-panduan" open>
+      <summary>Panduan ambil data LPSE (baca dulu)</summary>
+
+      <h3>Persiapan</h3>
       <ol>
-        <li><b>SIRUP:</b> buka daftar paket satuan kerja, jalankan script di Console (F12), isi nama satuan kerja dan tahun.</li>
-        <li><b>Tempel:</b> hasilnya sudah tersalin. Tempel (Ctrl+V) di kotak "Atau tempel CSV" di bawah.</li>
-        <li><b>File:</b> atau simpan ke Notepad sebagai CSV UTF-8, lalu pilih filenya.</li>
-        <li><b>Simpan:</b> periksa pratinjau, lalu klik Simpan.</li>
+        <li>Buka halaman <b>Nontender</b> atau <b>Tender</b> di LPSE: <code>spse.inaproc.id/langkatkab/nontender</code> atau <code>spse.inaproc.id/langkatkab/lelang</code>.</li>
+        <li>Di bagian atas tabel, ubah <b>Tampilkan</b> menjadi <b>100</b>.</li>
+        <li>Kalau tampilan terlihat kecil, tekan <b>Ctrl + 0</b> untuk mengembalikan zoom ke 100%.</li>
       </ol>
-      <p><b>Template judul kolom</b></p>
-      <p><b>RUP:</b> tahun,bulan,kode_rup,nama_paket,instansi,pagu,metode,sumber_dana,id_satker</p>
-      <p><b>Lelang:</b> tahun,bulan,jenis,kode_lelang,nama_paket,instansi,pagu,hps,status,pemenang,alamat_pemenang,nilai_kontrak,tanggal_kontrak</p>
-      <p><b>APBD:</b> tahun,jenis,total,keterangan (jenis: rapbd, apbd, atau papbd)</p>
+
+      <h3>Menjalankan skrip</h3>
+      <ol>
+        <li>Pilih halaman yang ingin diambil, misalnya halaman 1 (paket 1 sampai 100).</li>
+        <li>Tekan <b>F12</b>, lalu klik tab <b>Console</b>.</li>
+        <li>Klik <b>Salin skrip</b> di bawah, lalu klik kolom Console dan tekan <b>Ctrl + V</b>, lalu <b>Enter</b>.</li>
+        <li>Kalau muncul pesan <i>"Don't paste code…"</i>, ketik <b>allow pasting</b> di kolom itu, tekan Enter, lalu tempel skrip sekali lagi.</li>
+        <li>Tunggu sampai muncul tulisan <b>Selesai</b>. Setiap paket memakan sekitar 3 sampai 4 detik. Jangan tutup tab atau pindah halaman selama proses berjalan.</li>
+        <li>File JSON akan terunduh otomatis, misalnya <b>lpse-nontender-hal01.json</b>, di folder Downloads.</li>
+      </ol>
+
+      <h3>Halaman berikutnya</h3>
+      <ol>
+        <li>Kembali ke daftar LPSE, pilih halaman berikutnya, misalnya halaman 2.</li>
+        <li>Ulangi langkah Console di atas. Nama file mengikuti nomor halaman secara otomatis.</li>
+      </ol>
+
+      <h3>Mengirim hasilnya</h3>
+      <ol>
+        <li>Kirim semua file JSON ke asisten untuk digabungkan. Jangan diunggah di halaman ini dulu.</li>
+        <li>Jika ada pesan <b>Gagal</b> di Console, catat kode paketnya dan kirim juga.</li>
+      </ol>
+
+      <h3>Skrip</h3>
+      <button type="button" class="ap-tombol ap-tombol-kecil" id="skripSalin">Salin skrip</button>
+      <pre class="ap-skrip" id="skripLpse"></pre>
     </details>
 
+    <h3 class="ap-label">Unggah file lain (RUP, lelang, APBD)</h3>
     <label class="ap-label">Jenis data
       <select class="ap-select" id="apJenis">
         <option value="rup">Rencana paket (SIRUP)</option>
@@ -57,7 +84,7 @@
       <input class="ap-input" type="file" id="apFile" accept=".csv,text/csv">
     </label>
     <label class="ap-label">Atau tempel CSV di sini (Ctrl+V)
-      <textarea class="ap-input" id="apTempel" rows="6" style="padding:10px;min-height:120px" placeholder="Tempel hasil dari Console SIRUP di sini"></textarea>
+      <textarea class="ap-input" id="apTempel" rows="6" style="padding:10px;min-height:120px" placeholder="Tempel hasil CSV di sini"></textarea>
     </label>
 
     <div id="apPratinjau"></div>
@@ -70,6 +97,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="config.js"></script>
 <script src="js/supabase.js"></script>
+<script src="js/panduan-lpse.js"></script>
 <script src="js/atur-pembangunan.js"></script>
 </body>
 </html>

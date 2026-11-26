@@ -45,12 +45,12 @@
 
   function kartu(a, jenis) {
     var tujuan = 'baca.html?s=' + encodeURIComponent(a.slug || a.id);
+    var gambar = a.cover_url
+      ? '<img src="' + esc(a.cover_url) + '" alt="' + esc(a.title) + '" loading="lazy" decoding="async">'
+      : '<span class="pin-kosong" aria-hidden="true">' + esc(jenis.judul.charAt(0)) + '</span>';
     return '<a class="pc-card pc-pin" data-pin="' + jenis.kunci + '" href="' + tujuan + '">' +
-      (a.cover_url
-        ? '<div class="pin-gambar"><img src="' + esc(a.cover_url) + '" alt="" loading="lazy" decoding="async"></div>'
-        : '') +
+      '<div class="pin-gambar">' + gambar + '<span class="pin-badge">PIN OLEH REDAKSI</span></div>' +
       '<div class="pin-teks">' +
-        '<span class="pin-badge">PIN OLEH REDAKSI</span>' +
         '<p class="pc-label">' + jenis.judul + '</p>' +
         '<h3 class="pin-judul">' + esc(a.title) + '</h3>' +
         (a.description ? '<p class="pc-sub">' + esc(a.description) + '</p>' : '') +

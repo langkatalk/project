@@ -1,20 +1,14 @@
 // js/siaga.js
-// Menampilkan Siaga Langkat di atas feed, lalu memperbarui datanya setiap 5 menit.
+// 1) Kartu PANTAU CUACA LANGKAT di feed, klik membuka pantau-cuaca.html
+// 2) Fungsi bersama untuk halaman pantau-cuaca.html lewat window.LKSiaga
 (function () {
   'use strict';
 
-  var feed = document.getElementById('feed');
-  if (!feed || document.getElementById('siagaLangkat')) return;
-
-  var wadah = document.createElement('section');
-  wadah.id = 'siagaLangkat';
-  wadah.className = 'siaga';
-  wadah.setAttribute('aria-label', 'Siaga Langkat');
-  wadah.setAttribute('aria-live', 'polite');
-  feed.parentNode.insertBefore(wadah, feed);
-
-  var URUTAN = { biru: 1, kuning: 2, merah: 3 };
   var LABEL = { biru: 'Aman', kuning: 'Waspada', merah: 'Darurat' };
+  var URUTAN = { biru: 1, kuning: 2, merah: 3 };
+  var KARTU_ID = 'pantauCuacaKartu';
+  var POSISI_FEED = 3; // kartu muncul setelah kartu berita ke-3
+  var data = null;
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
@@ -22,87 +16,135 @@
     });
   }
 
-  function jamSekarang() {
-    return new Date().toLocaleTimeString('id-ID', {
-      hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'Asia/Jakarta'
-    }) + ' WIB';
+  function grup(desc) {
+    var t = String(desc || '').toLowerCase();
+    if (/petir/.test(t)) return 'petir';
+    if (/hujan/.test(t)) return 'hujan';
+    if (/berawan|mendung/.test(t)) return 'berawan';
+    return 'cerah';
   }
 
-  function tanggalHari() {
-    return new Date().toLocaleDateString('id-ID', {
-      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta'
-    });
-  }
-
-  function kartu(k) {
-    var c = k.cuaca;
-    var suhu = c && c.suhu != null ? c.suhu + '°C' : '–';
-    var desk = c && c.cuaca ? esc(c.cuaca) : 'Data belum tersedia';
-    var ikon = c && c.ikon ? '<img src="' + esc(c.ikon) + '" alt="" width="40" height="40" loading="lazy">' : '';
-    var peringatan = k.peringatan && k.peringatan.length
-      ? '<p class="sk-peringatan">' + esc(k.peringatan[0].judul) + '</p>'
-      : '';
-    return '<article class="sk sk-' + k.status + '">' +
-      '<div class="sk-atas"><h3>' + esc(k.nama) + '</h3>' +
-      '<span class="sk-pil">' + LABEL[k.status] + '</span></div>' +
-      '<div class="sk-cuaca">' + ikon +
-      '<div><p class="sk-suhu">' + suhu + '</p><p class="sk-desk">' + desk + '</p></div></div>' +
-      peringatan +
-      '</article>';
-  }
-
-  function gambar(data) {
-    var urut = data.kecamatan.slice().sort(function (a, b) {
-      return URUTAN[b.status] - URUTAN[a.status];
-    });
-    var tertinggi = data.kecamatan.reduce(function (m, k) {
+  function tertinggi(kec) {
+    return kec.reduce(function (m, k) {
       return URUTAN[k.status] > URUTAN[m] ? k.status : m;
     }, 'biru');
-    var terdampak = data.kecamatan.filter(function (k) { return k.status !== 'biru'; }).length;
-    var sub = terdampak
-      ? terdampak + ' kecamatan terdampak peringatan dini'
-      : 'Tidak ada peringatan dini untuk Kabupaten Langkat';
-    var dimuat = new Date(data.diperbarui).toLocaleTimeString('id-ID', {
-      hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta'
+  }
+
+  // Kondisi untuk ilustrasi: peringatan dulu, baru cuaca mayoritas kecamatan
+  function kondisi(d) {
+    var t = tertinggi(d.kecamatan);
+    if (t === 'merah') return 'siklon';
+    if (t === 'kuning') return 'waspada';
+    var hitung = {};
+    d.kecamatan.forEach(function (k) {
+      if (k.cuaca && k.cuaca.cuaca) {
+        var g = grup(k.cuaca.cuaca);
+        hitung[g] = (hitung[g] || 0) + 1;
+      }
     });
-
-    wadah.innerHTML =
-      '<div class="siaga-kaca sk-banner sb-' + tertinggi + '">' +
-        '<div><p class="sb-label">SIAGA LANGKAT</p>' +
-        '<h2 class="sb-judul">' + LABEL[tertinggi] + '</h2>' +
-        '<p class="sb-sub">' + sub + '</p></div>' +
-        '<div><p class="sb-jam" id="siagaJam">' + jamSekarang() + '</p>' +
-        '<p class="sb-tgl">' + tanggalHari() + '</p></div>' +
-      '</div>' +
-      '<div class="sk-grid">' + urut.map(kartu).join('') + '</div>' +
-      '<p class="siaga-sumber">Sumber: BMKG. Prakiraan diperbarui oleh BMKG secara berkala. ' +
-      'Terakhir dimuat ' + dimuat + ' WIB.</p>';
+    var best = 'cerah', n = -1;
+    Object.keys(hitung).forEach(function (g) {
+      if (hitung[g] > n) { n = hitung[g]; best = g; }
+    });
+    return best;
   }
 
-  function kerangka() {
-    wadah.innerHTML = '<div class="siaga-kaca"><p class="siaga-memuat">Memuat data BMKG…</p></div>';
+  function sinar() {
+    var s = '';
+    for (var i = 0; i < 8; i++) {
+      var a = i * Math.PI / 4;
+      s += '<line x1="' + (48 + Math.cos(a) * 28).toFixed(1) + '" y1="' + (48 + Math.sin(a) * 28).toFixed(1) +
+           '" x2="' + (48 + Math.cos(a) * 40).toFixed(1) + '" y2="' + (48 + Math.sin(a) * 40).toFixed(1) +
+           '" stroke="#FFB020" stroke-width="5" stroke-linecap="round"/>';
+    }
+    return s;
   }
 
-  function muat() {
-    fetch('/api/siaga', { cache: 'no-store' })
-      .then(function (r) {
-        if (!r.ok) throw new Error('gagal');
-        return r.json();
-      })
-      .then(gambar)
-      .catch(function () {
-        if (!wadah.querySelector('.sk-grid')) {
-          wadah.innerHTML = '<div class="siaga-kaca"><p class="siaga-memuat">' +
-            'Data BMKG belum bisa dimuat. Coba lagi sebentar lagi.</p></div>';
-        }
-      });
+  var AWAN = '<path d="M26 62a14 14 0 0 1 4-27 18 18 0 0 1 34 4 12 12 0 0 1 2 23z" fill="#EEF3FF" stroke="#8FA8E8" stroke-width="2.5"/>';
+  var AWAN_GELAP = '<path d="M26 60a14 14 0 0 1 4-27 18 18 0 0 1 34 4 12 12 0 0 1 2 23z" fill="#C9D3E8" stroke="#5E6F99" stroke-width="2.5"/>';
+
+  var SVG = {
+    cerah: '<g class="pc-putar">' + sinar() + '</g><circle cx="48" cy="48" r="18" fill="#FFB020"/>',
+    berawan: '<circle cx="36" cy="36" r="12" fill="#FFB020" opacity=".85"/>' + AWAN,
+    hujan: AWAN_GELAP +
+      '<g stroke="#2D5CF0" stroke-width="4" stroke-linecap="round">' +
+      '<line x1="36" y1="70" x2="32" y2="84"/><line x1="50" y1="70" x2="46" y2="84"/><line x1="64" y1="70" x2="60" y2="84"/></g>',
+    petir: AWAN_GELAP +
+      '<polygon points="50,64 41,80 49,80 45,92 58,74 50,74" fill="#FFB020"/>',
+    waspada: AWAN_GELAP +
+      '<path d="M48 66 L38 86 H58 Z" fill="#F59E0B"/><rect x="47" y="72" width="2.5" height="7" fill="#fff"/><circle cx="48.2" cy="82" r="1.4" fill="#fff"/>',
+    siklon: '<g class="pc-siklon">' +
+      '<path d="M48 12a36 36 0 1 1-33 22" fill="none" stroke="#5A2FCF" stroke-width="6" stroke-linecap="round"/>' +
+      '<path d="M48 26a22 22 0 1 1-20 13" fill="none" stroke="#2D5CF0" stroke-width="5" stroke-linecap="round"/>' +
+      '<circle cx="48" cy="48" r="4" fill="#5A2FCF"/></g>'
+  };
+
+  function ilustrasi(k) {
+    return '<svg viewBox="0 0 96 96" class="pc-svg" aria-hidden="true">' + (SVG[k] || SVG.cerah) + '</svg>';
   }
 
-  kerangka();
-  muat();
-  setInterval(muat, 5 * 60 * 1000);
-  setInterval(function () {
-    var j = document.getElementById('siagaJam');
-    if (j) j.textContent = jamSekarang();
-  }, 1000);
+  function ambil() {
+    return fetch('/api/siaga', { cache: 'no-store' })
+      .then(function (r) { if (!r.ok) throw new Error('gagal'); return r.json(); })
+      .then(function (j) { data = j; return j; });
+  }
+
+  function aktifSemua() {
+    var c = document.querySelector('#chips .chip-kat.on');
+    return !c || c.dataset.filter === '';
+  }
+
+  function isiKartu(a, d) {
+    var t = tertinggi(d.kecamatan);
+    var pertama = null;
+    d.kecamatan.forEach(function (k) {
+      if (!pertama && k.peringatan && k.peringatan.length) pertama = k.peringatan[0];
+    });
+    var sub = pertama ? esc(pertama.judul) : 'Tidak ada peringatan dini untuk Kabupaten Langkat';
+    a.className = 'pc-card pc-' + t;
+    a.innerHTML =
+      '<div class="pc-ikon">' + ilustrasi(kondisi(d)) + '</div>' +
+      '<div class="pc-teks">' +
+        '<p class="pc-label">PANTAU CUACA LANGKAT</p>' +
+        '<h3 class="pc-status">' + LABEL[t] + '</h3>' +
+        '<p class="pc-sub">' + sub + '</p>' +
+      '</div>';
+  }
+
+  function pasang() {
+    var feed = document.getElementById('feed');
+    if (!feed) return;
+    var ada = document.getElementById(KARTU_ID);
+    if (!data || !aktifSemua()) {
+      if (ada) ada.remove();
+      return;
+    }
+    if (ada) { isiKartu(ada, data); return; }
+    if (feed.children.length < POSISI_FEED) return;
+    var a = document.createElement('a');
+    a.id = KARTU_ID;
+    a.href = 'pantau-cuaca.html';
+    isiKartu(a, data);
+    feed.insertBefore(a, feed.children[POSISI_FEED] || null);
+  }
+
+  function segarkan() {
+    ambil().then(pasang).catch(function () {});
+  }
+
+  var feedEl = document.getElementById('feed');
+  if (feedEl) new MutationObserver(pasang).observe(feedEl, { childList: true });
+  var chipsEl = document.getElementById('chips');
+  if (chipsEl) new MutationObserver(pasang).observe(chipsEl, { subtree: true, attributes: true, attributeFilter: ['class'] });
+
+  window.LKSiaga = {
+    ambil: ambil,
+    kondisi: kondisi,
+    ilustrasi: ilustrasi,
+    tertinggi: tertinggi,
+    LABEL: LABEL
+  };
+
+  segarkan();
+  setInterval(segarkan, 5 * 60 * 1000);
 })();

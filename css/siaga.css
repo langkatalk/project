@@ -86,3 +86,20 @@ body.pc-halaman {
 @media (prefers-reduced-motion: reduce) {
   .pc-putar, .pc-siklon, .pc-merah .pc-status { animation: none; }
 }
+/* ===== Zona PIN: section di atas feed ===== */
+.lk-zona-pin {
+  max-width: 1240px;
+  margin: 14px auto 8px;
+  padding: 0 16px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+.lk-zona-pin[hidden] { display: none !important; }
+.lk-zona-pin .pc-card { margin: 0; height: 100%; }
+@media (min-width: 640px) {
+  .lk-zona-pin { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 1024px) {
+  .lk-zona-pin { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}

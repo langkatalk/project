@@ -19,7 +19,7 @@ module.exports = async function handler(req, res) {
   var sekarang = new Date().toISOString();
   var url = SUPABASE_URL + '/rest/v1/articles' +
     '?select=slug,id,published_at,updated_at' +
-    '&status=eq.terbit&deleted_at=is.null' +
+    '&status=eq.terbit&deleted_at=is.null&is_pin=eq.false' +
     '&or=' + encodeURIComponent('(scheduled_at.is.null,scheduled_at.lte.' + sekarang + ')') +
     '&order=published_at.desc&limit=5000';
 

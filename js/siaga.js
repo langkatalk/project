@@ -1,13 +1,12 @@
 // js/siaga.js
-// 1) Kartu PANTAU CUACA LANGKAT di feed, klik membuka pantau-cuaca.html
-// 2) Fungsi bersama untuk halaman pantau-cuaca.html lewat window.LKSiaga
+// Zona PIN: kartu PANTAU CUACA LANGKAT di section tersendiri di atas feed.
+// Klik membuka pantau-cuaca.html. Hanya tampil di chip Semua.
 (function () {
   'use strict';
 
   var LABEL = { biru: 'Aman', kuning: 'Waspada', merah: 'Darurat' };
   var URUTAN = { biru: 1, kuning: 2, merah: 3 };
   var KARTU_ID = 'pantauCuacaKartu';
-  var POSISI_FEED = 3; // kartu muncul setelah kartu berita ke-3
   var data = null;
 
   function esc(s) {
@@ -30,7 +29,6 @@
     }, 'biru');
   }
 
-  // Kondisi untuk ilustrasi: peringatan dulu, baru cuaca mayoritas kecamatan
   function kondisi(d) {
     var t = tertinggi(d.kecamatan);
     if (t === 'merah') return 'siklon';
@@ -112,28 +110,32 @@
   }
 
   function pasang() {
-    var feed = document.getElementById('feed');
-    if (!feed) return;
-    var ada = document.getElementById(KARTU_ID);
+    var zona = document.getElementById('zonaPin');
+    if (!zona) return;
+
     if (!data || !aktifSemua()) {
-      if (ada) ada.remove();
+      zona.hidden = true;
+      zona.innerHTML = '';
       return;
     }
-    if (ada) { isiKartu(ada, data); return; }
-    if (feed.children.length < POSISI_FEED) return;
-    var a = document.createElement('a');
-    a.id = KARTU_ID;
-    a.href = 'pantau-cuaca.html';
-    isiKartu(a, data);
-    feed.insertBefore(a, feed.children[POSISI_FEED] || null);
+
+    var ada = document.getElementById(KARTU_ID);
+    if (ada) {
+      isiKartu(ada, data);
+    } else {
+      var a = document.createElement('a');
+      a.id = KARTU_ID;
+      a.href = 'pantau-cuaca.html';
+      isiKartu(a, data);
+      zona.appendChild(a);
+    }
+    zona.hidden = false;
   }
 
   function segarkan() {
     ambil().then(pasang).catch(function () {});
   }
 
-  var feedEl = document.getElementById('feed');
-  if (feedEl) new MutationObserver(pasang).observe(feedEl, { childList: true });
   var chipsEl = document.getElementById('chips');
   if (chipsEl) new MutationObserver(pasang).observe(chipsEl, { subtree: true, attributes: true, attributeFilter: ['class'] });
 

@@ -115,6 +115,7 @@
   }
 
   // Tag artikel ditampilkan di bawah isi berita
+   // Tag ditempatkan di luar kartu artikel, antara isi berita dan bagian komentar
   async function muatTag() {
     if (!KUNCI) return;
     var q = /^\d+$/.test(KUNCI)
@@ -124,13 +125,13 @@
     var tags = (r.data && r.data.tags) || [];
     if (!tags.length) return;
 
-    var tubuh = document.querySelector('#baca .bc-tubuh');
-    if (!tubuh || $('btTag')) return;
+    var artikelKartu = document.querySelector('#baca article.bc-kartu');
+    if (!artikelKartu || $('btTag')) return;
     var box = document.createElement('div');
     box.id = 'btTag';
     box.className = 'bt-tag';
     box.innerHTML = tags.map(function (t) { return '<span>#' + esc(t) + '</span>'; }).join('');
-    tubuh.insertAdjacentElement('afterend', box);
+    artikelKartu.insertAdjacentElement('afterend', box);
   }
 
   // Artikel dirender oleh baca.js setelah halaman siap, jadi tag dipasang saat isinya muncul

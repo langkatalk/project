@@ -114,8 +114,8 @@
     if (!zona) return;
 
     if (!data || !aktifSemua()) {
-      zona.hidden = true;
-      zona.innerHTML = '';
+      var lama = document.getElementById(KARTU_ID);
+      if (lama) lama.remove();
       return;
     }
 

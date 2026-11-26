@@ -199,7 +199,13 @@
     if (!r.error && r.data) daftarKategori = r.data.map(function (x) { return x.name; });
     render();
   }
-
+  // Kalau kategori diganti lewat chip, pop-up ikut menyesuaikan
+  document.addEventListener('lk:kategori', function (ev) {
+    var k = ev.detail || '';
+    aktif.kategori = k;
+    tmp.kategori = k;
+    btn.classList.toggle('aktif', sudahDiubah(aktif));
+  });
   isiPilihan();
   render();
   muatKategori();

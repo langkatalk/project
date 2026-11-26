@@ -34,6 +34,7 @@
   };
 
   var simpanRange = null;
+    var kotakPin = false;
 
   /* ---------- Utilitas ---------- */
 
@@ -777,6 +778,33 @@
     });
   }
 
+  /* ---------- Kotak PIN (hanya direktur) ---------- */
+
+  function sinkronPin() {
+    $('tPinJenis').disabled = !$('tPinAktif').checked;
+  }
+
+  function buatKotakPin() {
+    var box = document.createElement('div');
+    box.id = 'tPinBox';
+    box.style.cssText = 'margin:12px 0;padding:12px 14px;border:1px dashed #C4B5FD;border-radius:14px;background:rgba(255,255,255,.7)';
+    box.innerHTML =
+      '<label style="display:flex;gap:8px;align-items:center;font-weight:700">' +
+        '<input type="checkbox" id="tPinAktif"> Jadikan PIN beranda (khusus direktur)</label>' +
+      '<label style="display:block;margin-top:8px;font-size:14px">Jenis PIN ' +
+        '<select id="tPinJenis" style="margin-left:6px">' +
+          '<option value="">Pilih jenis…</option>' +
+          '<option value="pembangunan">Pantau Pembangunan</option>' +
+          '<option value="laporan">Laporan Rakyat</option>' +
+        '</select></label>' +
+      '<p style="margin:6px 0 0;font-size:12px;color:#6B6890">PIN tidak tampil di feed berita. ' +
+        'Tampil di zona PIN di atas feed, dengan halaman artikel ini.</p>';
+    $('btnSimpanDraf').parentNode.insertBefore(box, $('btnSimpanDraf'));
+    $('tPinAktif').addEventListener('change', sinkronPin);
+    kotakPin = true;
+    sinkronPin();
+  }
+  
   /* ---------- Mulai ---------- */
 
   async function mulai() {

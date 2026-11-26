@@ -30,18 +30,18 @@
 
   <section class="ap-kaca" id="apPanel" hidden>
     <h1 class="ap-judul">Atur Pantau Pembangunan</h1>
-    <p>Unggah file CSV dari SIRUP dan LPSE. Setelah disimpan, data langsung tampil di Pantau Pembangunan.</p>
+    <p>Unggah file CSV dari SIRUP dan LPSE, atau tempel hasil dari Console. Yang sudah ada tidak akan diubah.</p>
 
     <details class="ap-kaca ap-panduan">
       <summary>Cara ambil data (baca dulu)</summary>
       <ol>
-        <li><b>SIRUP:</b> buka rekap Kabupaten Langkat, salin tabel paket beserta pagunya ke Excel, lalu isi judul kolom sesuai template.</li>
-        <li><b>LPSE:</b> buka daftar lelang atau nontender, salin ke Excel, lengkapi pemenang dan nilai kontrak.</li>
-        <li><b>Simpan:</b> pilih <i>Simpan sebagai → CSV UTF-8</i>.</li>
-        <li><b>Unggah:</b> pilih jenis data di bawah, pilih filenya, periksa pratinjau, lalu simpan.</li>
+        <li><b>SIRUP:</b> buka daftar paket satuan kerja, jalankan script di Console (F12), isi nama satuan kerja dan tahun.</li>
+        <li><b>Tempel:</b> hasilnya sudah tersalin. Tempel (Ctrl+V) di kotak "Atau tempel CSV" di bawah.</li>
+        <li><b>File:</b> atau simpan ke Notepad sebagai CSV UTF-8, lalu pilih filenya.</li>
+        <li><b>Simpan:</b> periksa pratinjau, lalu klik Simpan.</li>
       </ol>
       <p><b>Template judul kolom</b></p>
-      <p><b>RUP:</b> tahun,bulan,kode_rup,nama_paket,instansi,pagu,metode,sumber_dana</p>
+      <p><b>RUP:</b> tahun,bulan,kode_rup,nama_paket,instansi,pagu,metode,sumber_dana,id_satker</p>
       <p><b>Lelang:</b> tahun,bulan,jenis,kode_lelang,nama_paket,instansi,pagu,hps,status,pemenang,alamat_pemenang,nilai_kontrak,tanggal_kontrak</p>
       <p><b>APBD:</b> tahun,jenis,total,keterangan (jenis: rapbd, apbd, atau papbd)</p>
     </details>
@@ -56,10 +56,10 @@
     <label class="ap-label">File CSV
       <input class="ap-input" type="file" id="apFile" accept=".csv,text/csv">
     </label>
-
-        <label class="ap-label">Atau tempel CSV di sini (Ctrl+V)
+    <label class="ap-label">Atau tempel CSV di sini (Ctrl+V)
       <textarea class="ap-input" id="apTempel" rows="6" style="padding:10px;min-height:120px" placeholder="Tempel hasil dari Console SIRUP di sini"></textarea>
     </label>
+
     <div id="apPratinjau"></div>
     <p class="ap-err" id="apErr"></p>
     <p class="ap-ok" id="apOk"></p>

@@ -13,33 +13,74 @@
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/feed.css">
   <link rel="stylesheet" href="css/baca.css">
+  <link rel="stylesheet" href="css/baca-tata.css">
 </head>
 <body>
 
-  <header class="lk-header">
-    <a class="lk-kembali" href="index.html">← Beranda</a>
-    <a class="lk-logo" href="index.html">
-      <img src="favicon.png" alt="" width="28" height="28">
-      <span>
-        <b>Langkatalk</b>
-        <small>Menghubungkan Cerita Langkat</small>
-      </span>
+  <header class="bt-header">
+    <div class="bt-kiri">
+      <a class="bt-ikon-home" href="index.html" aria-label="Beranda">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>
+      </a>
+      <div class="bt-kat">
+        <button type="button" class="bt-tombol-kat" id="btKat" aria-expanded="false" aria-controls="btKatMenu">Kategori ▾</button>
+        <div class="bt-menu" id="btKatMenu" hidden></div>
+      </div>
+    </div>
+    <a class="bt-logo" href="index.html">
+      <img src="logo-landscape.png" alt="Langkatalk – Menghubungkan Cerita Langkat" width="260" height="70">
     </a>
-    <a class="btn btn-utama btn-kecil" href="redaksi.html">Masuk</a>
+    <div class="bt-kanan">
+      <a class="btn btn-utama btn-kecil" href="redaksi.html">Masuk</a>
+    </div>
   </header>
 
-  <main class="lk-baca" id="baca">
-    <p class="lk-status">Memuat berita…</p>
-  </main>
+  <div class="bt-wrap">
+    <main class="bt-utama">
+      <div class="lk-baca" id="baca">
+        <p class="lk-status">Memuat berita…</p>
+      </div>
+    </main>
 
-  <footer class="lk-footer">
-    <div><b>Langkatalk</b> • Dari hulu ke hilir, dari bukit ke layar.</div>
-    <div class="lk-footer-link">
-      <a href="index.html">Beranda</a>
-      <a href="tulis.html">Tulis</a>
-      <a href="redaksi.html">Redaksi</a>
+    <aside class="bt-samping" aria-label="Berita lainnya">
+      <section class="bt-blok">
+        <h2>Breaking news</h2>
+        <div id="btBreaking"></div>
+      </section>
+      <section class="bt-blok">
+        <h2>Berita terpopuler</h2>
+        <div id="btPopuler"></div>
+      </section>
+      <section class="bt-blok">
+        <h2>Komentar terbaru</h2>
+        <div id="btKomentar"></div>
+      </section>
+    </aside>
+  </div>
+
+  <footer class="bt-footer">
+    <div class="bt-footer-grid">
+      <div>
+        <img src="logo-landscape.png" alt="Langkatalk" class="bt-footer-logo" width="220" height="60">
+        <p class="bt-footer-teks">[Alamat lengkap akan diisi setelah legalitas selesai]</p>
+        <p class="bt-footer-teks">[Nomor telepon akan diisi setelah legalitas selesai]</p>
+        <p class="bt-footer-teks">[Email redaksi akan diisi setelah legalitas selesai]</p>
+      </div>
+      <div>
+        <p class="bt-footer-judul">Kategori</p>
+        <ul class="bt-footer-kat" id="btFKat"></ul>
+      </div>
+    </div>
+    <div class="bt-footer-bawah">
+      <a href="tentang.html">Tentang Kami</a>
+      <a href="masthead.html">Susunan Redaksi</a>
+      <span>Info Iklan</span>
+      <span>Karir</span>
+      <span>Kontak</span>
+      <a href="pedoman.html">Pedoman Media Siber</a>
+      <span>Pedoman AI</span>
       <a href="privasi.html">Privasi</a>
-      <a href="pedoman.html">Pedoman</a>
+      <span class="bt-copy">©2026 Langkatalk</span>
     </div>
   </footer>
 
@@ -49,5 +90,6 @@
   <script src="config.js"></script>
   <script src="js/supabase.js"></script>
   <script src="js/baca.js"></script>
+  <script src="js/baca-samping.js"></script>
 </body>
 </html>

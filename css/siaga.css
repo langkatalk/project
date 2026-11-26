@@ -1,73 +1,88 @@
-/* ===== Siaga Langkat ===== */
-.siaga {
-  max-width: 1240px;
-  margin: 18px auto;
-  padding: 0 16px;
-  font-family: 'Plus Jakarta Sans', Inter, system-ui, sans-serif;
-  color: var(--lk-teks, #1d1640);
+/* ===== Pantau Cuaca Langkat ===== */
+.pc-card {
+  position: relative; overflow: hidden;
+  display: flex; gap: 14px; align-items: center;
+  margin: 14px 0; padding: 16px 18px;
+  color: var(--lk-teks, #1d1640); text-decoration: none;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.95); border-radius: 22px;
+  box-shadow: 0 10px 26px rgba(45, 30, 110, 0.08);
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
 }
-.siaga-kaca {
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(255, 255, 255, 0.9);
-  border-radius: 24px;
-  backdrop-filter: blur(18px) saturate(150%);
-  -webkit-backdrop-filter: blur(18px) saturate(150%);
-  box-shadow: 0 18px 40px rgba(45, 30, 110, 0.1);
-}
-.siaga-memuat { padding: 24px; margin: 0; text-align: center; font-weight: 600; }
+.pc-card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--pc-c, #2D5CF0); }
+.pc-biru { --pc-c: #2D5CF0; }
+.pc-kuning { --pc-c: #F59E0B; }
+.pc-merah { --pc-c: #DC2626; }
+.pc-ikon { flex: 0 0 72px; height: 72px; }
+.pc-svg { width: 100%; height: 100%; display: block; }
+.pc-label { font: 800 11px/1 'Sora', sans-serif; letter-spacing: 0.14em; color: #5b5478; margin: 0 0 6px; }
+.pc-status { font: 800 22px/1.1 'Sora', sans-serif; margin: 0; }
+.pc-sub { margin: 4px 0 0; font-size: 13px; color: #5b5478; }
+.pc-merah .pc-status { color: #B91C1C; animation: pcKedip 1.4s ease-in-out infinite; }
+.pc-kuning .pc-status { color: #B45309; }
+.pc-putar { transform-origin: 48px 48px; animation: pcPutar 14s linear infinite; }
+.pc-siklon { transform-origin: 48px 48px; animation: pcPutar 2.6s linear infinite; }
+@keyframes pcPutar { to { transform: rotate(360deg); } }
+@keyframes pcKedip { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
-.sk-banner {
-  display: flex; justify-content: space-between; align-items: center;
-  gap: 16px; padding: 22px 26px; color: #fff;
+/* ===== Halaman Pantau Cuaca ===== */
+body.pc-halaman {
+  margin: 0; min-height: 100vh;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #1d1640;
+  background: radial-gradient(circle at 8% 6%, rgba(124, 63, 224, 0.16), transparent 36%),
+              radial-gradient(circle at 92% 10%, rgba(28, 200, 200, 0.14), transparent 36%), #F3F0FF;
+}
+.pc-header { max-width: 980px; margin: 0 auto; padding: 16px; }
+.pc-kembali { font-weight: 700; color: #5A2FCF; text-decoration: none; }
+.pc-wrap { max-width: 980px; margin: 0 auto; padding: 0 16px 40px; }
+.pc-kaca {
+  background: rgba(255, 255, 255, 0.78); border: 1px solid rgba(255, 255, 255, 0.95);
+  border-radius: 24px; padding: 22px; margin-top: 14px;
+  box-shadow: 0 18px 40px rgba(45, 30, 110, 0.1);
+  backdrop-filter: blur(18px) saturate(150%); -webkit-backdrop-filter: blur(18px) saturate(150%);
+}
+.pc-hero { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
+.pc-hero-ikon { flex: 0 0 120px; height: 120px; }
+.pc-hero h1 { font: 800 30px/1.1 'Sora', sans-serif; margin: 0; }
+.pc-hero .pc-label { margin-bottom: 8px; }
+.pc-hero .pc-sub { font-size: 14px; }
+.pc-jam { margin-left: auto; text-align: right; }
+.pc-jam p { margin: 0; }
+#pcJam { font: 800 22px/1 'Sora', sans-serif; font-variant-numeric: tabular-nums; }
+.pc-tgl { font-size: 12px; color: #5b5478; margin-top: 6px !important; }
+
+.pc-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 14px; }
+@media (min-width: 640px) { .pc-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { .pc-grid { grid-template-columns: repeat(4, 1fr); } }
+.pc-kec {
+  position: relative; overflow: hidden; padding: 14px 16px 14px 18px; margin: 0;
+  background: rgba(255, 255, 255, 0.85); border: 1px solid rgba(255, 255, 255, 0.95);
+  border-radius: 18px; box-shadow: 0 8px 20px rgba(45, 30, 110, 0.06);
+}
+.pc-kec::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--pc-c, #2D5CF0); }
+.pc-kec-atas { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.pc-kec h3 { font: 800 16px/1.2 'Sora', sans-serif; margin: 0; }
+.pc-pil { font: 700 11px/1 'Plus Jakarta Sans', sans-serif; padding: 6px 10px; border-radius: 999px; color: #fff; background: var(--pc-c, #2D5CF0); white-space: nowrap; }
+.pc-kec-cuaca { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+.pc-kec-cuaca img { width: 40px; height: 40px; }
+.pc-suhu { font: 800 24px/1 'Sora', sans-serif; margin: 0; }
+.pc-desk { margin: 4px 0 0; font-size: 13px; color: #5b5478; }
+.pc-kec-peringatan { margin: 10px 0 0; font-size: 12px; font-weight: 600; color: #991B1B; }
+
+.pc-disklaimer { font-size: 13px; line-height: 1.6; color: #443d63; }
+.pc-disklaimer strong { color: #1d1640; }
+.pc-bagi {
+  margin-top: 12px; min-height: 44px; padding: 0 18px; border: 0; border-radius: 14px;
+  font: 800 14px 'Sora', sans-serif; color: #fff; cursor: pointer;
   background: linear-gradient(135deg, #5A2FCF, #2D5CF0);
 }
-.sb-kuning { background: linear-gradient(135deg, #F59E0B, #FFA257); }
-.sb-merah { background: linear-gradient(135deg, #B91C1C, #F43F5E); animation: siagaKedip 1.4s ease-in-out infinite; }
-.sb-label { font: 700 12px/1 'Sora', sans-serif; letter-spacing: 0.14em; opacity: 0.85; margin: 0 0 8px; }
-.sb-judul { font: 800 28px/1.1 'Sora', sans-serif; margin: 0; }
-.sb-sub { margin: 6px 0 0; font-size: 14px; opacity: 0.92; }
-.sb-jam { font: 800 22px/1 'Sora', sans-serif; margin: 0; font-variant-numeric: tabular-nums; text-align: right; }
-.sb-tgl { margin: 6px 0 0; font-size: 12px; opacity: 0.85; text-align: right; }
 
-.sk-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 14px; }
-@media (min-width: 640px) { .sk-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (min-width: 1024px) { .sk-grid { grid-template-columns: repeat(4, 1fr); } }
-
-.sk {
-  --c: #2D5CF0;
-  position: relative; overflow: hidden;
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.95);
-  border-radius: 18px; padding: 14px 16px 14px 18px;
-  box-shadow: 0 8px 22px rgba(45, 30, 110, 0.07);
-}
-.sk::before { content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 4px; background: var(--c); }
-.sk-kuning { --c: #F59E0B; }
-.sk-merah { --c: #DC2626; }
-
-.sk-atas { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-.sk-atas h3 { font: 800 16px/1.2 'Sora', sans-serif; margin: 0; color: var(--lk-teks, #1d1640); }
-.sk-pil {
-  font: 700 11px/1 'Plus Jakarta Sans', sans-serif;
-  padding: 6px 10px; border-radius: 999px; color: #fff;
-  background: var(--c); white-space: nowrap;
-}
-.sk-merah .sk-pil { animation: siagaKedip 1.4s ease-in-out infinite; }
-
-.sk-cuaca { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
-.sk-cuaca img { width: 40px; height: 40px; }
-.sk-suhu { font: 800 24px/1 'Sora', sans-serif; margin: 0; }
-.sk-desk { margin: 4px 0 0; font-size: 13px; color: #5b5478; }
-.sk-peringatan { margin: 10px 0 0; font-size: 12px; font-weight: 600; color: #991B1B; }
-
-.siaga-sumber { font-size: 12px; color: #5b5478; margin: 12px 4px 0; }
-
-@keyframes siagaKedip { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
 @media (max-width: 600px) {
-  .sk-banner { flex-direction: column; align-items: flex-start; padding: 20px; }
-  .sb-judul { font-size: 24px; }
-  .sb-jam, .sb-tgl { text-align: left; }
+  .pc-jam { margin-left: 0; text-align: left; }
+  .pc-hero h1 { font-size: 24px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .sb-merah, .sk-merah .sk-pil { animation: none; }
+  .pc-putar, .pc-siklon, .pc-merah .pc-status { animation: none; }
 }

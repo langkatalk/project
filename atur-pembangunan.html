@@ -1,1 +1,72 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Atur Pantau Pembangunan | Langkatalk</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@700;800&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/siaga.css">
+<style>
+  .ap-wrap { max-width: 880px; margin: 0 auto; padding: 16px; font-family: 'Plus Jakarta Sans', sans-serif; color: #1d1640; }
+  .ap-kaca { background: rgba(255,255,255,.8); border: 1px solid rgba(255,255,255,.95); border-radius: 22px; padding: 20px; margin-top: 14px; box-shadow: 0 14px 34px rgba(45,30,110,.08); }
+  .ap-judul { font: 800 24px/1.2 'Sora', sans-serif; margin: 0 0 6px; }
+  .ap-label { display: block; font-weight: 700; margin-top: 12px; }
+  .ap-input, .ap-select { width: 100%; min-height: 44px; margin-top: 6px; padding: 0 12px; border-radius: 12px; border: 1.5px solid #E4DEFF; background: #fff; font: inherit; }
+  .ap-tabel { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; }
+  .ap-tabel th, .ap-tabel td { border-bottom: 1px solid #ECE8FF; padding: 6px 8px; text-align: left; }
+  .ap-err { color: #B91C1C; font-weight: 700; min-height: 20px; }
+  .ap-ok { color: #047857; font-weight: 700; }
+  .ap-panduan summary { font-weight: 800; cursor: pointer; }
+  .ap-panduan ol { margin: 10px 0 0; padding-left: 20px; line-height: 1.7; }
+  .ap-tombol { margin-top: 14px; min-height: 46px; padding: 0 20px; border: 0; border-radius: 14px; background: linear-gradient(135deg,#5A2FCF,#2D5CF0); color: #fff; font: 800 15px 'Sora', sans-serif; cursor: pointer; }
+  .ap-tombol:disabled { opacity: .5; cursor: default; }
+</style>
+</head>
+<body style="margin:0;background:#F3F0FF">
+<main class="ap-wrap">
+  <section class="ap-kaca" id="apAkses"><p>Memuat…</p></section>
 
+  <section class="ap-kaca" id="apPanel" hidden>
+    <h1 class="ap-judul">Atur Pantau Pembangunan</h1>
+    <p>Unggah file CSV dari SIRUP dan LPSE. Setelah disimpan, data langsung tampil di Pantau Pembangunan.</p>
+
+    <details class="ap-kaca ap-panduan">
+      <summary>Cara ambil data (baca dulu)</summary>
+      <ol>
+        <li><b>SIRUP:</b> buka rekap Kabupaten Langkat, salin tabel paket beserta pagunya ke Excel, lalu isi judul kolom sesuai template.</li>
+        <li><b>LPSE:</b> buka daftar lelang atau nontender, salin ke Excel, lengkapi pemenang dan nilai kontrak.</li>
+        <li><b>Simpan:</b> pilih <i>Simpan sebagai → CSV UTF-8</i>.</li>
+        <li><b>Unggah:</b> pilih jenis data di bawah, pilih filenya, periksa pratinjau, lalu simpan.</li>
+      </ol>
+      <p><b>Template judul kolom</b></p>
+      <p><b>RUP:</b> tahun,bulan,kode_rup,nama_paket,instansi,pagu,metode,sumber_dana</p>
+      <p><b>Lelang:</b> tahun,bulan,jenis,kode_lelang,nama_paket,instansi,pagu,hps,status,pemenang,alamat_pemenang,nilai_kontrak,tanggal_kontrak</p>
+      <p><b>APBD:</b> tahun,jenis,total,keterangan (jenis: rapbd, apbd, atau papbd)</p>
+    </details>
+
+    <label class="ap-label">Jenis data
+      <select class="ap-select" id="apJenis">
+        <option value="rup">Rencana paket (SIRUP)</option>
+        <option value="lelang">Lelang dan nontender (LPSE)</option>
+        <option value="apbd">Anggaran APBD (R-APBD, APBD, P-APBD)</option>
+      </select>
+    </label>
+    <label class="ap-label">File CSV
+      <input class="ap-input" type="file" id="apFile" accept=".csv,text/csv">
+    </label>
+
+    <div id="apPratinjau"></div>
+    <p class="ap-err" id="apErr"></p>
+    <p class="ap-ok" id="apOk"></p>
+    <button class="ap-tombol" id="apSimpan" disabled>Simpan ke Pantau Pembangunan</button>
+  </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script src="js/supabase.js"></script>
+<script src="js/atur-pembangunan.js"></script>
+</body>
+</html>

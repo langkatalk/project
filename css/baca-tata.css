@@ -1,0 +1,86 @@
+/* ===== Tata letak halaman artikel ===== */
+.bt-header {
+  position: sticky; top: 0; z-index: 50;
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px;
+  padding: 10px 16px;
+  background: rgba(255,255,255,.75);
+  backdrop-filter: blur(14px) saturate(150%); -webkit-backdrop-filter: blur(14px) saturate(150%);
+  border-bottom: 1px solid rgba(255,255,255,.9);
+}
+.bt-kiri { display: flex; gap: 8px; align-items: center; justify-self: start; }
+.bt-kanan { justify-self: end; }
+.bt-ikon-home {
+  width: 42px; height: 42px; border-radius: 14px; display: inline-flex; align-items: center; justify-content: center;
+  background: #fff; border: 1px solid #E4DEFF; color: #1d1640;
+}
+.bt-kat { position: relative; }
+.bt-tombol-kat {
+  min-height: 42px; padding: 0 14px; border-radius: 14px; border: 1px solid #E4DEFF;
+  background: #fff; font: 700 14px 'Plus Jakarta Sans', sans-serif; color: #1d1640; cursor: pointer;
+}
+.bt-menu {
+  position: absolute; top: calc(100% + 8px); left: 0; z-index: 60; min-width: 230px; max-height: 70vh; overflow: auto;
+  background: rgba(255,255,255,.97); border: 1px solid #ECE8FF; border-radius: 16px; padding: 8px;
+  box-shadow: 0 18px 40px rgba(45,30,110,.14);
+}
+.bt-menu[hidden] { display: none; }
+.bt-menu a { display: block; padding: 9px 12px; border-radius: 10px; color: #1d1640; text-decoration: none; font-weight: 600; font-size: 14px; }
+.bt-menu a:hover { background: #EEF3FF; }
+.bt-logo img { display: block; height: 52px; width: auto; }
+
+.bt-wrap { max-width: 1240px; margin: 0 auto; padding: 16px; display: grid; grid-template-columns: minmax(0,1fr); gap: 20px; }
+.bt-utama { min-width: 0; }
+.bt-samping { min-width: 0; }
+.bt-blok {
+  background: rgba(255,255,255,.82); border: 1px solid rgba(255,255,255,.95); border-radius: 20px;
+  padding: 16px; margin-bottom: 14px; box-shadow: 0 10px 26px rgba(45,30,110,.07);
+}
+.bt-blok h2 { font: 800 15px 'Sora', sans-serif; margin: 0 0 10px; color: #1d1640; }
+.bt-item {
+  display: flex; gap: 10px; align-items: center; padding: 9px 0; border-bottom: 1px solid #ECE8FF;
+  text-decoration: none; color: #1d1640;
+}
+.bt-item:last-child { border-bottom: 0; }
+.bt-item img { width: 76px; height: 50px; object-fit: cover; border-radius: 10px; flex-shrink: 0; }
+.bt-item span { font-size: 13px; line-height: 1.4; font-weight: 600; }
+.bt-kosong { font-size: 13px; color: #5b5478; margin: 0; }
+.bt-komen { padding: 9px 0; border-bottom: 1px solid #ECE8FF; font-size: 13px; color: #1d1640; }
+.bt-komen:last-child { border-bottom: 0; }
+.bt-komen b { display: block; font-size: 13px; }
+.bt-komen small { color: #5b5478; font-size: 11px; }
+.bt-komen p { margin: 4px 0 0; line-height: 1.5; color: #443d63; }
+
+.bt-tag { display: flex; flex-wrap: wrap; gap: 8px; margin: 22px 0 0; padding: 0 2px; }
+.bt-tag span {
+  padding: 6px 12px; border-radius: 999px; background: #EEF3FF; color: #5A2FCF;
+  font-size: 13px; font-weight: 700;
+}
+
+.bt-footer { margin-top: 30px; padding: 28px 16px 20px; background: rgba(255,255,255,.75); border-top: 1px solid #E4DEFF; }
+.bt-footer-grid { max-width: 1240px; margin: 0 auto; display: grid; grid-template-columns: 1fr; gap: 24px; }
+.bt-footer-logo { height: 60px; width: auto; display: block; margin-bottom: 12px; }
+.bt-footer-teks { font-size: 13px; line-height: 1.6; color: #5b5478; margin: 0 0 6px; }
+.bt-footer-judul { font: 800 14px 'Sora', sans-serif; margin: 0 0 8px; color: #1d1640; }
+.bt-footer-kat { list-style: none; padding: 0; margin: 0; columns: 2; font-size: 13px; }
+.bt-footer-kat li { margin-bottom: 6px; }
+.bt-footer-kat a { color: #1d1640; text-decoration: none; }
+.bt-footer-bawah {
+  max-width: 1240px; margin: 22px auto 0; padding-top: 14px; border-top: 1px solid #E4DEFF;
+  display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 13px; color: #1d1640;
+}
+.bt-footer-bawah a { color: #1d1640; text-decoration: none; }
+.bt-footer-bawah span { color: #5b5478; }
+.bt-copy { margin-left: auto; }
+
+@media (min-width: 1024px) {
+  .bt-wrap { grid-template-columns: minmax(0,1fr) 340px; }
+  .bt-samping { position: sticky; top: 92px; align-self: start; max-height: calc(100vh - 110px); overflow: auto; padding-right: 2px; }
+  .bt-footer-grid { grid-template-columns: 1.1fr 1fr; }
+}
+@media (max-width: 700px) {
+  .bt-header { grid-template-columns: auto 1fr auto; padding: 8px 10px; }
+  .bt-logo img { height: 40px; }
+  .bt-tombol-kat { padding: 0 10px; font-size: 13px; }
+  .bt-footer-kat { columns: 1; }
+  .bt-copy { margin-left: 0; }
+}

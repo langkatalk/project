@@ -250,15 +250,6 @@
     return q.order('published_at', { ascending: false });
   }
 
-    var u = st.urutan || 'terbaru';
-    if (u === 'terlama') return q.order('published_at', { ascending: true });
-    if (u === 'az') return q.order('title', { ascending: true });
-    if (u === 'za') return q.order('title', { ascending: false });
-    // Sementara memakai jumlah suka, sampai pencatatan pembacaan dibuat
-    if (u === 'populer') return q.order('like_count', { ascending: false }).order('published_at', { ascending: false });
-    return q.order('published_at', { ascending: false });
-  }
-
   async function muatBerikutnya() {
     if (st.sedangMuat || st.selesai) return;
     if (!sb) {

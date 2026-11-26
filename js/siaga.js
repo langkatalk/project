@@ -99,12 +99,13 @@
       if (!pertama && k.peringatan && k.peringatan.length) pertama = k.peringatan[0];
     });
     var sub = pertama ? esc(pertama.judul) : 'Tidak ada peringatan dini untuk Kabupaten Langkat';
-    a.className = 'pc-card pc-' + t;
+    a.className = 'pc-card pc-pin pc-cuaca pc-' + t;
     a.innerHTML =
-      '<div class="pc-ikon">' + ilustrasi(kondisi(d)) + '</div>' +
-      '<div class="pc-teks">' +
+      '<div class="pin-gambar pc-gambar">' + ilustrasi(kondisi(d)) +
+        '<span class="pin-badge">PIN OLEH REDAKSI</span></div>' +
+      '<div class="pin-teks">' +
         '<p class="pc-label">PANTAU CUACA LANGKAT</p>' +
-        '<h3 class="pc-status">' + LABEL[t] + '</h3>' +
+        '<h3 class="pin-judul pc-status">' + LABEL[t] + '</h3>' +
         '<p class="pc-sub">' + sub + '</p>' +
       '</div>';
   }

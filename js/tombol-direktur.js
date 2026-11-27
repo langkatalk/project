@@ -1,5 +1,5 @@
 // js/tombol-direktur.js
-// Menambahkan tombol "Atur Pantau Pembangunan" di Ruang Redaksi, hanya untuk direktur.
+// Tombol khusus direktur di Ruang Redaksi: Atur Pantau Pembangunan dan Pengaturan Situs.
 (async function () {
   'use strict';
 
@@ -18,13 +18,19 @@
     return /\+\s*Tulis/.test(el.textContent);
   });
 
-  var a = document.createElement('a');
-  a.id = 'btnAturPembangunan';
-  a.href = 'atur-pembangunan.html';
-  a.textContent = 'Atur Pantau Pembangunan';
-  a.className = 'btn btn-kecil';
-  a.style.cssText = 'margin-right:8px;background:#fff;color:#5A2FCF;border:1.5px solid #E4DEFF;';
+  var tombol = [
+    { id: 'btnAturPembangunan', href: 'atur-pembangunan.html', teks: 'Atur Pantau Pembangunan' },
+    { id: 'btnPengaturanSitus', href: 'pengaturan-situs.html', teks: 'Pengaturan Situs' }
+  ];
 
-  if (tulis && tulis.parentNode) tulis.parentNode.insertBefore(a, tulis);
-  else document.querySelector('.rd-header').appendChild(a);
+  tombol.forEach(function (t) {
+    var a = document.createElement('a');
+    a.id = t.id;
+    a.href = t.href;
+    a.textContent = t.teks;
+    a.className = 'btn btn-kecil';
+    a.style.cssText = 'margin-right:8px;background:#fff;color:#5A2FCF;border:1.5px solid #E4DEFF;';
+    if (tulis && tulis.parentNode) tulis.parentNode.insertBefore(a, tulis);
+    else document.querySelector('.rd-header').appendChild(a);
+  });
 })();

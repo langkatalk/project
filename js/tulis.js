@@ -614,15 +614,26 @@
     }
   }
 
-  // Keterangan gambar wajib diisi sebelum diajukan (draf boleh belum lengkap)
+  // Keterangan gambar wajib diisi sebelum diajukan.
+  // Gambar di dalam kotak "Baca juga" tidak dihitung, karena itu hanya tautan.
   function cekKeteranganGambar(d) {
     if (d.cover_url && !d.cover_caption) return 'Isi keterangan gambar sampul dulu.';
-    var adaTanpaKet = Array.from($('cmsEditorArea').querySelectorAll('img')).some(function (im) {
+
+    var gambar = Array.from($('cmsEditorArea').querySelectorAll('img')).filter(function (im) {
+      return !im.closest('.lk-baca-juga');
+    });
+    for (var i = 0; i < gambar.length; i++) {
+      var im = gambar[i];
       var f = im.closest('figure');
       var cap = f && f.querySelector('figcaption');
-      return !cap || !cap.textContent.trim();
-    });
-    if (adaTanpaKet) return 'Ada gambar di isi berita tanpa keterangan. Tambahkan keterangan, lalu ajukan lagi.';
+      if (!cap || !cap.textContent.trim()) {
+        im.style.outline = '3px solid #DC2626';
+        im.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return 'Gambar ke-' + (i + 1) + ' di isi berita belum ada keterangan (ditandai merah). ' +
+          'Tambahkan keterangan di bawahnya, atau hapus gambarnya.';
+      }
+      im.style.outline = '';
+    }
     return '';
   }
 

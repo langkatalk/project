@@ -30,13 +30,10 @@
   async function muatKategori() {
     var r = await sb.from('categories').select('name').order('sort', { ascending: true });
     var list = (r.data || []).map(function (c) { return c.name; });
-    var menu = $('btKatMenu');
-    var footer = $('btFKat');
-    var links = list.map(function (n) {
+    $('btKatMenu').innerHTML = list.map(function (n) {
       return '<a href="index.html?kategori=' + encodeURIComponent(n) + '">' + esc(n) + '</a>';
-    });
-    menu.innerHTML = links.join('');
-    footer.innerHTML = list.map(function (n) {
+    }).join('');
+    $('btFKat').innerHTML = list.map(function (n) {
       return '<li><a href="index.html?kategori=' + encodeURIComponent(n) + '">' + esc(n) + '</a></li>';
     }).join('');
   }
@@ -61,7 +58,6 @@
     });
   }
 
-  // Breaking: yang ditandai breaking dan terbit 12 jam terakhir. Kalau tidak ada, berita terbaru.
   // Breaking: tampil sampai Direktur melepasnya (urutan dikosongkan). Kalau kosong, berita terbaru.
   async function muatBreaking() {
     var r = await sb.from('articles')
@@ -72,18 +68,6 @@
       .order('breaking_urutan', { ascending: true })
       .limit(5);
     var list = r.data || [];
-
-    if (!list.length) {
-      r = await sb.from('articles')
-        .select('id,title,slug,cover_url')
-        .eq('status', 'terbit').is('deleted_at', null)
-        .or('scheduled_at.is.null,scheduled_at.lte.' + ISO())
-        .order('published_at', { ascending: false })
-        .limit(5);
-      list = r.data || [];
-    }
-    $('btBreaking').innerHTML = list.length ? list.map(itemBerita).join('') : '<p class="bt-kosong">Belum ada berita.</p>';
-  }
 
     if (!list.length) {
       r = await sb.from('articles')
@@ -121,13 +105,13 @@
     var list = r.data || [];
     $('btKomentar').innerHTML = list.length ? list.map(function (c) {
       return '<a class="bt-komen" href="baca.html?s=' + encodeURIComponent(c.article_id) + '" style="text-decoration:none;display:block">' +
-        '<b>' + esc(c.guest_name) + '</b><small>' + new Date(c.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) + '</small>' +
-        '<p>' + esc(c.body) + '</p></a>';
+        '<b>' + esc(c.guest_name) + '</b><small>' +
+        new Date(c.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) +
+        '</small><p>' + esc(c.body) + '</p></a>';
     }).join('') : '<p class="bt-kosong">Belum ada komentar.</p>';
   }
 
-  // Tag artikel ditampilkan di bawah isi berita
-   // Tag ditempatkan di luar kartu artikel, antara isi berita dan bagian komentar
+  // Tag ditempatkan di luar kartu artikel, antara isi berita dan bagian komentar
   async function muatTag() {
     if (!KUNCI) return;
     var q = /^\d+$/.test(KUNCI)

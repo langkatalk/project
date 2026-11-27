@@ -1,10 +1,10 @@
 // js/sesi.js
-// Logout otomatis jika tidak ada aktivitas selama 15 menit.
+// Logout otomatis jika tidak ada aktivitas selama 20 menit.
 // Aktivitas di tab mana pun dihitung, karena disimpan di localStorage bersama.
 (function () {
   'use strict';
 
-  var BATAS_MS = 15 * 60 * 1000;
+  var BATAS_MS = 20 * 60 * 1000;
   var PERIKSA_MS = 30 * 1000;
   var KUNCI_AKTIF = 'lk_aktif_terakhir';
 
@@ -23,7 +23,7 @@
     var c = sb();
     try { if (c) await c.auth.signOut(); } catch (e) {}
     try { localStorage.removeItem(KUNCI_AKTIF); } catch (e) {}
-    alert('Sesi berakhir karena tidak ada aktivitas selama 15 menit. Silakan masuk lagi.');
+    alert('Sesi berakhir karena tidak ada aktivitas selama 20 menit. Silakan masuk lagi.');
     location.href = 'redaksi.html';
   }
 

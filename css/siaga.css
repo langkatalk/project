@@ -156,3 +156,12 @@ body.pc-halaman {
 }
 .pin-gambar .pin-badge { position: absolute; top: 10px; left: 10px; z-index: 1; }
 .pc-cuaca .pc-status { font-size: 26px; }
+/* ===== Ukuran kartu Zona PIN ===== */
+.lk-zona-pin .pin-kecil .pin-gambar { aspect-ratio: 3 / 1; }
+.lk-zona-pin .pin-kecil .pin-judul { font-size: 15px; }
+@media (min-width: 640px) {
+  .lk-zona-pin .pin-besar { grid-column: span 2; }
+}
+@media (min-width: 1024px) {
+  .lk-zona-pin .pin-besar { grid-column: span 2; }
+}

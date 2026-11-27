@@ -1030,9 +1030,11 @@ function tampilRedaksi(p) {
     el.kirim.disabled = false;
 
     if (r.error) {
-      el.err.textContent = /not confirmed/i.test(r.error.message)
-        ? 'Email belum dikonfirmasi. Hubungi direktur.'
-        : 'Email atau kata sandi salah.';
+      var m = r.error.message || '';
+      el.err.textContent = /not confirmed/i.test(m) ? 'Email belum dikonfirmasi. Hubungi direktur.'
+        : /rate|too many|429/i.test(m) ? 'Terlalu banyak percobaan masuk. Tunggu beberapa menit, lalu coba lagi.'
+        : /invalid login/i.test(m) ? 'Email atau kata sandi salah.'
+        : 'Gagal masuk: ' + m;
       return;
     }
 

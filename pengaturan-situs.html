@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pengaturan Situs | Langkatalk</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@700;800&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/siaga.css">
+<style>
+  .ps-wrap { max-width: 720px; margin: 0 auto; padding: 16px; font-family: 'Plus Jakarta Sans', sans-serif; color: #1d1640; }
+  .ps-kaca { background: rgba(255,255,255,.8); border: 1px solid rgba(255,255,255,.95); border-radius: 22px; padding: 20px; margin-top: 14px; box-shadow: 0 14px 34px rgba(45,30,110,.08); }
+  .ps-judul { font: 800 24px/1.2 'Sora', sans-serif; margin: 0 0 6px; }
+  .ps-label { display: block; font-weight: 700; margin-top: 14px; font-size: 14px; }
+  .ps-input { width: 100%; min-height: 44px; margin-top: 6px; padding: 10px 12px; border-radius: 12px; border: 1.5px solid #E4DEFF; background: #fff; font: inherit; box-sizing: border-box; }
+  .ps-catatan { font-size: 12px; color: #5b5478; margin: 4px 0 0; }
+  .ps-err { color: #B91C1C; font-weight: 700; min-height: 20px; }
+  .ps-ok { color: #047857; font-weight: 700; min-height: 20px; }
+  .ps-tombol { margin-top: 16px; min-height: 46px; padding: 0 20px; border: 0; border-radius: 14px; background: linear-gradient(135deg,#5A2FCF,#2D5CF0); color: #fff; font: 800 15px 'Sora', sans-serif; cursor: pointer; }
+  .ps-tombol:disabled { opacity: .5; cursor: default; }
+</style>
+</head>
+<body style="margin:0;background:#F3F0FF">
+<main class="ps-wrap">
+  <section class="ps-kaca" id="psAkses"><p>Memuat…</p></section>
+
+  <section class="ps-kaca" id="psPanel" hidden>
+    <h1 class="ps-judul">Pengaturan Situs</h1>
+    <p class="ps-catatan">Isian di sini dipakai di footer dan halaman situs. Kosongkan kolom yang belum siap, misalnya alamat dan badan hukum sampai legalitas selesai.</p>
+
+    <form id="psForm" novalidate>
+      <label class="ps-label">Nama situs
+        <input class="ps-input" id="ps_nama_situs" type="text" maxlength="60">
+      </label>
+      <label class="ps-label">Tagline
+        <input class="ps-input" id="ps_tagline" type="text" maxlength="120">
+      </label>
+      <label class="ps-label">Nama badan hukum
+        <input class="ps-input" id="ps_badan_hukum" type="text" maxlength="160" placeholder="Diisi setelah legalitas selesai">
+      </label>
+      <label class="ps-label">Alamat redaksi
+        <textarea class="ps-input" id="ps_alamat" rows="3" maxlength="300" placeholder="Diisi setelah legalitas selesai" style="padding:10px"></textarea>
+      </label>
+      <label class="ps-label">Telepon
+        <input class="ps-input" id="ps_telepon" type="text" maxlength="30" placeholder="Contoh: 0812-xxxx-xxxx">
+      </label>
+      <label class="ps-label">Email redaksi
+        <input class="ps-input" id="ps_email" type="email" maxlength="120" placeholder="nama@email.com">
+      </label>
+      <label class="ps-label">Tautan Instagram
+        <input class="ps-input" id="ps_instagram" type="url" maxlength="200" placeholder="https://instagram.com/langkatalk">
+      </label>
+
+      <p class="ps-err" id="psErr"></p>
+      <p class="ps-ok" id="psOk"></p>
+      <button class="ps-tombol" id="psSimpan" type="submit">Simpan pengaturan</button>
+    </form>
+  </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script src="js/supabase.js"></script>
+<script src="js/sesi.js"></script>
+<script src="js/pengaturan-situs.js"></script>
+</body>
+</html>

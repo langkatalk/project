@@ -33,6 +33,22 @@
   .pn-err { color: #B91C1C; font-weight: 700; min-height: 20px; }
   .pn-ok { color: #047857; font-weight: 700; min-height: 20px; }
   @media (max-width: 600px) { .pn-baris { grid-template-columns: 1fr; } .pn-gambar { width: 90px; } }
+    #pnErr, #pnOk { display: none; }
+  .pn-toast {
+    position: fixed; left: 50%; bottom: 22px; z-index: 100;
+    transform: translate(-50%, 20px); opacity: 0; pointer-events: none;
+    min-width: 240px; max-width: calc(100vw - 32px); padding: 14px 20px;
+    border-radius: 18px; text-align: center;
+    background: rgba(255,255,255,.72);
+    backdrop-filter: blur(18px) saturate(160%); -webkit-backdrop-filter: blur(18px) saturate(160%);
+    border: 1px solid rgba(255,255,255,.9);
+    box-shadow: 0 18px 40px rgba(45,30,110,.18);
+    font: 700 14px 'Plus Jakarta Sans', sans-serif; color: #1d1640;
+    transition: opacity .25s ease, transform .25s ease;
+  }
+  .pn-toast.on { opacity: 1; transform: translate(-50%, 0); }
+  .pn-toast.err { border-left: 4px solid #DC2626; }
+  .pn-toast.ok { border-left: 4px solid #5A2FCF; }
 </style>
 </head>
 <body style="margin:0;background:#F3F0FF">

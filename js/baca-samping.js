@@ -62,16 +62,28 @@
   }
 
   // Breaking: yang ditandai breaking dan terbit 12 jam terakhir. Kalau tidak ada, berita terbaru.
+  // Breaking: tampil sampai Direktur melepasnya (urutan dikosongkan). Kalau kosong, berita terbaru.
   async function muatBreaking() {
-    var batas = new Date(Date.now() - 12 * 3600000).toISOString();
     var r = await sb.from('articles')
       .select('id,title,slug,cover_url')
       .eq('status', 'terbit').eq('is_breaking', true).is('deleted_at', null)
-      .gte('published_at', batas)
+      .not('breaking_urutan', 'is', null)
       .or('scheduled_at.is.null,scheduled_at.lte.' + ISO())
       .order('breaking_urutan', { ascending: true })
       .limit(5);
     var list = r.data || [];
+
+    if (!list.length) {
+      r = await sb.from('articles')
+        .select('id,title,slug,cover_url')
+        .eq('status', 'terbit').is('deleted_at', null)
+        .or('scheduled_at.is.null,scheduled_at.lte.' + ISO())
+        .order('published_at', { ascending: false })
+        .limit(5);
+      list = r.data || [];
+    }
+    $('btBreaking').innerHTML = list.length ? list.map(itemBerita).join('') : '<p class="bt-kosong">Belum ada berita.</p>';
+  }
 
     if (!list.length) {
       r = await sb.from('articles')

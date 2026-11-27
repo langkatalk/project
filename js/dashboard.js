@@ -1030,6 +1030,14 @@ function tampilRedaksi(p) {
     el.kirim.disabled = false;
 
     if (r.error) {
+      // Cek dulu: kadang sesi sudah terbentuk walau respons pertama terbaca gagal
+      var sesiAda = await sb.auth.getSession();
+      if (sesiAda.data && sesiAda.data.session) {
+        el.sandi.value = '';
+        state.tab = 'naskah';
+        await cekSesi();
+        return;
+      }
       var m = r.error.message || '';
       el.err.textContent = /not confirmed/i.test(m) ? 'Email belum dikonfirmasi. Hubungi direktur.'
         : /rate|too many|429/i.test(m) ? 'Terlalu banyak percobaan masuk. Tunggu beberapa menit, lalu coba lagi.'

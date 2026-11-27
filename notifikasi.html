@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Notifikasi Redaksi | Langkatalk</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@700;800&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/siaga.css">
+<style>
+  .nt-wrap { max-width: 760px; margin: 0 auto; padding: 16px; font-family: 'Plus Jakarta Sans', sans-serif; color: #1d1640; }
+  .nt-kaca { background: rgba(255,255,255,.8); border: 1px solid rgba(255,255,255,.95); border-radius: 22px; padding: 20px; margin-top: 14px; box-shadow: 0 14px 34px rgba(45,30,110,.08); }
+  .nt-judul { font: 800 24px/1.2 'Sora', sans-serif; margin: 0 0 6px; }
+  .nt-h { font: 800 17px 'Sora', sans-serif; margin: 0 0 10px; display: flex; align-items: center; gap: 8px; }
+  .nt-angka { font: 800 12px 'Plus Jakarta Sans', sans-serif; background: #5A2FCF; color: #fff; border-radius: 999px; padding: 3px 9px; }
+  .nt-item { display: block; padding: 12px 14px; border: 1px solid #ECE8FF; border-radius: 16px; background: #fff; margin-bottom: 8px; text-decoration: none; color: #1d1640; }
+  .nt-item:hover { background: #F7F5FF; }
+  .nt-item b { display: block; font-size: 14px; line-height: 1.4; }
+  .nt-item small { font-size: 12px; color: #5b5478; }
+  .nt-kosong { font-size: 13px; color: #5b5478; margin: 0; }
+  .nt-err { color: #B91C1C; font-weight: 700; }
+</style>
+</head>
+<body style="margin:0;background:#F3F0FF">
+<main class="nt-wrap">
+  <section class="nt-kaca" id="ntAkses"><p>Memuat…</p></section>
+
+  <section id="ntPanel" hidden>
+    <div class="nt-kaca">
+      <h1 class="nt-judul">Notifikasi</h1>
+      <p class="nt-kosong">Pekerjaan yang menunggu tindakan kamu. Klik untuk membukanya di Ruang Redaksi.</p>
+    </div>
+
+    <div class="nt-kaca">
+      <h2 class="nt-h">Naskah <span class="nt-angka" id="ntJumlahNaskah">0</span></h2>
+      <div id="ntNaskah"></div>
+    </div>
+
+    <div class="nt-kaca">
+      <h2 class="nt-h">Komentar menunggu persetujuan <span class="nt-angka" id="ntJumlahKomen">0</span></h2>
+      <div id="ntKomen"></div>
+    </div>
+  </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script src="js/supabase.js"></script>
+<script src="js/sesi.js"></script>
+<script src="js/notifikasi.js"></script>
+</body>
+</html>

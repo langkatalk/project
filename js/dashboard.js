@@ -2,7 +2,7 @@
 // Ruang Redaksi: masuk, menu sesuai peran, Naskah (dengan submenu status), Komentar, dan Log.
 // Perubahan status naskah lewat fungsi resmi di database.
 (function () {
-  'use strict'; 
+  'use strict';
 
   var sb = window.LK && window.LK.sb;
   var REGEX_EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
@@ -15,7 +15,8 @@
     ditinjau: 'Ditinjau', revisi: 'Revisi', terbit: 'Terbit', arsip: 'Arsip'
   };
   var STAF = ['direktur', 'pemred', 'redaktur', 'editor'];
-  var SUDAH_DIBUAT = ['notifikasi' , 'naskah', 'komentar', 'log', 'kategori' , 'pengguna', 'breaking', 'iklan', 'halaman', 'zona', 'pengaturan'];
+  var SUDAH_DIBUAT = ['notifikasi', 'naskah', 'komentar', 'log', 'kategori', 'pengguna', 'breaking', 'iklan', 'halaman', 'zona', 'pengaturan'];
+  var ALIHKAN_KE_HALAMAN = ['notifikasi', 'pengaturan', 'kategori', 'zona'];
   var FOTO_SISI = 480;
   var FOTO_MAX_MB = 2;
   var FILTER_NASKAH = [
@@ -196,7 +197,7 @@
     if (ada && id === 'zona') { location.href = 'atur-pin.html'; return; }
     if (ada && id === 'notifikasi') { location.href = 'notifikasi.html'; return; }
     state.tab = ada ? id : 'naskah';
-        sessionStorage.setItem('lk_tab', state.tab);
+    sessionStorage.setItem('lk_tab', state.tab);
     gambarTab();
 
     if (state.tab === 'naskah') return muatNaskah();
@@ -212,14 +213,14 @@
   /* ---------- Layar masuk dan sesi ---------- */
 
   function tampilMasuk() {
-        sessionStorage.removeItem('lk_tab');
+    sessionStorage.removeItem('lk_tab');
     el.masuk.hidden = false;
     if (el.daftar) el.daftar.hidden = true;
     el.app.hidden = true;
     el.aksi.hidden = true;
   }
 
-function tampilRedaksi(p) {
+  function tampilRedaksi(p) {
     state.profil = p;
     el.masuk.hidden = true;
     el.app.hidden = false;
@@ -240,7 +241,7 @@ function tampilRedaksi(p) {
       '<span class="rd-lencana-peran">' + esc(peran) + '</span>';
 
     var simpanTab = sessionStorage.getItem('lk_tab');
-    if (simpanTab && ['notifikasi', 'pengaturan', 'kategori', 'zona'].indexOf(simpanTab) === -1) {
+    if (simpanTab && ALIHKAN_KE_HALAMAN.indexOf(simpanTab) === -1) {
       state.tab = simpanTab;
     }
     bukaTab(state.tab);
@@ -378,7 +379,7 @@ function tampilRedaksi(p) {
       }
       return b.join('');
     }
-        if (st !== 'terbit') b.push('<a class="btn-xs" href="baca.html?pratinjau=' + a.id + '" target="_blank" rel="noopener">Pratinjau</a>');
+    if (st !== 'terbit') b.push('<a class="btn-xs" href="baca.html?pratinjau=' + a.id + '" target="_blank" rel="noopener">Pratinjau</a>');
     if ((st === 'draf' || st === 'draft' || st === 'revisi') && (saya || r === 'direktur')) {
       b.push(t('ajukan', 'Ajukan', 'utama'));
     }
@@ -1086,9 +1087,7 @@ function tampilRedaksi(p) {
     if (t) bukaTab(t.dataset.tab);
   });
 
-  el.isi.addEventListener('click', function (ev) {
-     // FIX GANTI FOTO: langsung upload begitu pilih foto, jangan nunggu Simpan.
-  // Ini yang bikin tadi gak ada notif & gak ada yang berubah.
+  // Foto anggota: langsung upload begitu pilih foto, tanpa menunggu tombol Simpan
   el.isi.addEventListener('change', async function (ev) {
     if (!ev.target.classList.contains('pg-foto')) return;
     var input = ev.target;
@@ -1105,7 +1104,6 @@ function tampilRedaksi(p) {
     var label = baris.querySelector('.pg-label-foto');
     var teksAwal = label ? label.childNodes[0].textContent : 'Ganti foto';
 
-    // 1. Langsung tampilkan preview biar keliatan berubah, jangan nunggu upload kelar
     var imgLama = baris.querySelector('.rd-av-foto, .rd-av');
     var previewUrl = URL.createObjectURL(file);
     if (imgLama) {
@@ -1116,7 +1114,6 @@ function tampilRedaksi(p) {
       imgLama.replaceWith(imgBaru);
     }
 
-    // 2. Kasih notif langsung, biar gak dikira gak ada apa-apa
     kabarkan('Mengunggah foto…');
     if (label) label.childNodes[0].textContent = 'Mengunggah…';
 
@@ -1124,12 +1121,10 @@ function tampilRedaksi(p) {
       var url = await unggahFoto(file, state.profil.id);
 
       if (sayaSendiri) {
-        // Akun sendiri: pakai fungsi sendiri, jangan pakai atur_pengguna (itu ditolak kalau direktur ubah diri sendiri)
         var r1 = await sb.rpc('perbarui_profil_sendiri', { p_full_name: null, p_username: null, p_avatar_url: url });
         if (r1.error) throw new Error(r1.error.message);
         state.profil.avatar_url = url;
       } else {
-        // Akun orang lain: pakai fungsi direktur
         var r2 = await sb.rpc('atur_pengguna', {
           p_id: uid, p_role: u.role, p_is_active: u.is_active !== false,
           p_username: u.username, p_full_name: u.full_name, p_desk: u.desk || null,
@@ -1139,19 +1134,20 @@ function tampilRedaksi(p) {
       }
 
       kabarkan('Foto profil diperbarui');
-      // Refresh list + header biar foto baru muncul di semua tempat
       muatPengguna();
       if (sayaSendiri) tampilRedaksi(state.profil);
     } catch (e) {
       kabarkan('Gagal: ' + (e.message || e));
-      // Kalau gagal, balikin preview ke foto lama
       muatPengguna();
     } finally {
       if (label) label.childNodes[0].textContent = teksAwal;
-      input.value = ''; // Biar bisa pilih foto yang sama lagi kalau mau coba ulang
+      input.value = '';
       URL.revokeObjectURL(previewUrl);
     }
   });
+
+  // Tombol-tombol di dalam isi (filter, aksi naskah, komentar, simpan pengguna)
+  el.isi.addEventListener('click', function (ev) {
     var t;
     if ((t = ev.target.closest('[data-fn]'))) { state.fNaskah = t.dataset.fn; return tampilNaskah(); }
     if ((t = ev.target.closest('[data-fk]'))) { state.fKomen = t.dataset.fk; return muatKomentar(); }
@@ -1161,24 +1157,24 @@ function tampilRedaksi(p) {
   });
 
   // Tombol "Ubah foto saya" ada di header profil (#profil), dibuat ulang tiap masuk.
-el.profil.addEventListener('change', async function (ev) {
-  if (ev.target.id !== 'fotoSaya') return;
-  var file = ev.target.files && ev.target.files[0];
-  if (!file) return;
-  try {
-    kabarkan('Mengunggah foto…');
-    var url = await unggahFoto(file, state.profil.id);
-    var r = await sb.rpc('perbarui_profil_sendiri', { p_full_name: null, p_username: null, p_avatar_url: url });
-    if (r.error) throw new Error(r.error.message);
-    state.profil.avatar_url = url;
-    kabarkan('Foto profil diperbarui');
-    tampilRedaksi(state.profil);
-  } catch (e) {
-    kabarkan('Gagal: ' + (e.message || e));
-  }
-});
+  el.profil.addEventListener('change', async function (ev) {
+    if (ev.target.id !== 'fotoSaya') return;
+    var file = ev.target.files && ev.target.files[0];
+    if (!file) return;
+    try {
+      kabarkan('Mengunggah foto…');
+      var url = await unggahFoto(file, state.profil.id);
+      var r = await sb.rpc('perbarui_profil_sendiri', { p_full_name: null, p_username: null, p_avatar_url: url });
+      if (r.error) throw new Error(r.error.message);
+      state.profil.avatar_url = url;
+      kabarkan('Foto profil diperbarui');
+      tampilRedaksi(state.profil);
+    } catch (e) {
+      kabarkan('Gagal: ' + (e.message || e));
+    }
+  });
 
-    /* ---------- Breaking News ---------- */
+  /* ---------- Breaking News ---------- */
 
   async function muatBreaking() {
     pesan('Memuat breaking news…');
@@ -1448,6 +1444,7 @@ el.profil.addEventListener('change', async function (ev) {
     wadah.innerHTML = '<img class="ik-gambar" alt="Pratinjau">';
     wadah.firstChild.src = URL.createObjectURL(f);
   });
+
   /* ---------- Halaman legal (privasi, pedoman, tentang, masthead) ---------- */
 
   var HALAMAN_LEGAL = [
@@ -1549,5 +1546,6 @@ el.profil.addEventListener('change', async function (ev) {
       muatHalamanLegal();
     }
   });
+
   cekSesi();
 })();

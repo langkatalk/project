@@ -121,3 +121,11 @@
   .bc-tubuh h2 { font-size: 21px; }
   .bc-tubuh h3 { font-size: 18px; }
 }
+/* ===== Ikon aksi di halaman artikel: dibuat lebih kecil ===== */
+.bc-aksi { gap: 6px; }
+.bc-aksi .ig-ikon {
+  width: 36px;
+  height: 36px;
+}
+.bc-aksi .ig-ikon svg { width: 19px; height: 19px; }
+.bc-jumlah { font-size: 12px; }

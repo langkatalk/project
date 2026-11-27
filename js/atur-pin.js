@@ -20,9 +20,22 @@
     return d ? new Date(d).toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' }) : '';
   }
 
+  // Notifikasi pop-up kaca di bawah layar, hilang otomatis
   function pesan(err, ok) {
-    $('pnErr').textContent = err || '';
-    $('pnOk').textContent = ok || '';
+    var teks = err || ok;
+    if (!teks) return;
+    var box = document.getElementById('pnToast');
+    if (!box) {
+      box = document.createElement('div');
+      box.id = 'pnToast';
+      box.className = 'pn-toast';
+      box.setAttribute('role', 'status');
+      document.body.appendChild(box);
+    }
+    box.textContent = teks;
+    box.className = 'pn-toast on ' + (err ? 'err' : 'ok');
+    clearTimeout(pesan.t);
+    pesan.t = setTimeout(function () { box.classList.remove('on'); }, 3200);
   }
 
   function opsi(list, nilai) {

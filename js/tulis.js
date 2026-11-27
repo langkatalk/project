@@ -158,7 +158,69 @@
     tmp.innerHTML = isiEditor();
     return (tmp.textContent || '').replace(/\s+/g, ' ').trim();
   }
+  // Teks dari alat tulis lain dipecah per baris, supaya enter-nya tidak hilang
+  function tempelRapi(e) {
+    var cd = e.clipboardData;
+    if (!cd) return;
+    var teks = cd.getData('text/plain');
+    if (!teks) return;
+    e.preventDefault();
+    var isi = teks.replace(/\r\n?/g, '\n').split('\n').map(function (baris) {
+      return baris.trim() === '' ? '<p><br></p>' : '<p>' + esc(baris) + '</p>';
+    }).join('');
+    sisipkan(isi);
+  }
 
+  // Setelah naskah diajukan, form kembali kosong untuk berita baru
+  function resetBaru(teks) {
+    st.artikelId = null;
+    st.tags = [];
+    st.related = [];
+    st.coverUrl = '';
+    st.kotor = false;
+    st.terkunci = false;
+    st.sedang = false;
+
+    ['tTitle', 'tDesc', 'tSource', 'tTopic', 'tMetaTitle', 'tMetaDesc', 'tCoverCaption'].forEach(function (id) {
+      $(id).value = '';
+    });
+    $('tCategory').value = '';
+    $('tAllowComment').checked = true;
+    $('tShowHome').checked = true;
+    $('tAuthor').value = (st.profil && (st.profil.full_name || st.profil.username)) || '';
+    if (kotakPin) {
+      $('tPinAktif').checked = false;
+      $('tPinJenis').value = '';
+      sinkronPin();
+    }
+
+    var area = $('cmsEditorArea');
+    area.innerHTML = '';
+    area.style.display = '';
+    area.contentEditable = 'true';
+    var sumber = $('cmsHtmlSource');
+    sumber.value = '';
+    sumber.classList.remove('on');
+
+    $('tImgPreview').hidden = true;
+    $('tImgInfo').textContent = '';
+    $('tCatatanRevisi').hidden = true;
+    $('tAutosave').textContent = '';
+
+    renderTag();
+    renderTerkait();
+    hapusLokal();
+    hitungUlang();
+    pembaruan();
+    st.kotor = false;
+
+    document.querySelectorAll('#layarTulis input, #layarTulis select, #layarTulis textarea, #layarTulis button, #btnSimpanDraf, #btnAjukan')
+      .forEach(function (n) { n.disabled = false; });
+    setSibuk(false);
+
+    history.replaceState(null, '', 'tulis.html');
+    pesanOk(teks);
+  }
   /* ---------- Hitungan dan status editor ---------- */
 
   function hitungUlang() {
@@ -586,7 +648,7 @@
       var r = await sb.rpc('advance_article', { p_id: st.artikelId, p_to: 'diajukan', p_note: null });
       if (r.error) throw new Error('Gagal mengajukan: ' + r.error.message);
       hapusLokal();
-      kunci('Naskah sudah diajukan ke redaksi. Pantau statusnya di Ruang Redaksi.');
+      resetBaru('Naskah sudah diajukan ke redaksi. Silakan tulis berita baru.');
     } catch (e) {
       pesanErr(e.message);
     } finally {
@@ -721,6 +783,7 @@
     area.addEventListener('input', pembaruan);
     area.addEventListener('keyup', perbaruiPath);
     area.addEventListener('mouseup', perbaruiPath);
+    area.addEventListener('paste', tempelRapi);
     $('cmsHtmlSource').addEventListener('input', pembaruan);
 
     $('toolbarTulis').addEventListener('click', klikToolbar);

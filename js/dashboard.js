@@ -239,6 +239,10 @@ function tampilRedaksi(p) {
       '</div>' +
       '<span class="rd-lencana-peran">' + esc(peran) + '</span>';
 
+    var simpanTab = sessionStorage.getItem('lk_tab');
+    if (simpanTab && ['notifikasi', 'pengaturan', 'kategori', 'zona'].indexOf(simpanTab) === -1) {
+      state.tab = simpanTab;
+    }
     bukaTab(state.tab);
   }
 
@@ -283,11 +287,7 @@ function tampilRedaksi(p) {
       el.err.textContent = 'Akun kamu sedang dinonaktifkan.';
       return tampilMasuk();
     }
-    var simpanTab = sessionStorage.getItem('lk_tab');
-    if (simpanTab && ['notifikasi', 'pengaturan', 'kategori', 'zona'].indexOf(simpanTab) === -1) {
-      state.tab = simpanTab;
-    }
-    bukaTab(state.tab);
+    tampilRedaksi(p);
   }
 
   /* ---------- Naskah ---------- */

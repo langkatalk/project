@@ -1,6 +1,6 @@
 // js/sesi.js
 // Logout otomatis jika tidak ada aktivitas selama 20 menit.
-// Aktivitas di tab mana pun dihitung, karena disimpan di localStorage bersama.
+// Membuka halaman dihitung sebagai aktivitas, jadi tidak langsung keluar saat berpindah halaman.
 (function () {
   'use strict';
 
@@ -40,7 +40,8 @@
   }
 
   function mulai() {
-    if (!localStorage.getItem(KUNCI_AKTIF)) catatAktif();
+    // Membuka halaman = aktivitas. Dicatat dulu, baru diperiksa.
+    catatAktif();
 
     ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll', 'click'].forEach(function (ev) {
       document.addEventListener(ev, catatAktif, { passive: true, capture: true });

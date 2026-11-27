@@ -15,7 +15,7 @@
     ditinjau: 'Ditinjau', revisi: 'Revisi', terbit: 'Terbit', arsip: 'Arsip'
   };
   var STAF = ['direktur', 'pemred', 'redaktur', 'editor'];
-  var SUDAH_DIBUAT = ['naskah', 'komentar', 'log', 'pengguna', 'breaking', 'iklan', 'halaman'];
+  var SUDAH_DIBUAT = ['naskah', 'komentar', 'log', 'pengguna', 'breaking', 'iklan', 'halaman', 'pengaturan'];
   var FOTO_SISI = 480;
   var FOTO_MAX_MB = 2;
   var FILTER_NASKAH = [
@@ -189,6 +189,7 @@
 
   function bukaTab(id) {
     var ada = menuUntuk(state.profil.role).some(function (m) { return m.id === id; });
+    if (ada && id === 'pengaturan') { location.href = 'pengaturan-situs.html'; return; }
     state.tab = ada ? id : 'naskah';
         sessionStorage.setItem('lk_tab', state.tab);
     gambarTab();

@@ -33,7 +33,7 @@
     { id: 'ditolak', nama: 'Ditolak' }
   ];
 
-  var state = { profil: null, tab: sessionStorage.getItem('lk_tab') || 'naskah', fNaskah: 'semua', fKomen: 'menunggu', naskah: [], komen: [], pengguna: [] };
+  var state = { profil: null, tab: 'naskah', fNaskah: 'semua', fKomen: 'menunggu', naskah: [], komen: [], pengguna: [] };
 
   var el = {
     masuk: document.getElementById('layarMasuk'),
@@ -283,7 +283,11 @@ function tampilRedaksi(p) {
       el.err.textContent = 'Akun kamu sedang dinonaktifkan.';
       return tampilMasuk();
     }
-    tampilRedaksi(p);
+    var simpanTab = sessionStorage.getItem('lk_tab');
+    if (simpanTab && ['notifikasi', 'pengaturan', 'kategori', 'zona'].indexOf(simpanTab) === -1) {
+      state.tab = simpanTab;
+    }
+    bukaTab(state.tab);
   }
 
   /* ---------- Naskah ---------- */

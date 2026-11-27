@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kategori | Langkatalk</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@700;800&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/siaga.css">
+<style>
+  .kt-wrap { max-width: 760px; margin: 0 auto; padding: 16px; font-family: 'Plus Jakarta Sans', sans-serif; color: #1d1640; }
+  .kt-kaca { background: rgba(255,255,255,.8); border: 1px solid rgba(255,255,255,.95); border-radius: 22px; padding: 20px; margin-top: 14px; box-shadow: 0 14px 34px rgba(45,30,110,.08); }
+  .kt-judul { font: 800 24px/1.2 'Sora', sans-serif; margin: 0 0 6px; }
+  .kt-catatan { font-size: 13px; color: #5b5478; margin: 4px 0 0; line-height: 1.6; }
+  .kt-baris { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 12px 0; border-bottom: 1px solid #ECE8FF; }
+  .kt-nomor { width: 28px; font-weight: 800; color: #5A2FCF; }
+  .kt-nama { flex: 1; min-width: 160px; font-weight: 700; }
+  .kt-jumlah { font-size: 12px; color: #5b5478; }
+  .kt-btn { min-height: 36px; padding: 0 12px; border-radius: 12px; border: 1.5px solid #E4DEFF; background: #fff; font: 700 13px 'Plus Jakarta Sans', sans-serif; color: #1d1640; cursor: pointer; }
+  .kt-btn.utama { background: linear-gradient(135deg,#5A2FCF,#2D5CF0); color: #fff; border: 0; }
+  .kt-btn.bahaya { color: #B91C1C; }
+  .kt-btn:disabled { opacity: .5; cursor: default; }
+  .kt-input, .kt-select { min-height: 42px; padding: 0 12px; border-radius: 12px; border: 1.5px solid #E4DEFF; background: #fff; font: inherit; }
+  .kt-panel { width: 100%; background: #F7F5FF; border-radius: 16px; padding: 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .kt-err { color: #B91C1C; font-weight: 700; min-height: 20px; }
+  .kt-ok { color: #047857; font-weight: 700; min-height: 20px; }
+</style>
+</head>
+<body style="margin:0;background:#F3F0FF">
+<main class="kt-wrap">
+  <section class="kt-kaca" id="ktAkses"><p>Memuat…</p></section>
+
+  <section class="kt-kaca" id="ktPanel" hidden>
+    <h1 class="kt-judul">Kategori</h1>
+    <p class="kt-catatan">Urutan di sini sama dengan urutan tombol kategori di beranda. Kalau kategori dihapus, artikelnya dipindahkan dulu ke kategori yang Anda pilih. Mengubah nama juga memperbarui semua artikel yang memakai nama lama.</p>
+
+    <div class="kt-baris" style="border-bottom:0;padding-bottom:0">
+      <input class="kt-input" id="ktBaru" type="text" maxlength="40" placeholder="Nama kategori baru" style="flex:1;min-width:200px">
+      <button type="button" class="kt-btn utama" id="ktTambah">+ Tambah kategori</button>
+    </div>
+    <p class="kt-err" id="ktErr"></p>
+    <p class="kt-ok" id="ktOk"></p>
+
+    <div id="ktDaftar"></div>
+  </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script src="js/supabase.js"></script>
+<script src="js/sesi.js"></script>
+<script src="js/kategori.js"></script>
+</body>
+</html>

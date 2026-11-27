@@ -15,7 +15,7 @@
     ditinjau: 'Ditinjau', revisi: 'Revisi', terbit: 'Terbit', arsip: 'Arsip'
   };
   var STAF = ['direktur', 'pemred', 'redaktur', 'editor'];
-  var SUDAH_DIBUAT = ['naskah', 'komentar', 'log', 'kategori' , 'pengguna', 'breaking', 'iklan', 'halaman', 'pengaturan'];
+  var SUDAH_DIBUAT = ['naskah', 'komentar', 'log', 'kategori' , 'pengguna', 'breaking', 'iklan', 'halaman', 'zona', 'pengaturan'];
   var FOTO_SISI = 480;
   var FOTO_MAX_MB = 2;
   var FILTER_NASKAH = [
@@ -162,6 +162,7 @@
     if (r === 'direktur') {
       m.push({ id: 'pengguna', nama: 'Manajemen Akses' });
       m.push({ id: 'pengaturan', nama: 'Pengaturan Situs' });
+      m.push({ id: 'zona', nama: 'Zona PIN' });
       m.push({ id: 'kategori', nama: 'Kategori' });
       m.push({ id: 'builder', nama: 'Builder Level 1' });
       m.push({ id: 'log', nama: 'Log Aktivitas' });
@@ -192,6 +193,7 @@
     var ada = menuUntuk(state.profil.role).some(function (m) { return m.id === id; });
     if (ada && id === 'pengaturan') { location.href = 'pengaturan-situs.html'; return; }
     if (ada && id === 'kategori') { location.href = 'kategori.html'; return; }
+    if (ada && id === 'zona') { location.href = 'atur-pin.html'; return; }
     state.tab = ada ? id : 'naskah';
         sessionStorage.setItem('lk_tab', state.tab);
     gambarTab();

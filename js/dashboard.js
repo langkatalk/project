@@ -15,7 +15,7 @@
     ditinjau: 'Ditinjau', revisi: 'Revisi', terbit: 'Terbit', arsip: 'Arsip'
   };
   var STAF = ['direktur', 'pemred', 'redaktur', 'editor'];
-  var SUDAH_DIBUAT = ['naskah', 'komentar', 'log', 'kategori' , 'pengguna', 'breaking', 'iklan', 'halaman', 'zona', 'pengaturan'];
+  var SUDAH_DIBUAT = ['notifikasi' , 'naskah', 'komentar', 'log', 'kategori' , 'pengguna', 'breaking', 'iklan', 'halaman', 'zona', 'pengaturan'];
   var FOTO_SISI = 480;
   var FOTO_MAX_MB = 2;
   var FILTER_NASKAH = [
@@ -158,6 +158,7 @@
   function menuUntuk(r) {
     var m = [{ id: 'naskah', nama: 'Naskah' }];
     if (STAF.indexOf(r) !== -1) m.push({ id: 'komentar', nama: 'Komentar' });
+    if (STAF.indexOf(r) !== -1) m.push({ id: 'notifikasi', nama: 'Notifikasi' });
     if (r === 'direktur' || r === 'pemred') m.push({ id: 'iklan', nama: 'Iklan' });
     if (r === 'direktur') {
       m.push({ id: 'pengguna', nama: 'Manajemen Akses' });
@@ -169,7 +170,6 @@
     }
     if (r === 'direktur' || r === 'pemred') {
       m.push({ id: 'galeri', nama: 'Galeri' });
-      m.push({ id: 'notifikasi', nama: 'Notifikasi' });
       m.push({ id: 'breaking', nama: 'Breaking News' });
       m.push({ id: 'web', nama: 'Manajemen Web' });
     }
@@ -194,6 +194,7 @@
     if (ada && id === 'pengaturan') { location.href = 'pengaturan-situs.html'; return; }
     if (ada && id === 'kategori') { location.href = 'kategori.html'; return; }
     if (ada && id === 'zona') { location.href = 'atur-pin.html'; return; }
+    if (ada && id === 'notifikasi') { location.href = 'notifikasi.html'; return; }
     state.tab = ada ? id : 'naskah';
         sessionStorage.setItem('lk_tab', state.tab);
     gambarTab();

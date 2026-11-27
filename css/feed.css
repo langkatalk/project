@@ -993,3 +993,15 @@ body {
   .chip-kat,
   .chip-tambah { font-size: 13px; }
 }
+/* ===== Ikon aksi di kartu feed: dibuat lebih kecil ===== */
+.ig-aksi { gap: 6px; }
+.ig-ikon {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.ig-ikon svg { width: 18px; height: 18px; }
+.ig-jumlah { font-size: 12px; }
